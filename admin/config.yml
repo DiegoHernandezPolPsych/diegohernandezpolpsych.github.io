@@ -1,0 +1,96 @@
+# =============================================================
+# Sveltia CMS configuration
+# Docs: https://github.com/sveltia/sveltia-cms
+#
+# THREE values to set before this works (see SETUP.md):
+#   1. repo    -> your GitHub repo, "owner/name"
+#   2. branch  -> your default branch (main or master)
+#   3. base_url-> the URL of your deployed Cloudflare auth Worker
+# =============================================================
+
+backend:
+  name: github
+  repo: DiegoHernandezPolPsych/diegohernandezpolpsych.github.io   # CHANGE to your repo
+  branch: main                                                     # CHANGE if your default branch is master
+  base_url: https://REPLACE-WITH-YOUR-WORKER.workers.dev           # CHANGE to your Worker URL
+
+site_url: https://diegohernandezpolpsych.github.io
+display_url: https://diegohernandezpolpsych.github.io
+
+media_folder: images
+public_folder: /images
+
+collections:
+  - name: site
+    label: Website
+    delete: false
+    files:
+      - name: content
+        label: Page content
+        file: data/content.json
+        format: json
+        fields:
+          - { name: name, label: Name, widget: string }
+          - { name: role, label: Role / title, widget: string }
+          - { name: email, label: Email, widget: string }
+
+          - name: bio
+            label: "About — paragraphs"
+            widget: list
+            summary: "{{fields.text}}"
+            fields:
+              - { name: text, label: Paragraph, widget: text }
+
+          - { name: researchLede, label: "Research — intro (simple <em> allowed)", widget: text }
+          - { name: dataTag, label: "Research — data line (simple <b> allowed)", widget: string }
+
+          - name: publications
+            label: Publications
+            widget: list
+            summary: "{{fields.title}}"
+            fields:
+              - { name: title, label: Title, widget: string }
+              - { name: status, label: Status badge, widget: string, required: false }
+              - { name: meta, label: Meta line, widget: string, required: false }
+              - { name: desc, label: Description, widget: text, required: false }
+              - name: links
+                label: Links
+                widget: list
+                required: false
+                fields:
+                  - { name: label, label: Label, widget: string }
+                  - { name: href, label: URL, widget: string }
+
+          - name: teaching
+            label: Teaching
+            widget: list
+            summary: "{{fields.title}}"
+            fields:
+              - { name: title, label: Course, widget: string }
+              - { name: meta, label: Role / term, widget: string, required: false }
+              - { name: desc, label: Description, widget: text, required: false }
+              - name: links
+                label: Links
+                widget: list
+                required: false
+                fields:
+                  - { name: label, label: Label, widget: string }
+                  - { name: href, label: URL, widget: string }
+
+          - name: cvEducation
+            label: "CV — education"
+            widget: list
+            summary: "{{fields.title}}"
+            fields:
+              - { name: year, label: Year, widget: string }
+              - { name: title, label: Degree, widget: string }
+              - { name: detail, label: Detail, widget: string }
+
+          - name: cvFields
+            label: "CV — fields & methods"
+            widget: list
+            summary: "{{fields.title}}"
+            fields:
+              - { name: year, label: Marker, widget: string }
+              - { name: title, label: Area, widget: string }
+              - { name: detail, label: Detail, widget: string }

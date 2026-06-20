@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Diego Hernandez · Political Psychology</title>
+<meta name="description" content="Diego Hernandez, PhD candidate in political psychology at Stony Brook University. Research on political independence, partisanship, and political reasoning." />
+
+<!-- ============================================================
+     Set theme before paint to avoid a light/dark flash on load.
+     localStorage is wrapped so the page never errors in a sandbox.
+============================================================ -->
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved === "light" || saved === "dark") {
+        document.documentElement.setAttribute("data-theme", saved);
+        return;
+      }
+    } catch (e) {}
+    var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.setAttribute("data-theme", prefersDark ? "dark" : "light");
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+/* =========================================================
+   TOKENS
+========================================================= */
+:root {
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-body: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
+  --font-mono: "Spline Sans Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  --maxw: 1080px;
+  --gutter: clamp(20px, 5vw, 64px);
+  --radius: 3px;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+:root[data-theme="light"] {
+  --bg: #faf8f3;
+  --bg-tint: #f3efe3;
+  --surface: #fffefb;
+  --ink: #211f18;
+  --muted: #6a6453;
+  --faint: #938d79;
+  --line: #e6dfcd;
+  --line-strong: #d6cdb4;
+  --accent: #876417;          /* links + interactive */
+  --accent-strong: #6c4f12;
+  --gold: #c39a22;            /* signature mark */
+  --teal: #2f4b44;           /* secondary accent */
+  --shadow: 0 1px 2px rgba(40,34,15,.04), 0 12px 32px rgba(40,34,15,.05);
+}
+
+:root[data-theme="dark"] {
+  --bg: #14130e;
+  --bg-tint: #1b1913;
+  --surface: #1e1c15;
+  --ink: #ece6d6;
+  --muted: #a7a18c;
+  --faint: #7d7765;
+  --line: #2d2a20;
+  --line-strong: #3a3527;
+  --accent: #d8b54c;
+  --accent-strong: #e8c869;
+  --gold: #e0c04a;
+  --teal: #82b6a6;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 18px 40px rgba(0,0,0,.45);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background .4s var(--ease), color .4s var(--ease);
+}
+
+a { color: var(--accent); text-decoration: none; }
+
+::selection { background: var(--gold); color: #14130e; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* =========================================================
+   SIGNATURE MARK — three squares (Wiener Werkstätte module)
+========================================================= */
+.triad { display: inline-flex; gap: 3px; align-items: center; }
+.triad span {
+  width: 6px; height: 6px;
+  background: var(--gold);
+  display: block;
+}
+.triad span:nth-child(2) { background: transparent; border: 1px solid var(--gold); }
+
+/* =========================================================
+   HEADER / NAV
+========================================================= */
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: saturate(140%) blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.header-inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 14px var(--gutter);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.brand {
+  display: inline-flex; align-items: center; gap: 11px;
+  color: var(--ink); font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 1.05rem; letter-spacing: .2px;
+  white-space: nowrap;
+}
+.brand .triad span { width: 7px; height: 7px; }
+
+.tabs {
+  display: flex; gap: 2px; margin-left: auto;
+  overflow-x: auto; scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  appearance: none; border: 0; background: transparent;
+  font-family: var(--font-body); font-size: .82rem; font-weight: 500;
+  letter-spacing: .04em; text-transform: uppercase;
+  color: var(--muted); cursor: pointer;
+  padding: 9px 14px; border-radius: var(--radius);
+  white-space: nowrap;
+  transition: color .2s var(--ease), background .2s var(--ease);
+}
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] {
+  color: var(--ink);
+  background: var(--bg-tint);
+}
+.tab[aria-selected="true"] {
+  box-shadow: inset 0 -2px 0 var(--gold);
+}
+
+.theme-toggle {
+  flex: none;
+  width: 38px; height: 38px;
+  display: grid; place-items: center;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  border-radius: 50%;
+  color: var(--ink); cursor: pointer;
+  transition: border-color .2s var(--ease), transform .2s var(--ease);
+}
+.theme-toggle:hover { border-color: var(--gold); transform: rotate(-12deg); }
+.theme-toggle svg { width: 18px; height: 18px; }
+.icon-sun { display: none; }
+.icon-moon { display: block; }
+:root[data-theme="dark"] .icon-sun { display: block; }
+:root[data-theme="dark"] .icon-moon { display: none; }
+
+/* =========================================================
+   LAYOUT / PANELS
+========================================================= */
+main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
+
+.panel { display: none; padding: clamp(40px, 7vw, 88px) 0 64px; }
+.panel.is-active { display: block; animation: fade .45s var(--ease) both; }
+@keyframes fade {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-mono);
+  font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--faint); margin: 0 0 18px;
+}
+
+/* =========================================================
+   ABOUT / HERO
+========================================================= */
+.hero { display: grid; grid-template-columns: 1.55fr 1fr; gap: clamp(28px, 5vw, 64px); align-items: start; }
+.hero-name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2.6rem, 6.5vw, 4.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  margin: 6px 0 4px;
+}
+.hero-role {
+  font-family: var(--font-display);
+  font-style: italic; font-weight: 400;
+  font-size: clamp(1.1rem, 2.6vw, 1.45rem);
+  color: var(--teal);
+  margin: 0 0 26px;
+}
+.hero-bio p { margin: 0 0 16px; max-width: 56ch; color: var(--ink); }
+.hero-bio p .lead { color: var(--ink); }
+
+.links-row {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  margin-top: 30px;
+}
+.pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: .85rem; font-weight: 500;
+  padding: 8px 15px;
+  border: 1px solid var(--line-strong);
+  border-radius: 100px;
+  color: var(--ink);
+  transition: border-color .2s var(--ease), background .2s var(--ease), color .2s var(--ease);
+}
+.pill:hover { border-color: var(--gold); background: var(--bg-tint); color: var(--accent-strong); }
+.pill.is-primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.pill.is-primary:hover { background: var(--accent-strong); border-color: var(--accent-strong); color: #fff; }
+
+/* portrait with secessionist frame */
+.portrait-wrap { position: relative; align-self: start; }
+.portrait {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background:
+    linear-gradient(150deg, var(--bg-tint), color-mix(in srgb, var(--teal) 14%, var(--bg-tint)));
+  border: 1px solid var(--line-strong);
+  display: grid; place-items: center;
+  overflow: hidden;
+}
+.portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.portrait .placeholder {
+  font-family: var(--font-mono); font-size: .72rem; letter-spacing: .1em;
+  color: var(--faint); text-align: center; padding: 16px;
+}
+.portrait-wrap::before,
+.portrait-wrap::after {
+  content: ""; position: absolute; width: 18px; height: 18px;
+  border: 2px solid var(--gold);
+}
+.portrait-wrap::before { top: -7px; left: -7px; border-right: 0; border-bottom: 0; }
+.portrait-wrap::after { bottom: -7px; right: -7px; border-left: 0; border-top: 0; }
+.portrait-caption {
+  margin-top: 16px;
+  font-family: var(--font-mono); font-size: .72rem; letter-spacing: .08em;
+  color: var(--faint); text-align: center;
+}
+
+/* =========================================================
+   SECTION HEADINGS + PROSE
+========================================================= */
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  line-height: 1.1; letter-spacing: -0.01em;
+  margin: 0 0 8px;
+}
+.lede {
+  font-size: 1.18rem; line-height: 1.55; color: var(--ink);
+  max-width: 62ch; margin: 0 0 36px;
+}
+.lede em { font-family: var(--font-display); font-style: italic; color: var(--teal); }
+
+.data-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: .78rem; letter-spacing: .05em;
+  color: var(--muted);
+  padding: 6px 12px; border: 1px solid var(--line);
+  border-radius: var(--radius); background: var(--bg-tint);
+  margin-bottom: 36px;
+}
+.data-tag b { color: var(--accent-strong); font-weight: 500; }
+
+/* =========================================================
+   CARDS (research / teaching)
+========================================================= */
+.cards { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.card {
+  background: var(--surface);
+  padding: 24px clamp(20px, 3vw, 30px);
+  display: grid; grid-template-columns: auto 1fr; gap: 22px;
+  transition: background .2s var(--ease);
+}
+.card:hover { background: var(--bg-tint); }
+.card-index {
+  font-family: var(--font-mono); font-size: .82rem;
+  color: var(--gold); padding-top: 4px;
+}
+.card h3 {
+  font-family: var(--font-display); font-weight: 500;
+  font-size: 1.2rem; line-height: 1.3; margin: 0 0 6px;
+}
+.card .meta {
+  font-family: var(--font-mono); font-size: .74rem; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--faint); margin: 0 0 10px;
+}
+.card p { margin: 0 0 12px; color: var(--muted); font-size: .96rem; line-height: 1.55; }
+.card .card-links { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.card .card-links a {
+  font-size: .85rem; font-weight: 500;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  padding-bottom: 1px;
+}
+.card .card-links a:hover { border-bottom-color: var(--accent); }
+.status {
+  display: inline-block; font-family: var(--font-mono);
+  font-size: .68rem; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--teal); border: 1px solid color-mix(in srgb, var(--teal) 40%, var(--line));
+  border-radius: 100px; padding: 2px 9px; margin-left: 8px; vertical-align: 2px;
+}
+
+/* =========================================================
+   CV
+========================================================= */
+.cv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 8px; }
+.cv-list { list-style: none; padding: 0; margin: 0; }
+.cv-list li {
+  display: grid; grid-template-columns: 76px 1fr; gap: 18px;
+  padding: 16px 0; border-top: 1px solid var(--line);
+}
+.cv-list li:first-child { border-top: 0; }
+.cv-year { font-family: var(--font-mono); font-size: .82rem; color: var(--gold); padding-top: 2px; }
+.cv-item b { font-weight: 600; font-family: var(--font-display); font-size: 1.05rem; }
+.cv-item span { display: block; color: var(--muted); font-size: .92rem; }
+.cv-sub-title {
+  font-family: var(--font-mono); font-size: .74rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--faint); margin: 0 0 8px;
+}
+
+/* =========================================================
+   CONTACT
+========================================================= */
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+.contact-list { list-style: none; padding: 0; margin: 0; }
+.contact-list li { padding: 14px 0; border-top: 1px solid var(--line); }
+.contact-list li:first-child { border-top: 0; }
+.contact-list .label {
+  font-family: var(--font-mono); font-size: .72rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--faint); display: block; margin-bottom: 3px;
+}
+.contact-list a, .contact-list span.value { font-size: 1.02rem; color: var(--ink); }
+.contact-list a:hover { color: var(--accent); }
+
+/* =========================================================
+   FOOTER
+========================================================= */
+.site-footer {
+  border-top: 1px solid var(--line);
+  margin-top: 40px;
+}
+.footer-inner {
+  max-width: var(--maxw); margin: 0 auto;
+  padding: 26px var(--gutter);
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+  justify-content: space-between;
+  font-size: .82rem; color: var(--faint);
+}
+.footer-inner .triad { opacity: .8; }
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; }
+  .portrait-wrap { max-width: 320px; margin-top: 8px; }
+  .cv-grid, .contact-grid { grid-template-columns: 1fr; gap: 28px; }
+}
+@media (max-width: 560px) {
+  body { font-size: 16px; }
+  .header-inner { gap: 10px; }
+  .brand span.brand-name { display: none; }
+  .card { grid-template-columns: 1fr; gap: 8px; }
+  .card-index { padding-top: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================ HEADER ============================================================ -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="#about" data-tab-link="about" aria-label="Diego Hernandez, home">
+      <span class="triad" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span class="brand-name">Diego Hernandez</span>
+    </a>
+
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" id="tab-about"    aria-controls="about"    aria-selected="true">About</button>
+      <button class="tab" role="tab" id="tab-research" aria-controls="research" aria-selected="false" tabindex="-1">Research</button>
+      <button class="tab" role="tab" id="tab-teaching" aria-controls="teaching" aria-selected="false" tabindex="-1">Teaching</button>
+      <button class="tab" role="tab" id="tab-cv"       aria-controls="cv"       aria-selected="false" tabindex="-1">CV</button>
+      <button class="tab" role="tab" id="tab-contact"  aria-controls="contact"  aria-selected="false" tabindex="-1">Contact</button>
+    </nav>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark theme">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============================== ABOUT ============================== -->
+  <!-- EDIT: name, role, bio paragraphs, portrait image, and the links below. -->
+  <section class="panel is-active" id="about" role="tabpanel" aria-labelledby="tab-about" tabindex="0">
+    <div class="hero">
+      <div class="hero-text">
+        <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Political Psychology · Stony Brook University</p>
+        <h1 class="hero-name" data-key="name">Diego Hernandez</h1>
+        <p class="hero-role" data-key="role">PhD candidate in political science</p>
+
+        <div class="hero-bio" data-bio>
+          <p class="lead">I study why some people refuse a partisan label, and what that refusal does to the way they reason about politics. My research brings the methods of political psychology to a group that most accounts of partisanship treat as a residual category: the pure independent.</p>
+          <p>My dissertation separates two routes into independence. Some people arrive through disaffection, a slow withdrawal from parties they have come to distrust. Others arrive through something closer to epistemic autonomy, a deliberate choice to weigh candidates and issues without a partisan shortcut. The two groups look identical on a standard party identification scale. They do not think alike. I trace the difference with pooled national survey data and a pair of survey experiments.</p>
+        </div>
+
+        <div class="links-row">
+          <!-- EDIT email -->
+          <a class="pill is-primary" href="mailto:diego.hernandez@stonybrook.edu" data-email-href>Email</a>
+          <!-- EDIT: point at your CV PDF once uploaded to /files/ -->
+          <a class="pill" href="files/cv.pdf">Curriculum Vitae</a>
+          <a class="pill" href="https://scholar.google.com/" target="_blank" rel="noopener">Google Scholar</a>
+          <a class="pill" href="https://sbsuny.academia.edu/DiegoHernandez" target="_blank" rel="noopener">Academia.edu</a>
+        </div>
+      </div>
+
+      <div class="portrait-wrap">
+        <figure class="portrait">
+          <!-- EDIT: drop a headshot at images/profile.jpg and uncomment the line below -->
+          <!-- <img src="images/profile.jpg" alt="Diego Hernandez" /> -->
+          <span class="placeholder">images/profile.jpg<br>4 : 5 portrait</span>
+        </figure>
+        <p class="portrait-caption">Stony Brook, New York</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== RESEARCH ============================== -->
+  <!-- EDIT: replace the placeholder cards with real titles, coauthors, links, and status. -->
+  <section class="panel" id="research" role="tabpanel" aria-labelledby="tab-research" tabindex="0" hidden>
+    <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Research</p>
+    <h2 class="section-title">Two ways of being independent</h2>
+    <p class="lede" data-html="researchLede">The dissertation argues that pure independence is not one thing. One pathway runs through <em>disaffection</em>, the other through <em>deliberative autonomy</em>, and the two carry different consequences for trust, engagement, and how people process political information.</p>
+    <span class="data-tag" data-html="dataTag">Pooled ANES <b>2016&ndash;2024</b> · N&nbsp;=&nbsp;<b>13,061</b> · two survey experiments</span>
+
+    <div class="cards" data-list="publications">
+      <article class="card">
+        <div class="card-index">01</div>
+        <div>
+          <h3>[Dissertation paper title]<span class="status">Job market paper</span></h3>
+          <p class="meta">Working paper</p>
+          <p>One-sentence summary of the argument and the headline finding. Replace this with your own abstract-length description.</p>
+          <div class="card-links">
+            <a href="#">PDF</a>
+            <a href="#">Pre-registration</a>
+            <a href="#">Replication data</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-index">02</div>
+        <div>
+          <h3>[Second paper title]<span class="status">Under review</span></h3>
+          <p class="meta">With [coauthors] · [Journal]</p>
+          <p>Short description of the question, the design, and what you found.</p>
+          <div class="card-links">
+            <a href="#">PDF</a>
+            <a href="#">Materials</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-index">03</div>
+        <div>
+          <h3>[Work in progress]<span class="status">In progress</span></h3>
+          <p class="meta">Work in progress</p>
+          <p>A line or two on what this project asks. Draft available on request.</p>
+          <div class="card-links">
+            <a href="#">Draft on request</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============================== TEACHING ============================== -->
+  <!-- EDIT: courses, roles, terms, and a one-line teaching statement. -->
+  <section class="panel" id="teaching" role="tabpanel" aria-labelledby="tab-teaching" tabindex="0" hidden>
+    <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Teaching</p>
+    <h2 class="section-title">In the classroom</h2>
+    <p class="lede">I teach comparative and European politics, and I build courses around the gap between how institutions are supposed to work and how citizens actually reason about them.</p>
+
+    <div class="cards" data-list="teaching">
+      <article class="card">
+        <div class="card-index">→</div>
+        <div>
+          <h3>European Union Politics</h3>
+          <p class="meta">Instructor / Teaching Assistant · [Term]</p>
+          <p>Short description of the course and your role. Add a link to the syllabus if you want it public.</p>
+          <div class="card-links"><a href="#">Syllabus</a></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-index">→</div>
+        <div>
+          <h3>[Course title]</h3>
+          <p class="meta">Teaching Assistant · [Term]</p>
+          <p>What the course covered and what you handled.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-index">→</div>
+        <div>
+          <h3>[Course title]</h3>
+          <p class="meta">Teaching Assistant · [Term]</p>
+          <p>What the course covered and what you handled.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============================== CV ============================== -->
+  <!-- EDIT: education, appointments, and the download link. Upload the PDF to /files/cv.pdf -->
+  <section class="panel" id="cv" role="tabpanel" aria-labelledby="tab-cv" tabindex="0" hidden>
+    <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Curriculum Vitae</p>
+    <h2 class="section-title">Curriculum vitae</h2>
+    <p class="lede">A short version lives here. The full document, with publications, presentations, and service, is in the PDF.</p>
+    <div class="links-row" style="margin-top:0;margin-bottom:40px">
+      <a class="pill is-primary" href="files/cv.pdf" target="_blank" rel="noopener">Download CV (PDF)</a>
+    </div>
+
+    <div class="cv-grid">
+      <div>
+        <p class="cv-sub-title">Education</p>
+        <ul class="cv-list" data-list="cvEducation">
+          <li>
+            <span class="cv-year">20XX–</span>
+            <span class="cv-item"><b>PhD, Political Science</b><span>Stony Brook University · Political psychology</span></span>
+          </li>
+          <li>
+            <span class="cv-year">20XX</span>
+            <span class="cv-item"><b>MA, [field]</b><span>[Institution]</span></span>
+          </li>
+          <li>
+            <span class="cv-year">20XX</span>
+            <span class="cv-item"><b>MSc, [field]</b><span>[Institution]</span></span>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="cv-sub-title">Fields &amp; methods</p>
+        <ul class="cv-list" data-list="cvFields">
+          <li><span class="cv-year">·</span><span class="cv-item"><b>Political psychology</b><span>Partisanship, independence, political reasoning</span></span></li>
+          <li><span class="cv-year">·</span><span class="cv-item"><b>Comparative</b><span>European Union politics, public opinion</span></span></li>
+          <li><span class="cv-year">·</span><span class="cv-item"><b>Methods</b><span>Survey experiments, R, reproducible workflows</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== CONTACT ============================== -->
+  <!-- EDIT email. The profile links below are pulled from your public pages. -->
+  <section class="panel" id="contact" role="tabpanel" aria-labelledby="tab-contact" tabindex="0" hidden>
+    <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Contact</p>
+    <h2 class="section-title">Get in touch</h2>
+    <p class="lede">Email is the surest way to reach me. I am happy to share drafts, materials, or replication code.</p>
+
+    <div class="contact-grid">
+      <ul class="contact-list">
+        <li>
+          <span class="label">Email</span>
+          <a href="mailto:diego.hernandez@stonybrook.edu" data-email-link>diego.hernandez@stonybrook.edu</a>
+        </li>
+        <li>
+          <span class="label">Department</span>
+          <a href="https://www.stonybrook.edu/commcms/polisci/people/grad_students.php" target="_blank" rel="noopener">Political Science, Stony Brook University</a>
+        </li>
+        <li>
+          <span class="label">Office</span>
+          <span class="value">[Building, room] · Stony Brook, NY</span>
+        </li>
+      </ul>
+
+      <ul class="contact-list">
+        <li>
+          <span class="label">Academia.edu</span>
+          <a href="https://sbsuny.academia.edu/DiegoHernandez" target="_blank" rel="noopener">sbsuny.academia.edu/DiegoHernandez</a>
+        </li>
+        <li>
+          <span class="label">LinkedIn</span>
+          <a href="https://www.linkedin.com/in/diego-hernandez-220b821ba/" target="_blank" rel="noopener">in/diego-hernandez-220b821ba</a>
+        </li>
+        <li>
+          <span class="label">X</span>
+          <a href="https://x.com/DTHernandez1" target="_blank" rel="noopener">@DTHernandez1</a>
+        </li>
+        <li>
+          <span class="label">GitHub</span>
+          <a href="https://github.com/DiegoHernandezPolPsych" target="_blank" rel="noopener">DiegoHernandezPolPsych</a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================================================ FOOTER ============================================================ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>© <span id="year"></span> Diego Hernandez</span>
+    <span class="triad" aria-hidden="true"><span></span><span></span><span></span></span>
+    <span>Stony Brook University</span>
+  </div>
+</footer>
+
+<script>
+/* =========================================================
+   THEME TOGGLE
+========================================================= */
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById("themeToggle");
+  btn.addEventListener("click", function () {
+    var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("theme", next); } catch (e) {}
+  });
+})();
+
+/* =========================================================
+   TABS — accessible tablist with hash sync + keyboard nav
+========================================================= */
+(function () {
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  var panels = Array.prototype.slice.call(document.querySelectorAll('[role="tabpanel"]'));
+
+  function activate(id, setFocus) {
+    tabs.forEach(function (t) {
+      var selected = t.getAttribute("aria-controls") === id;
+      t.setAttribute("aria-selected", selected ? "true" : "false");
+      t.tabIndex = selected ? 0 : -1;
+      if (selected && setFocus) t.focus();
+    });
+    panels.forEach(function (p) {
+      var on = p.id === id;
+      p.classList.toggle("is-active", on);
+      if (on) { p.hidden = false; } else { p.hidden = true; }
+    });
+    if (history.replaceState) history.replaceState(null, "", "#" + id);
+    else location.hash = id;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener("click", function () {
+      activate(tab.getAttribute("aria-controls"), false);
+    });
+    tab.addEventListener("keydown", function (e) {
+      var idx = i;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") { idx = (i + 1) % tabs.length; }
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") { idx = (i - 1 + tabs.length) % tabs.length; }
+      else if (e.key === "Home") { idx = 0; }
+      else if (e.key === "End") { idx = tabs.length - 1; }
+      else { return; }
+      e.preventDefault();
+      activate(tabs[idx].getAttribute("aria-controls"), true);
+    });
+  });
+
+  // brand + any in-page link with data-tab-link
+  document.querySelectorAll("[data-tab-link]").forEach(function (el) {
+    el.addEventListener("click", function (e) {
+      e.preventDefault();
+      activate(el.getAttribute("data-tab-link"), false);
+    });
+  });
+
+  // open the tab named in the URL hash on load
+  var initial = (location.hash || "").replace("#", "");
+  var valid = panels.some(function (p) { return p.id === initial; });
+  activate(valid ? initial : "about", false);
+})();
+
+/* =========================================================
+   CONTENT — render editable fields from data/content.json
+   Edited through the CMS at /admin. If the file is missing or
+   blocked (e.g. opened from file://), the static fallback
+   content already in the page is used as-is.
+========================================================= */
+(function () {
+  fetch("data/content.json", { cache: "no-store" })
+    .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+    .then(render)
+    .catch(function () { /* keep static fallback */ });
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c];
+    });
+  }
+
+  function render(c) {
+    if (c.name) document.querySelectorAll('[data-key="name"]').forEach(function (el) { el.textContent = c.name; });
+    if (c.role) document.querySelectorAll('[data-key="role"]').forEach(function (el) { el.textContent = c.role; });
+    if (c.researchLede) document.querySelectorAll('[data-html="researchLede"]').forEach(function (el) { el.innerHTML = c.researchLede; });
+    if (c.dataTag) document.querySelectorAll('[data-html="dataTag"]').forEach(function (el) { el.innerHTML = c.dataTag; });
+
+    if (Array.isArray(c.bio)) {
+      document.querySelectorAll("[data-bio]").forEach(function (box) {
+        box.innerHTML = c.bio.map(function (p, i) {
+          return "<p" + (i === 0 ? ' class="lead"' : "") + ">" + esc(p.text) + "</p>";
+        }).join("");
+      });
+    }
+
+    if (c.email) {
+      document.querySelectorAll("[data-email-href]").forEach(function (a) { a.setAttribute("href", "mailto:" + c.email); });
+      document.querySelectorAll("[data-email-link]").forEach(function (a) {
+        a.setAttribute("href", "mailto:" + c.email); a.textContent = c.email;
+      });
+    }
+
+    if (Array.isArray(c.publications)) renderCards("publications", c.publications, false);
+    if (Array.isArray(c.teaching)) renderCards("teaching", c.teaching, true);
+    if (Array.isArray(c.cvEducation)) renderCv("cvEducation", c.cvEducation);
+    if (Array.isArray(c.cvFields)) renderCv("cvFields", c.cvFields);
+  }
+
+  function linksHtml(links) {
+    if (!Array.isArray(links) || !links.length) return "";
+    return '<div class="card-links">' + links.map(function (l) {
+      return '<a href="' + esc(l.href || "#") + '">' + esc(l.label) + "</a>";
+    }).join("") + "</div>";
+  }
+
+  function renderCards(name, items, isTeaching) {
+    var box = document.querySelector('[data-list="' + name + '"]');
+    if (!box) return;
+    box.innerHTML = items.map(function (it, i) {
+      var index = isTeaching ? "\u2192" : ("0" + (i + 1)).slice(-2);
+      var status = (!isTeaching && it.status) ? '<span class="status">' + esc(it.status) + "</span>" : "";
+      var meta = it.meta ? '<p class="meta">' + esc(it.meta) + "</p>" : "";
+      var desc = it.desc ? "<p>" + esc(it.desc) + "</p>" : "";
+      return '<article class="card"><div class="card-index">' + index + "</div><div>" +
+             "<h3>" + esc(it.title) + status + "</h3>" + meta + desc + linksHtml(it.links) + "</div></article>";
+    }).join("");
+  }
+
+  function renderCv(name, items) {
+    var box = document.querySelector('[data-list="' + name + '"]');
+    if (!box) return;
+    box.innerHTML = items.map(function (it) {
+      return '<li><span class="cv-year">' + esc(it.year) + "</span>" +
+             '<span class="cv-item"><b>' + esc(it.title) + "</b><span>" + esc(it.detail) + "</span></span></li>";
+    }).join("");
+  }
+})();
+
+document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
