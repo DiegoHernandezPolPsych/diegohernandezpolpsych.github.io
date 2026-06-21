@@ -401,6 +401,24 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   font-size: .82rem; line-height: 1.6; color: var(--faint);
 }
 
+/* =========================================================
+   GENERATIVE GOLD-LEAF FIELD — grown from the triad module,
+   sits behind the About hero, density tracks scroll depth
+========================================================= */
+#about { position: relative; isolation: isolate; }
+.leaf-field {
+  position: absolute; inset: 0; z-index: -1;
+  width: 100%; height: 100%;
+  overflow: visible; pointer-events: none;
+}
+.leaf-field rect {
+  fill: none;
+  stroke: var(--gold);
+  shape-rendering: crispEdges;
+  transition: opacity 1.2s ease, stroke 0.4s ease;
+}
+.leaf-field rect.filled { fill: var(--gold); stroke: none; }
+
 /* corner brackets drift slightly with scroll, set via JS custom property */
 .portrait-wrap::before,
 .portrait-wrap::after {
@@ -489,18 +507,33 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
    VIEW TRANSITIONS — circular wipe on theme, cross-fade on tabs
 ========================================================= */
 @media (prefers-reduced-motion: no-preference) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) { animation-duration: .45s; }
+  /* default cross-fade still applies for normal browser navigations;
+     for tab changes we shorten it, for theme we replace it entirely below */
+  ::view-transition-group(root) { animation-duration: .42s; }
 
-  /* theme toggle: reveal the incoming theme as an expanding circle */
-  html.theme-vt::view-transition-old(root) { animation: none; z-index: 1; }
-  html.theme-vt::view-transition-new(root) { animation: vt-reveal .5s var(--ease); z-index: 2; }
-  @keyframes vt-reveal {
-    from { clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%)); }
-    to   { clip-path: circle(160% at var(--vt-x, 50%) var(--vt-y, 50%)); }
+  /* THEME TOGGLE: old view holds still, new view reveals via expanding circle */
+  ::view-transition-image-pair(root) { isolation: isolate; }
+  html.theme-vt::view-transition-old(root) {
+    animation: none;
+    z-index: 1;
   }
+  html.theme-vt::view-transition-new(root) {
+    animation: vt-reveal .55s var(--ease);
+    z-index: 2;
+    mix-blend-mode: normal;
+  }
+  @keyframes vt-reveal {
+    from { clip-path: circle(0% at var(--vt-x, 50%) var(--vt-y, 50%)); }
+    to   { clip-path: circle(150% at var(--vt-x, 50%) var(--vt-y, 50%)); }
+  }
+
+  /* TAB CHANGE: simple, fast cross-fade, no circle */
+  html.tab-vt::view-transition-old(root) { animation: vt-fade-out .28s var(--ease) both; }
+  html.tab-vt::view-transition-new(root) { animation: vt-fade-in .28s var(--ease) both; }
+  @keyframes vt-fade-out { to   { opacity: 0; } }
+  @keyframes vt-fade-in  { from { opacity: 0; } }
 }
-/* when View Transitions drive the tab change, drop the per-panel keyframe */
+/* when View Transitions drive the tab change, drop the per-panel keyframe so it doesn't double up */
 html.vt-on .panel.is-active { animation: none; }
 
 /* =========================================================
@@ -556,6 +589,7 @@ html.vt-on .panel.is-active { animation: none; }
   <!-- ============================== ABOUT ============================== -->
   <!-- EDIT: name, role, bio paragraphs, portrait image, and the links below. -->
   <section class="panel is-active" id="about" role="tabpanel" aria-labelledby="tab-about" tabindex="0">
+    <svg class="leaf-field" id="leafField" viewBox="0 0 1080 900" preserveAspectRatio="xMidYMin slice" aria-hidden="true"></svg>
     <div class="hero">
       <div class="hero-text">
         <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Political Psychology · Stony Brook University</p>
@@ -766,7 +800,7 @@ html.vt-on .panel.is-active { animation: none; }
 <section class="colophon" aria-label="About this site">
   <div class="colophon-inner">
     <span class="triad" aria-hidden="true"><span></span><span></span><span></span></span>
-    <p>Set in Fraunces and Hanken Grotesk. The mark above borrows its three-square module from the Wiener Werkstätte, the design workshop of the Vienna Secession. Built by hand, no template, hosted on GitHub Pages.</p>
+    <p>Set in Fraunces and Hanken Grotesk. Built by hand, no template, hosted on GitHub Pages.</p>
   </div>
 </section>
 
@@ -834,7 +868,10 @@ html.vt-on .panel.is-active { animation: none; }
 
   function activate(id, setFocus, vt) {
     if (vt && supportsVT && !reducedMotion()) {
-      document.startViewTransition(function () { apply(id, setFocus); });
+      var root = document.documentElement;
+      root.classList.add("tab-vt");
+      var t = document.startViewTransition(function () { apply(id, setFocus); });
+      t.finished.finally(function () { root.classList.remove("tab-vt"); });
     } else {
       apply(id, setFocus);
     }
@@ -966,6 +1003,90 @@ html.vt-on .panel.is-active { animation: none; }
              '<span class="cv-item"><b>' + esc(it.title) + "</b><span>" + esc(it.detail) + "</span></span></li>";
     }).join("");
   }
+})();
+
+/* =========================================================
+   GENERATIVE GOLD-LEAF FIELD
+   Builds a sparse field of squares from the triad module,
+   placed on a coarse grid with a seeded RNG so layout is
+   stable across reloads. Each square's opacity tracks how
+   far the visitor has scrolled into the About panel, so the
+   field quietly grows denser as you read rather than firing
+   all at once.
+========================================================= */
+(function () {
+  var svg = document.getElementById("leafField");
+  if (!svg) return;
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // small seeded PRNG so the layout is identical on every load
+  function mulberry32(seed) {
+    return function () {
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  var rand = mulberry32(20260620); // seeded to the site's own build date
+
+  var W = 1080, H = 900;
+  var cells = [];
+  var cols = 9, rows = 7, cw = W / cols, ch = H / rows;
+  for (var r = 0; r < rows; r++) {
+    for (var c = 0; c < cols; c++) {
+      if (rand() > 0.4) continue; // sparse: most cells stay empty
+      var size = 6 + Math.floor(rand() * 14);
+      var x = c * cw + rand() * (cw - size);
+      var y = r * ch + rand() * (ch - size);
+      var filled = rand() > 0.62;
+      cells.push({ x: x, y: y, size: size, filled: filled, depth: r / rows });
+    }
+  }
+
+  var frag = document.createDocumentFragment();
+  cells.forEach(function (cell, i) {
+    var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    rect.setAttribute("x", cell.x.toFixed(1));
+    rect.setAttribute("y", cell.y.toFixed(1));
+    rect.setAttribute("width", cell.size);
+    rect.setAttribute("height", cell.size);
+    rect.setAttribute("stroke-width", cell.filled ? "0" : "1.4");
+    rect.style.opacity = "0";
+    if (cell.filled) rect.classList.add("filled");
+    rect.dataset.depth = cell.depth.toFixed(3);
+    rect.dataset.base = (0.05 + rand() * 0.10).toFixed(3); // each leaf's max opacity, kept faint
+    frag.appendChild(rect);
+  });
+  svg.appendChild(frag);
+
+  if (reduced) {
+    // show a calm static field rather than nothing
+    svg.querySelectorAll("rect").forEach(function (rect) { rect.style.opacity = rect.dataset.base; });
+    return;
+  }
+
+  var rects = Array.prototype.slice.call(svg.querySelectorAll("rect"));
+  var aboutPanel = document.getElementById("about");
+  var ticking = false;
+
+  function update() {
+    ticking = false;
+    if (!aboutPanel.classList.contains("is-active")) return;
+    var scrollFrac = Math.min(1, (window.scrollY || 0) / 700); // 0 at top, 1 after ~700px
+    rects.forEach(function (rect) {
+      var depth = parseFloat(rect.dataset.depth);
+      var base = parseFloat(rect.dataset.base);
+      // leaves "unlock" from top to bottom as you scroll
+      var reveal = Math.max(0, Math.min(1, (scrollFrac - depth * 0.6) * 2.2));
+      rect.style.opacity = (base * reveal).toFixed(3);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
+  }, { passive: true });
+  window.addEventListener("hashchange", function () { setTimeout(update, 60); });
+  setTimeout(update, 50);
 })();
 
 /* =========================================================
