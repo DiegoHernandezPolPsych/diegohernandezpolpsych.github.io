@@ -466,7 +466,7 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   <!-- EDIT: replace the placeholder cards with real titles, coauthors, links, and status. -->
   <section class="panel" id="research" role="tabpanel" aria-labelledby="tab-research" tabindex="0" hidden>
     <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Research</p>
-    <h2 class="section-title">Two ways of being independent</h2>
+    <h2 class="section-title" data-key="researchTitle">Two ways of being independent</h2>
     <p class="lede" data-html="researchLede">The dissertation argues that pure independence is not one thing. One pathway runs through <em>disaffection</em>, the other through <em>deliberative autonomy</em>, and the two carry different consequences for trust, engagement, and how people process political information.</p>
     <span class="data-tag" data-html="dataTag">Pooled ANES <b>2016&ndash;2024</b> · N&nbsp;=&nbsp;<b>13,061</b> · two survey experiments</span>
 
@@ -516,8 +516,8 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   <!-- EDIT: courses, roles, terms, and a one-line teaching statement. -->
   <section class="panel" id="teaching" role="tabpanel" aria-labelledby="tab-teaching" tabindex="0" hidden>
     <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Teaching</p>
-    <h2 class="section-title">In the classroom</h2>
-    <p class="lede">I teach comparative and European politics, and I build courses around the gap between how institutions are supposed to work and how citizens actually reason about them.</p>
+    <h2 class="section-title" data-key="teachingTitle">In the classroom</h2>
+    <p class="lede" data-html="teachingLede">I teach comparative and European politics, and I build courses around the gap between how institutions are supposed to work and how citizens actually reason about them.</p>
 
     <div class="cards" data-list="teaching">
       <article class="card">
@@ -554,8 +554,8 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   <!-- EDIT: education, appointments, and the download link. Upload the PDF to /files/cv.pdf -->
   <section class="panel" id="cv" role="tabpanel" aria-labelledby="tab-cv" tabindex="0" hidden>
     <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Curriculum Vitae</p>
-    <h2 class="section-title">Curriculum vitae</h2>
-    <p class="lede">A short version lives here. The full document, with publications, presentations, and service, is in the PDF.</p>
+    <h2 class="section-title" data-key="cvTitle">Curriculum vitae</h2>
+    <p class="lede" data-html="cvLede">A short version lives here. The full document, with publications, presentations, and service, is in the PDF.</p>
     <div class="links-row" style="margin-top:0;margin-bottom:40px">
       <a class="pill is-primary" href="files/cv.pdf" target="_blank" rel="noopener">Download CV (PDF)</a>
     </div>
@@ -594,8 +594,8 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   <!-- EDIT email. The profile links below are pulled from your public pages. -->
   <section class="panel" id="contact" role="tabpanel" aria-labelledby="tab-contact" tabindex="0" hidden>
     <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Contact</p>
-    <h2 class="section-title">Get in touch</h2>
-    <p class="lede">Email is the surest way to reach me. I am happy to share drafts, materials, or replication code.</p>
+    <h2 class="section-title" data-key="contactTitle">Get in touch</h2>
+    <p class="lede" data-html="contactLede">Email is the surest way to reach me. I am happy to share drafts, materials, or replication code.</p>
 
     <div class="contact-grid">
       <ul class="contact-list">
@@ -732,10 +732,14 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   }
 
   function render(c) {
-    if (c.name) document.querySelectorAll('[data-key="name"]').forEach(function (el) { el.textContent = c.name; });
-    if (c.role) document.querySelectorAll('[data-key="role"]').forEach(function (el) { el.textContent = c.role; });
-    if (c.researchLede) document.querySelectorAll('[data-html="researchLede"]').forEach(function (el) { el.innerHTML = c.researchLede; });
-    if (c.dataTag) document.querySelectorAll('[data-html="dataTag"]').forEach(function (el) { el.innerHTML = c.dataTag; });
+    document.querySelectorAll("[data-key]").forEach(function (el) {
+      var k = el.getAttribute("data-key");
+      if (c[k] != null && c[k] !== "") el.textContent = c[k];
+    });
+    document.querySelectorAll("[data-html]").forEach(function (el) {
+      var k = el.getAttribute("data-html");
+      if (c[k] != null && c[k] !== "") el.innerHTML = c[k];
+    });
 
     if (Array.isArray(c.bio)) {
       document.querySelectorAll("[data-bio]").forEach(function (box) {
