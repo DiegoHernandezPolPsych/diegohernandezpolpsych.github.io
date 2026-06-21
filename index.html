@@ -22,6 +22,32 @@
 <meta name="twitter:description" content="PhD candidate in political science at Stony Brook University. Research on political independence, partisanship, and political reasoning." />
 <meta name="twitter:image" content="https://diegohernandezpolpsych.github.io/og-image.png" />
 
+<!-- Structured data: helps search engines and citation tools parse this as a scholar's page -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Diego Hernandez",
+  "jobTitle": "PhD Candidate in Political Science",
+  "affiliation": { "@type": "CollegeOrUniversity", "name": "Stony Brook University" },
+  "url": "https://diegohernandezpolpsych.github.io",
+  "sameAs": [
+    "https://sbsuny.academia.edu/DiegoHernandez",
+    "https://www.linkedin.com/in/diego-hernandez-220b821ba/",
+    "https://x.com/DTHernandez1",
+    "https://github.com/DiegoHernandezPolPsych"
+  ]
+}
+</script>
+
+<!-- Highwire Press tags: lets Google Scholar index the job market paper.
+     EDIT these to match your real paper once the PDF and title are final. -->
+<meta name="citation_title" content="[Dissertation paper title]" />
+<meta name="citation_author" content="Hernandez, Diego" />
+<meta name="citation_publication_date" content="2026" />
+<meta name="citation_pdf_url" content="https://diegohernandezpolpsych.github.io/files/cv.pdf" />
+<meta name="citation_abstract_html_url" content="https://diegohernandezpolpsych.github.io/#research" />
+
 <!-- ============================================================
      Set theme before paint to avoid a light/dark flash on load.
      localStorage is wrapped so the page never errors in a sandbox.
@@ -353,6 +379,37 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   padding-bottom: 1px;
 }
 .card .card-links a:hover { border-bottom-color: var(--accent); }
+.cite-btn {
+  appearance: none; margin-top: 12px;
+  font-family: var(--font-mono); font-size: .74rem; letter-spacing: .03em;
+  color: var(--faint); background: transparent;
+  border: 1px solid var(--line-strong); border-radius: 100px;
+  padding: 5px 12px; cursor: pointer;
+  transition: color .2s var(--ease), border-color .2s var(--ease);
+}
+.cite-btn:hover { color: var(--section); border-color: var(--section); }
+
+.colophon { border-top: 1px solid var(--line); }
+.colophon-inner {
+  max-width: var(--maxw); margin: 0 auto;
+  padding: 28px var(--gutter) 0;
+  display: flex; align-items: flex-start; gap: 14px;
+}
+.colophon-inner .triad { flex: none; margin-top: 4px; opacity: .7; }
+.colophon-inner p {
+  margin: 0; max-width: 62ch;
+  font-size: .82rem; line-height: 1.6; color: var(--faint);
+}
+
+/* corner brackets drift slightly with scroll, set via JS custom property */
+.portrait-wrap::before,
+.portrait-wrap::after {
+  transform: translate(calc(var(--parallax, 0) * -1px), calc(var(--parallax, 0) * -1px));
+  transition: transform .05s linear;
+}
+.portrait-wrap::after {
+  transform: translate(calc(var(--parallax, 0) * 1px), calc(var(--parallax, 0) * 1px));
+}
 .status {
   display: inline-block; font-family: var(--font-mono);
   font-size: .68rem; letter-spacing: .08em; text-transform: uppercase;
@@ -445,6 +502,27 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
 }
 /* when View Transitions drive the tab change, drop the per-panel keyframe */
 html.vt-on .panel.is-active { animation: none; }
+
+/* =========================================================
+   PRINT — Cmd+P on the CV tab produces a clean one-page CV
+========================================================= */
+@media print {
+  .site-header, .site-footer, .colophon, .cmdk-hint, #cmdk-overlay { display: none !important; }
+  body { background: #fff; color: #111; font-size: 11pt; }
+  main { max-width: 100%; padding: 0; }
+  .panel { display: none !important; padding: 0 !important; }
+  #cv.panel { display: block !important; }
+  .eyebrow, .data-tag { display: none; }
+  .section-title { font-size: 22pt; margin-bottom: 4pt; }
+  .lede { display: none; }
+  .links-row { display: none; }
+  .cv-grid { grid-template-columns: 1fr 1fr; gap: 24pt; }
+  .cv-sub-title { font-size: 9pt; color: #555; }
+  .cv-list li { border-top: 1px solid #ccc; padding: 8pt 0; break-inside: avoid; }
+  .cv-year { color: #555; }
+  a { color: #111; text-decoration: none; }
+  @page { margin: 0.6in; }
+}
 </style>
 </head>
 
@@ -684,7 +762,14 @@ html.vt-on .panel.is-active { animation: none; }
 
 </main>
 
-<!-- ============================================================ FOOTER ============================================================ -->
+<!-- ============================================================ COLOPHON ============================================================ -->
+<section class="colophon" aria-label="About this site">
+  <div class="colophon-inner">
+    <span class="triad" aria-hidden="true"><span></span><span></span><span></span></span>
+    <p>Set in Fraunces and Hanken Grotesk. The mark above borrows its three-square module from the Wiener Werkstätte, the design workshop of the Vienna Secession. Built by hand, no template, hosted on GitHub Pages.</p>
+  </div>
+</section>
+
 <footer class="site-footer">
   <div class="footer-inner">
     <span>© <span id="year"></span> Diego Hernandez</span>
@@ -828,8 +913,8 @@ html.vt-on .panel.is-active { animation: none; }
       });
     }
 
-    if (Array.isArray(c.publications)) renderCards("publications", c.publications, false);
-    if (Array.isArray(c.teaching)) renderCards("teaching", c.teaching, true);
+    if (Array.isArray(c.publications)) renderCards("publications", c.publications, false, c.name);
+    if (Array.isArray(c.teaching)) renderCards("teaching", c.teaching, true, c.name);
     if (Array.isArray(c.cvEducation)) renderCv("cvEducation", c.cvEducation);
     if (Array.isArray(c.cvFields)) renderCv("cvFields", c.cvFields);
   }
@@ -841,7 +926,14 @@ html.vt-on .panel.is-active { animation: none; }
     }).join("") + "</div>";
   }
 
-  function renderCards(name, items, isTeaching) {
+  function citeText(authorName, it) {
+    var year = new Date().getFullYear();
+    var who = authorName ? authorName.split(" ").reverse().join(", ") : "Author";
+    var title = it.title || "Untitled";
+    return who + " (" + year + "). " + title + ". Working paper.";
+  }
+
+  function renderCards(name, items, isTeaching, authorName) {
     var box = document.querySelector('[data-list="' + name + '"]');
     if (!box) return;
     box.innerHTML = items.map(function (it, i) {
@@ -849,9 +941,21 @@ html.vt-on .panel.is-active { animation: none; }
       var status = (!isTeaching && it.status) ? '<span class="status">' + esc(it.status) + "</span>" : "";
       var meta = it.meta ? '<p class="meta">' + esc(it.meta) + "</p>" : "";
       var desc = it.desc ? "<p>" + esc(it.desc) + "</p>" : "";
+      var cite = (!isTeaching) ? '<button class="cite-btn" type="button" data-cite="' + esc(citeText(authorName, it)) + '">Copy citation</button>' : "";
       return '<article class="card"><div class="card-index">' + index + "</div><div>" +
-             "<h3>" + esc(it.title) + status + "</h3>" + meta + desc + linksHtml(it.links) + "</div></article>";
+             "<h3>" + esc(it.title) + status + "</h3>" + meta + desc + linksHtml(it.links) + cite + "</div></article>";
     }).join("");
+    if (!isTeaching) {
+      box.querySelectorAll(".cite-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var text = btn.getAttribute("data-cite");
+          var done = function () { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy citation"; }, 1600); };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done).catch(function () { btn.textContent = "Copy failed"; });
+          } else { done(); }
+        });
+      });
+    }
   }
 
   function renderCv(name, items) {
@@ -862,6 +966,25 @@ html.vt-on .panel.is-active { animation: none; }
              '<span class="cv-item"><b>' + esc(it.title) + "</b><span>" + esc(it.detail) + "</span></span></li>";
     }).join("");
   }
+})();
+
+/* =========================================================
+   PARALLAX — corner brackets drift gently with scroll
+========================================================= */
+(function () {
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var root = document.documentElement;
+  var ticking = false;
+  function update() {
+    var y = window.scrollY || window.pageYOffset || 0;
+    var px = Math.max(-10, Math.min(10, y * 0.06));
+    root.style.setProperty("--parallax", px.toFixed(2));
+    ticking = false;
+  }
+  window.addEventListener("scroll", function () {
+    if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
+  }, { passive: true });
+  update();
 })();
 
 document.getElementById("year").textContent = new Date().getFullYear();
