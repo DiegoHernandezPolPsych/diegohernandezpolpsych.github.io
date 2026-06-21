@@ -11,8 +11,8 @@
 backend:
   name: github
   repo: DiegoHernandezPolPsych/diegohernandezpolpsych.github.io   # CHANGE to your repo
-  branch: main                                                     # CHANGE if your default branch is master
-  base_url: https://REPLACE-WITH-YOUR-WORKER.workers.dev           # CHANGE to your Worker URL
+  branch: master                                                     # CHANGE if your default branch is master
+  base_url: https://sveltia-cms-auth.diegohernandez.workers.dev           # CHANGE to your Worker URL
 
 site_url: https://diegohernandezpolpsych.github.io
 display_url: https://diegohernandezpolpsych.github.io
