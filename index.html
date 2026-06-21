@@ -864,6 +864,7 @@ html.vt-on .panel.is-active { animation: none; }
     if (history.replaceState) history.replaceState(null, "", "#" + id);
     else location.hash = id;
     window.scrollTo({ top: 0, behavior: "smooth" });
+    document.dispatchEvent(new CustomEvent("section:active", { detail: { id: id } }));
   }
 
   function activate(id, setFocus, vt) {
@@ -1069,24 +1070,57 @@ html.vt-on .panel.is-active { animation: none; }
   var rects = Array.prototype.slice.call(svg.querySelectorAll("rect"));
   var aboutPanel = document.getElementById("about");
   var ticking = false;
+  var bloomed = false;
+  var startTime = null;
+  var DURATION = 2200; // ms for the field to fully bloom in
 
-  function update() {
-    ticking = false;
-    if (!aboutPanel.classList.contains("is-active")) return;
-    var scrollFrac = Math.min(1, (window.scrollY || 0) / 700); // 0 at top, 1 after ~700px
+  function frame(now) {
+    if (startTime === null) startTime = now;
+    var elapsed = now - startTime;
+    var scrollNudge = Math.min(1, (window.scrollY || 0) / 400) * 0.25; // small extra lift if there IS room to scroll
     rects.forEach(function (rect) {
       var depth = parseFloat(rect.dataset.depth);
       var base = parseFloat(rect.dataset.base);
-      // leaves "unlock" from top to bottom as you scroll
-      var reveal = Math.max(0, Math.min(1, (scrollFrac - depth * 0.6) * 2.2));
+      // each leaf starts blooming a little later than the one above it
+      var delay = depth * (DURATION * 0.55);
+      var local = Math.max(0, Math.min(1, (elapsed - delay) / (DURATION * 0.6)));
+      var reveal = Math.min(1, local + scrollNudge);
       rect.style.opacity = (base * reveal).toFixed(3);
     });
+    if (elapsed < DURATION + 400) {
+      window.requestAnimationFrame(frame);
+    } else {
+      bloomed = true;
+    }
   }
-  window.addEventListener("scroll", function () {
-    if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
-  }, { passive: true });
-  window.addEventListener("hashchange", function () { setTimeout(update, 60); });
-  setTimeout(update, 50);
+
+  function enterAbout() {
+    if (!aboutPanel.classList.contains("is-active")) return;
+    startTime = null;
+    bloomed = false;
+    window.requestAnimationFrame(frame);
+  }
+
+  function onScroll() {
+    if (!bloomed) return; // bloom animation already handles early frames
+    if (!ticking) {
+      window.requestAnimationFrame(function () {
+        var scrollNudge = Math.min(1, (window.scrollY || 0) / 400) * 0.25;
+        rects.forEach(function (rect) {
+          var base = parseFloat(rect.dataset.base);
+          rect.style.opacity = (base * Math.min(1, 1 + scrollNudge)).toFixed(3);
+        });
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  document.addEventListener("section:active", function (e) {
+    if (e.detail && e.detail.id === "about") enterAbout();
+  });
+  enterAbout();
 })();
 
 /* =========================================================
