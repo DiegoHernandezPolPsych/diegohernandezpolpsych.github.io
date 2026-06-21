@@ -402,9 +402,8 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
 }
 
 /* =========================================================
-   GENERATIVE GOLD TREE — branching structure with a denser,
-   warm-toned canopy and concentric-ring accents, grown from the
-   site's own square/circle vocabulary
+   GENERATIVE GOLD-LEAF FIELD — grown from the triad module,
+   sits behind the About hero, blooms in on entering the tab
 ========================================================= */
 #about { position: relative; isolation: isolate; }
 .leaf-field {
@@ -419,21 +418,6 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   transition: opacity 1.2s ease, stroke 0.4s ease;
 }
 .leaf-field rect.filled { fill: var(--gold); stroke: none; }
-.leaf-field rect.rose { stroke: var(--rose); }
-.leaf-field rect.rose.filled { fill: var(--rose); }
-.leaf-field rect.lapis { stroke: var(--lapis); }
-.leaf-field rect.lapis.filled { fill: var(--lapis); }
-.leaf-field line {
-  stroke: var(--line-strong);
-  stroke-linecap: round;
-  transition: opacity 1.4s ease;
-}
-.leaf-field circle {
-  fill: none;
-  stroke: var(--gold);
-  stroke-width: 0.8;
-  transition: opacity 1.6s ease;
-}
 
 /* corner brackets drift slightly with scroll, set via JS custom property */
 .portrait-wrap::before,
@@ -605,7 +589,7 @@ html.vt-on .panel.is-active { animation: none; }
   <!-- ============================== ABOUT ============================== -->
   <!-- EDIT: name, role, bio paragraphs, portrait image, and the links below. -->
   <section class="panel is-active" id="about" role="tabpanel" aria-labelledby="tab-about" tabindex="0">
-    <svg class="leaf-field" id="leafField" viewBox="0 0 1080 760" preserveAspectRatio="xMidYMax slice" aria-hidden="true"></svg>
+    <svg class="leaf-field" id="leafField" viewBox="0 0 1080 900" preserveAspectRatio="xMidYMin slice" aria-hidden="true"></svg>
     <div class="hero">
       <div class="hero-text">
         <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Political Psychology · Stony Brook University</p>
@@ -1023,15 +1007,10 @@ html.vt-on .panel.is-active { animation: none; }
 })();
 
 /* =========================================================
-   GENERATIVE GOLD TREE
-   An original branching structure (not traced from any
-   reference) grown by recursive subdivision, in the spirit of
-   Secession tree-of-life motifs. The canopy is built from the
-   same square module as the brand mark, so it stays consistent
-   with the rest of the site's vocabulary rather than borrowing
-   imagery from elsewhere. Seeded so the shape is stable across
-   reloads. Blooms in on entering the About tab, branches first,
-   then canopy, regardless of how much room there is to scroll.
+   GENERATIVE GOLD-LEAF FIELD
+   A sparse field of squares from the triad module, placed on
+   a coarse grid with a seeded RNG so layout is stable across
+   reloads. Blooms in on entering the About tab.
 ========================================================= */
 (function () {
   var svg = document.getElementById("leafField");
@@ -1048,112 +1027,57 @@ html.vt-on .panel.is-active { animation: none; }
   }
   var rand = mulberry32(20260620);
 
-  var W = 1080, H = 760;
-  var branches = []; // {x1,y1,x2,y2,depth}
-  var leaves = [];   // {x,y,depth}
-  var MAX_DEPTH = 7;
-
-  function grow(x, y, angle, length, depth) {
-    if (depth > MAX_DEPTH || length < 7) {
-      leaves.push({ x: x, y: y, depth: depth });
-      return;
-    }
-    var x2 = x + Math.cos(angle) * length;
-    var y2 = y + Math.sin(angle) * length;
-    branches.push({ x1: x, y1: y, x2: x2, y2: y2, depth: depth });
-    var nChildren = depth < MAX_DEPTH - 1 ? 2 : (rand() > 0.45 ? 2 : 1);
-    var spread = 0.50 + (0.28 - 0.50) * (depth / MAX_DEPTH);
-    for (var i = 0; i < nChildren; i++) {
-      var jitter = (rand() - 0.5) * 0.25;
-      var childAngle = angle + (i === 0 ? spread : -spread) + jitter;
-      var childLength = length * (0.72 + rand() * 0.12);
-      grow(x2, y2, childAngle, childLength, depth + 1);
+  var W = 1080, H = 900;
+  var cells = [];
+  var cols = 9, rows = 7, cw = W / cols, ch = H / rows;
+  for (var r = 0; r < rows; r++) {
+    for (var c = 0; c < cols; c++) {
+      if (rand() > 0.4) continue;
+      var size = 6 + Math.floor(rand() * 14);
+      var x = c * cw + rand() * (cw - size);
+      var y = r * ch + rand() * (ch - size);
+      var filled = rand() > 0.62;
+      cells.push({ x: x, y: y, size: size, filled: filled, depth: r / rows });
     }
   }
-  // trunk rises from the left margin, well clear of the bio text column,
-  // so the canopy reads as a quiet backdrop motif rather than sitting
-  // under the paragraph
-  grow(W * 0.16, H, -Math.PI / 2, 88, 0);
 
   var frag = document.createDocumentFragment();
-
-  branches.forEach(function (b) {
-    var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("x1", b.x1.toFixed(1));
-    line.setAttribute("y1", b.y1.toFixed(1));
-    line.setAttribute("x2", b.x2.toFixed(1));
-    line.setAttribute("y2", b.y2.toFixed(1));
-    line.setAttribute("stroke-width", Math.max(0.7, 4.2 - b.depth * 0.5).toFixed(2));
-    line.style.opacity = "0";
-    line.dataset.depth = b.depth;
-    line.dataset.base = "0.16";
-    frag.appendChild(line);
-  });
-
-  leaves.forEach(function (l) {
-    var size = 6 + Math.floor(rand() * 13);
-    var filled = rand() > 0.42; // denser canopy: more filled squares than before
-    var colorRoll = rand();
-    var colorClass = colorRoll < 0.72 ? null : (colorRoll < 0.90 ? "rose" : "lapis");
+  cells.forEach(function (cell) {
     var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    rect.setAttribute("x", (l.x - size / 2).toFixed(1));
-    rect.setAttribute("y", (l.y - size / 2).toFixed(1));
-    rect.setAttribute("width", size);
-    rect.setAttribute("height", size);
-    rect.setAttribute("stroke-width", filled ? "0" : "1.3");
+    rect.setAttribute("x", cell.x.toFixed(1));
+    rect.setAttribute("y", cell.y.toFixed(1));
+    rect.setAttribute("width", cell.size);
+    rect.setAttribute("height", cell.size);
+    rect.setAttribute("stroke-width", cell.filled ? "0" : "1.4");
     rect.style.opacity = "0";
-    if (filled) rect.classList.add("filled");
-    if (colorClass) rect.classList.add(colorClass);
-    rect.dataset.depth = l.depth;
-    rect.dataset.base = (0.10 + rand() * 0.13).toFixed(3); // a bit bolder than before, still a backdrop not the focal point
+    if (cell.filled) rect.classList.add("filled");
+    rect.dataset.depth = cell.depth.toFixed(3);
+    rect.dataset.base = (0.05 + rand() * 0.10).toFixed(3);
     frag.appendChild(rect);
   });
-  // a sparse scatter of concentric rings echoes the ring motifs from the
-  // brand's source mood-board without copying any specific composition
-  var ringSeeds = [];
-  for (var ri = 0; ri < leaves.length; ri += 18) ringSeeds.push(leaves[ri]);
-  ringSeeds.forEach(function (l) {
-    var cx = l.x + (rand() - 0.5) * 16;
-    var cy = l.y + (rand() - 0.5) * 16;
-    var maxR = 16 + rand() * 24;
-    var ringCount = 3 + Math.floor(rand() * 3);
-    for (var k = 0; k < ringCount; k++) {
-      var rr = maxR * (k + 1) / ringCount;
-      var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      circle.setAttribute("cx", cx.toFixed(1));
-      circle.setAttribute("cy", cy.toFixed(1));
-      circle.setAttribute("r", rr.toFixed(1));
-      circle.style.opacity = "0";
-      circle.dataset.depth = l.depth;
-      circle.dataset.base = (0.05 + rand() * 0.05).toFixed(3); // rings stay the faintest layer
-      frag.appendChild(circle);
-    }
-  });
-
   svg.appendChild(frag);
 
   if (reduced) {
-    svg.querySelectorAll("[data-base]").forEach(function (el) { el.style.opacity = el.dataset.base; });
+    svg.querySelectorAll("rect").forEach(function (rect) { rect.style.opacity = rect.dataset.base; });
     return;
   }
 
-  var nodes = Array.prototype.slice.call(svg.querySelectorAll("[data-base]"));
-  var maxDepthSeen = MAX_DEPTH + 1;
+  var rects = Array.prototype.slice.call(svg.querySelectorAll("rect"));
   var aboutPanel = document.getElementById("about");
   var startTime = null;
-  var DURATION = 2600; // a touch longer than the old scatter, since the trunk should land before the canopy
+  var DURATION = 2200;
 
   function frame(now) {
     if (startTime === null) startTime = now;
     var elapsed = now - startTime;
-    nodes.forEach(function (el) {
-      var depth = parseFloat(el.dataset.depth) / maxDepthSeen; // 0 = trunk, ~1 = outer canopy
-      var base = parseFloat(el.dataset.base);
-      var delay = depth * (DURATION * 0.62);
-      var local = Math.max(0, Math.min(1, (elapsed - delay) / (DURATION * 0.45)));
-      el.style.opacity = (base * local).toFixed(3);
+    rects.forEach(function (rect) {
+      var depth = parseFloat(rect.dataset.depth);
+      var base = parseFloat(rect.dataset.base);
+      var delay = depth * (DURATION * 0.55);
+      var local = Math.max(0, Math.min(1, (elapsed - delay) / (DURATION * 0.6)));
+      rect.style.opacity = (base * local).toFixed(3);
     });
-    if (elapsed < DURATION + 300) window.requestAnimationFrame(frame);
+    if (elapsed < DURATION + 400) window.requestAnimationFrame(frame);
   }
 
   function enterAbout() {
