@@ -11,8 +11,8 @@
 backend:
   name: github
   repo: DiegoHernandezPolPsych/diegohernandezpolpsych.github.io   # CHANGE to your repo
-  branch: master                                                     # CHANGE if your default branch is master
-  base_url: https://sveltia-cms-auth.diegohernandez.workers.dev           # CHANGE to your Worker URL
+  branch: main                                                     # CHANGE if your default branch is master
+  base_url: https://REPLACE-WITH-YOUR-WORKER.workers.dev           # CHANGE to your Worker URL
 
 site_url: https://diegohernandezpolpsych.github.io
 display_url: https://diegohernandezpolpsych.github.io
@@ -41,6 +41,7 @@ collections:
             fields:
               - { name: text, label: Paragraph, widget: text }
 
+          - { name: researchTitle, label: "Research — section heading", widget: string, required: false }
           - { name: researchLede, label: "Research — intro (simple <em> allowed)", widget: text }
           - { name: dataTag, label: "Research — data line (simple <b> allowed)", widget: string }
 
@@ -61,6 +62,9 @@ collections:
                   - { name: label, label: Label, widget: string }
                   - { name: href, label: URL, widget: string }
 
+          - { name: teachingTitle, label: "Teaching — section heading", widget: string, required: false }
+          - { name: teachingLede, label: "Teaching — intro", widget: text, required: false }
+
           - name: teaching
             label: Teaching
             widget: list
@@ -76,6 +80,9 @@ collections:
                 fields:
                   - { name: label, label: Label, widget: string }
                   - { name: href, label: URL, widget: string }
+
+          - { name: cvTitle, label: "CV — section heading", widget: string, required: false }
+          - { name: cvLede, label: "CV — intro", widget: text, required: false }
 
           - name: cvEducation
             label: "CV — education"
@@ -94,3 +101,6 @@ collections:
               - { name: year, label: Marker, widget: string }
               - { name: title, label: Area, widget: string }
               - { name: detail, label: Detail, widget: string }
+
+          - { name: contactTitle, label: "Contact — section heading", widget: string, required: false }
+          - { name: contactLede, label: "Contact — intro", widget: text, required: false }
