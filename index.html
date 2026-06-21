@@ -6,6 +6,22 @@
 <title>Diego Hernandez · Political Psychology</title>
 <meta name="description" content="Diego Hernandez, PhD candidate in political psychology at Stony Brook University. Research on political independence, partisanship, and political reasoning." />
 
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="apple-touch-icon" href="favicon.svg" />
+
+<!-- Social share card -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Diego Hernandez · Political Psychology" />
+<meta property="og:description" content="PhD candidate in political science at Stony Brook University. Research on political independence, partisanship, and political reasoning." />
+<meta property="og:url" content="https://diegohernandezpolpsych.github.io" />
+<meta property="og:image" content="https://diegohernandezpolpsych.github.io/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Diego Hernandez · Political Psychology" />
+<meta name="twitter:description" content="PhD candidate in political science at Stony Brook University. Research on political independence, partisanship, and political reasoning." />
+<meta name="twitter:image" content="https://diegohernandezpolpsych.github.io/og-image.png" />
+
 <!-- ============================================================
      Set theme before paint to avoid a light/dark flash on load.
      localStorage is wrapped so the page never errors in a sandbox.
@@ -56,6 +72,9 @@
   --accent-strong: #6c4f12;
   --gold: #c39a22;            /* signature mark */
   --teal: #2f4b44;           /* secondary accent */
+  --rose: #9e5b4b;           /* teaching */
+  --lapis: #3f5a7a;          /* cv */
+  --plum: #7a5270;           /* contact */
   --shadow: 0 1px 2px rgba(40,34,15,.04), 0 12px 32px rgba(40,34,15,.05);
 }
 
@@ -72,8 +91,18 @@
   --accent-strong: #e8c869;
   --gold: #e0c04a;
   --teal: #82b6a6;
+  --rose: #cf9080;
+  --lapis: #8aa6c9;
+  --plum: #c39bba;
   --shadow: 0 1px 2px rgba(0,0,0,.3), 0 18px 40px rgba(0,0,0,.45);
 }
+
+/* per-section accent, switched by the active tab (set in JS) */
+:root { --section: var(--gold); }
+:root[data-section="research"] { --section: var(--teal); }
+:root[data-section="teaching"] { --section: var(--rose); }
+:root[data-section="cv"]       { --section: var(--lapis); }
+:root[data-section="contact"]  { --section: var(--plum); }
 
 * { box-sizing: border-box; }
 
@@ -111,6 +140,8 @@ a { color: var(--accent); text-decoration: none; }
   display: block;
 }
 .triad span:nth-child(2) { background: transparent; border: 1px solid var(--gold); }
+.eyebrow .triad span { background: var(--section); }
+.eyebrow .triad span:nth-child(2) { background: transparent; border-color: var(--section); }
 
 /* =========================================================
    HEADER / NAV
@@ -158,7 +189,7 @@ a { color: var(--accent); text-decoration: none; }
   background: var(--bg-tint);
 }
 .tab[aria-selected="true"] {
-  box-shadow: inset 0 -2px 0 var(--gold);
+  box-shadow: inset 0 -2px 0 var(--section);
 }
 
 .theme-toggle {
@@ -325,7 +356,7 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
 .status {
   display: inline-block; font-family: var(--font-mono);
   font-size: .68rem; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--teal); border: 1px solid color-mix(in srgb, var(--teal) 40%, var(--line));
+  color: var(--section); border: 1px solid color-mix(in srgb, var(--section) 40%, var(--line));
   border-radius: 100px; padding: 2px 9px; margin-left: 8px; vertical-align: 2px;
 }
 
@@ -397,6 +428,23 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 
+/* =========================================================
+   VIEW TRANSITIONS — circular wipe on theme, cross-fade on tabs
+========================================================= */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation-duration: .45s; }
+
+  /* theme toggle: reveal the incoming theme as an expanding circle */
+  html.theme-vt::view-transition-old(root) { animation: none; z-index: 1; }
+  html.theme-vt::view-transition-new(root) { animation: vt-reveal .5s var(--ease); z-index: 2; }
+  @keyframes vt-reveal {
+    from { clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%)); }
+    to   { clip-path: circle(160% at var(--vt-x, 50%) var(--vt-y, 50%)); }
+  }
+}
+/* when View Transitions drive the tab change, drop the per-panel keyframe */
+html.vt-on .panel.is-active { animation: none; }
 </style>
 </head>
 
@@ -651,11 +699,23 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
 ========================================================= */
 (function () {
   var root = document.documentElement;
+  if (document.startViewTransition) root.classList.add("vt-on");
+  function reduced() { return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
+
   var btn = document.getElementById("themeToggle");
-  btn.addEventListener("click", function () {
-    var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  function applyTheme(next) {
     root.setAttribute("data-theme", next);
     try { localStorage.setItem("theme", next); } catch (e) {}
+  }
+  btn.addEventListener("click", function () {
+    var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    if (!document.startViewTransition || reduced()) { applyTheme(next); return; }
+    var r = btn.getBoundingClientRect();
+    root.style.setProperty("--vt-x", (r.left + r.width / 2) + "px");
+    root.style.setProperty("--vt-y", (r.top + r.height / 2) + "px");
+    root.classList.add("theme-vt");
+    var t = document.startViewTransition(function () { applyTheme(next); });
+    t.finished.finally(function () { root.classList.remove("theme-vt"); });
   });
 })();
 
@@ -666,7 +726,11 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
   var panels = Array.prototype.slice.call(document.querySelectorAll('[role="tabpanel"]'));
 
-  function activate(id, setFocus) {
+  var supportsVT = !!document.startViewTransition;
+  function reducedMotion() { return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
+
+  function apply(id, setFocus) {
+    document.documentElement.setAttribute("data-section", id);
     tabs.forEach(function (t) {
       var selected = t.getAttribute("aria-controls") === id;
       t.setAttribute("aria-selected", selected ? "true" : "false");
@@ -683,9 +747,17 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function activate(id, setFocus, vt) {
+    if (vt && supportsVT && !reducedMotion()) {
+      document.startViewTransition(function () { apply(id, setFocus); });
+    } else {
+      apply(id, setFocus);
+    }
+  }
+
   tabs.forEach(function (tab, i) {
     tab.addEventListener("click", function () {
-      activate(tab.getAttribute("aria-controls"), false);
+      activate(tab.getAttribute("aria-controls"), false, true);
     });
     tab.addEventListener("keydown", function (e) {
       var idx = i;
@@ -695,7 +767,7 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
       else if (e.key === "End") { idx = tabs.length - 1; }
       else { return; }
       e.preventDefault();
-      activate(tabs[idx].getAttribute("aria-controls"), true);
+      activate(tabs[idx].getAttribute("aria-controls"), true, true);
     });
   });
 
@@ -703,14 +775,14 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   document.querySelectorAll("[data-tab-link]").forEach(function (el) {
     el.addEventListener("click", function (e) {
       e.preventDefault();
-      activate(el.getAttribute("data-tab-link"), false);
+      activate(el.getAttribute("data-tab-link"), false, true);
     });
   });
 
   // open the tab named in the URL hash on load
   var initial = (location.hash || "").replace("#", "");
   var valid = panels.some(function (p) { return p.id === initial; });
-  activate(valid ? initial : "about", false);
+  activate(valid ? initial : "about", false, false);
 })();
 
 /* =========================================================
