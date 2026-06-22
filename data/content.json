@@ -1,6 +1,6 @@
 {
   "name": "Diego Hernandez",
-  "role": "PhD Candidate in Political Science",
+  "role": "PhD Student in Political Science",
   "email": "diego.hernandez@stonybrook.edu",
   "bio": [
     {"text": "I study why some people refuse a partisan label, and how that refusal translates into political behavior. My research brings the methods of political psychology to understand a group that most accounts of partisanship treat as a residual category: the American independent."},
@@ -10,7 +10,7 @@
   "dataTag": "Pooled ANES <b>2016–2024</b> · N = <b>13,061</b> · two survey experiments",
   "publications": [
     {"title": "[Dissertation paper title]", "status": "Job market paper", "meta": "Working paper",
-     "desc": "One-sentence summary of the argument and the headline finding. Replace this with your own abstract-length description.",
+     "desc": "",
      "links": [{"label": "Draft on request", "href": "#"}]},
     {"title": "Democratic Governance, Interpersonal Trust, and Interpersonal Responsibility: Do Values Predict Vote Choice in Hypothetical EU Membership Referenda?", "status": "MA thesis", "meta": "Stony Brook University, 2023",
      "desc": "",
@@ -21,7 +21,7 @@
   ],
   "teaching": [
     {"title": "POL309: Politics of the European Union", "meta": "Instructor of Record · Summer 2025; Summer 2026; Fall 2026; Spring 2027",
-     "desc": "Undergraduate survey course covering EU institutions, integration theory, and European public opinion.",
+     "desc": "",
      "links": []}
   ],
   "cvEducation": [
@@ -32,9 +32,7 @@
     {"year": "2014–2018", "title": "AA, Political Science; Liberal Arts: Social and Behavioral Sciences; Liberal Arts: Arts and Humanities", "detail": "Santa Barbara City College"}
   ],
   "cvFields": [
-    {"year": "·", "title": "Political psychology", "detail": "Partisanship, political independence, political reasoning"},
-    {"year": "·", "title": "Comparative politics", "detail": "European Union politics, public opinion"},
-    {"year": "·", "title": "Methods", "detail": "Survey experiments, R, Python, SPSS, Qualtrics, text-as-data"}
+    {"year": "·", "title": "Methods", "detail": "Quantitative social science, data analysis in R, Python, and SPSS programming languages, social science experiments, Qualtrics; qualitative methods including focus groups and interviews, text-as-data approaches"}
   ],
   "researchTitle": "Two ways of being independent",
   "teachingTitle": "In the classroom",
