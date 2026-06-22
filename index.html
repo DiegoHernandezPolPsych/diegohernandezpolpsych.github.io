@@ -402,13 +402,12 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
 }
 
 /* =========================================================
-   ABOUT BACKGROUND — artwork sits behind the hero, fades in
-   on load. Positioned so the tree falls behind the portrait
-   column, keeping the bio text legible.
+   ABOUT BACKGROUND — artwork bleeds full viewport height so
+   no hard panel edge is visible against the page background
 ========================================================= */
 #about { position: relative; isolation: isolate; }
 .about-bg {
-  position: absolute; inset: 0; z-index: -1;
+  position: fixed; inset: 0; z-index: -1;
   background: url('images/about-bg.jpg') center top / 100% auto no-repeat;
   opacity: 0;
   pointer-events: none;
