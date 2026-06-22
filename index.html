@@ -495,6 +495,7 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
 }
 .cv-list li:first-child { border-top: 0; }
 .cv-year { font-family: var(--font-mono); font-size: .82rem; color: var(--gold); padding-top: 2px; }
+.cv-year:empty, .cv-year-dot { visibility: hidden; }
 .cv-item b { font-weight: 600; font-family: var(--font-display); font-size: 1.05rem; }
 .cv-item span { display: block; color: var(--muted); font-size: .92rem; }
 .cv-sub-title {
@@ -1079,7 +1080,8 @@ html.vt-on .panel.is-active { animation: none; }
     var box = document.querySelector('[data-list="' + name + '"]');
     if (!box) return;
     box.innerHTML = items.map(function (it) {
-      return '<li><span class="cv-year">' + esc(it.year) + "</span>" +
+      var yearClass = (it.year === '·' || !it.year) ? 'cv-year cv-year-dot' : 'cv-year';
+      return '<li><span class="' + yearClass + '">' + esc(it.year) + "</span>" +
              '<span class="cv-item"><b>' + esc(it.title) + "</b><span>" + esc(it.detail) + "</span></span></li>";
     }).join("");
   }
