@@ -402,22 +402,24 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
 }
 
 /* =========================================================
-   GENERATIVE GOLD-LEAF FIELD — grown from the triad module,
-   sits behind the About hero, blooms in on entering the tab
+   ABOUT BACKGROUND — artwork sits behind the hero, fades in
+   on load. Dark mode gets a subtle invert + hue-rotate so it
+   reads warmly against the dark surface without a second image.
 ========================================================= */
 #about { position: relative; isolation: isolate; }
-.leaf-field {
+.about-bg {
   position: absolute; inset: 0; z-index: -1;
-  width: 100%; height: 100%;
-  overflow: visible; pointer-events: none;
+  background: url('images/about-bg.jpg') center top / cover no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 2s ease;
 }
-.leaf-field rect {
-  fill: none;
-  stroke: var(--gold);
-  shape-rendering: crispEdges;
-  transition: opacity 1.2s ease, stroke 0.4s ease;
+.about-bg.visible { opacity: 0.10; }
+:root[data-theme="dark"] .about-bg {
+  filter: invert(1) hue-rotate(180deg) saturate(0.7);
+  opacity: 0;
 }
-.leaf-field rect.filled { fill: var(--gold); stroke: none; }
+:root[data-theme="dark"] .about-bg.visible { opacity: 0.12; }
 
 /* corner brackets drift slightly with scroll, set via JS custom property */
 .portrait-wrap::before,
@@ -589,7 +591,7 @@ html.vt-on .panel.is-active { animation: none; }
   <!-- ============================== ABOUT ============================== -->
   <!-- EDIT: name, role, bio paragraphs, portrait image, and the links below. -->
   <section class="panel is-active" id="about" role="tabpanel" aria-labelledby="tab-about" tabindex="0">
-    <svg class="leaf-field" id="leafField" viewBox="0 0 1080 900" preserveAspectRatio="xMidYMin slice" aria-hidden="true"></svg>
+    <div class="about-bg" id="aboutBg" aria-hidden="true"></div>
     <div class="hero">
       <div class="hero-text">
         <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Political Psychology · Stony Brook University</p>
@@ -1007,87 +1009,26 @@ html.vt-on .panel.is-active { animation: none; }
 })();
 
 /* =========================================================
-   GENERATIVE GOLD-LEAF FIELD
-   A sparse field of squares from the triad module, placed on
-   a coarse grid with a seeded RNG so layout is stable across
-   reloads. Blooms in on entering the About tab.
+   ABOUT BACKGROUND — fade in the artwork on entering the tab,
+   fade it out when leaving. Respects reduced-motion.
 ========================================================= */
 (function () {
-  var svg = document.getElementById("leafField");
-  if (!svg) return;
+  var bg = document.getElementById("aboutBg");
+  if (!bg) return;
   var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduced) { bg.classList.add("visible"); return; }
 
-  function mulberry32(seed) {
-    return function () {
-      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
-      var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  }
-  var rand = mulberry32(20260620);
-
-  var W = 1080, H = 900;
-  var cells = [];
-  var cols = 9, rows = 7, cw = W / cols, ch = H / rows;
-  for (var r = 0; r < rows; r++) {
-    for (var c = 0; c < cols; c++) {
-      if (rand() > 0.4) continue;
-      var size = 6 + Math.floor(rand() * 14);
-      var x = c * cw + rand() * (cw - size);
-      var y = r * ch + rand() * (ch - size);
-      var filled = rand() > 0.62;
-      cells.push({ x: x, y: y, size: size, filled: filled, depth: r / rows });
+  function enterAbout() {
+    var about = document.getElementById("about");
+    if (about && about.classList.contains("is-active")) {
+      bg.classList.add("visible");
+    } else {
+      bg.classList.remove("visible");
     }
   }
 
-  var frag = document.createDocumentFragment();
-  cells.forEach(function (cell) {
-    var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    rect.setAttribute("x", cell.x.toFixed(1));
-    rect.setAttribute("y", cell.y.toFixed(1));
-    rect.setAttribute("width", cell.size);
-    rect.setAttribute("height", cell.size);
-    rect.setAttribute("stroke-width", cell.filled ? "0" : "1.4");
-    rect.style.opacity = "0";
-    if (cell.filled) rect.classList.add("filled");
-    rect.dataset.depth = cell.depth.toFixed(3);
-    rect.dataset.base = (0.05 + rand() * 0.10).toFixed(3);
-    frag.appendChild(rect);
-  });
-  svg.appendChild(frag);
-
-  if (reduced) {
-    svg.querySelectorAll("rect").forEach(function (rect) { rect.style.opacity = rect.dataset.base; });
-    return;
-  }
-
-  var rects = Array.prototype.slice.call(svg.querySelectorAll("rect"));
-  var aboutPanel = document.getElementById("about");
-  var startTime = null;
-  var DURATION = 2200;
-
-  function frame(now) {
-    if (startTime === null) startTime = now;
-    var elapsed = now - startTime;
-    rects.forEach(function (rect) {
-      var depth = parseFloat(rect.dataset.depth);
-      var base = parseFloat(rect.dataset.base);
-      var delay = depth * (DURATION * 0.55);
-      var local = Math.max(0, Math.min(1, (elapsed - delay) / (DURATION * 0.6)));
-      rect.style.opacity = (base * local).toFixed(3);
-    });
-    if (elapsed < DURATION + 400) window.requestAnimationFrame(frame);
-  }
-
-  function enterAbout() {
-    if (!aboutPanel.classList.contains("is-active")) return;
-    startTime = null;
-    window.requestAnimationFrame(frame);
-  }
-
   document.addEventListener("section:active", function (e) {
-    if (e.detail && e.detail.id === "about") enterAbout();
+    enterAbout();
   });
   enterAbout();
 })();
