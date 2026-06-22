@@ -458,12 +458,16 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   pointer-events: none;
   transition: opacity 0.3s ease;
   view-transition-name: none;
-  -webkit-mask-image: radial-gradient(ellipse 85% 80% at 60% 40%, black 30%, transparent 100%);
-  mask-image: radial-gradient(ellipse 85% 80% at 60% 40%, black 30%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 85% 80% at 60% 40%, black 30%, transparent 100%),
+                      linear-gradient(to bottom, black 60%, transparent 100%);
+  -webkit-mask-composite: destination-in;
+  mask-image: radial-gradient(ellipse 85% 80% at 60% 40%, black 30%, transparent 100%),
+              linear-gradient(to bottom, black 60%, transparent 100%);
+  mask-composite: intersect;
 }
 .about-bg.visible { opacity: 0.62; }
 :root[data-theme="dark"] .about-bg { filter: saturate(1.0) brightness(0.85); }
-:root[data-theme="dark"] .about-bg.visible { opacity: 0.45; }
+:root[data-theme="dark"] .about-bg.visible { opacity: 0.35; }
 
 /* corner brackets drift slightly with scroll, set via JS custom property */
 .portrait-wrap::before,
