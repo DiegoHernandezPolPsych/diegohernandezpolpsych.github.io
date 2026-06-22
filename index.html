@@ -278,11 +278,21 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
 }
 .hero-bio p { margin: 0 0 16px; max-width: 56ch; color: var(--ink); }
 .hero-bio p .lead { color: var(--ink); }
+
+/* dark mode: dark text shadow + dark scrim */
 :root[data-theme="dark"] .hero-bio p,
 :root[data-theme="dark"] .hero-name,
 :root[data-theme="dark"] .hero-role,
 :root[data-theme="dark"] .eyebrow {
   text-shadow: 0 1px 12px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.7);
+}
+
+/* light mode: soft white shadow so dark ink stays readable over warm image tones */
+:root[data-theme="light"] .hero-bio p,
+:root[data-theme="light"] .hero-name,
+:root[data-theme="light"] .hero-role,
+:root[data-theme="light"] .eyebrow {
+  text-shadow: 0 1px 8px rgba(255,255,255,0.95), 0 0 30px rgba(255,255,255,0.8);
 }
 
 .links-row {
@@ -338,6 +348,16 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   position: absolute;
   inset: -24px -32px;
   background: radial-gradient(ellipse at 40% 50%, rgba(20,19,14,0.55) 40%, transparent 100%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* light-mode scrim: soft warm-white halo behind the text column */
+:root[data-theme="light"] .hero-text::before {
+  content: "";
+  position: absolute;
+  inset: -24px -32px;
+  background: radial-gradient(ellipse at 40% 50%, rgba(250,248,243,0.72) 35%, transparent 100%);
   z-index: -1;
   pointer-events: none;
 }
@@ -435,12 +455,12 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   -webkit-mask-image: radial-gradient(ellipse 85% 80% at 60% 40%, black 30%, transparent 100%);
   mask-image: radial-gradient(ellipse 85% 80% at 60% 40%, black 30%, transparent 100%);
 }
-.about-bg.visible { opacity: 0.11; }
+.about-bg.visible { opacity: 0.42; filter: saturate(1.1); }
 :root[data-theme="dark"] .about-bg {
   filter: saturate(0.6) brightness(0.9);
   opacity: 0;
 }
-:root[data-theme="dark"] .about-bg.visible { opacity: 0.13; }
+:root[data-theme="dark"] .about-bg.visible { opacity: 0.13; filter: saturate(0.6) brightness(0.9); }
 
 /* corner brackets drift slightly with scroll, set via JS custom property */
 .portrait-wrap::before,
