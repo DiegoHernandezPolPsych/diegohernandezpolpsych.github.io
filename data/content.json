@@ -1,58 +1,46 @@
 {
   "name": "Diego Hernandez",
-  "role": "PhD student in political science",
+  "role": "PhD Candidate in Political Science",
   "email": "diego.hernandez@stonybrook.edu",
   "bio": [
-    {
-      "text": "I study why some people refuse a partisan label, and how that refusal translates into political behavior.  My research brings the methods of political psychology to a group that most accounts of partisanship treat as a residual category: the pure independent."
-    }
+    {"text": "I study why some people refuse a partisan label, and how that refusal translates into political behavior. My research brings the methods of political psychology to understand a group that most accounts of partisanship treat as a residual category: the American independent."},
+    {"text": "My dissertation separates two routes into independence. Some people arrive through disaffection, a slow withdrawal from parties they have come to distrust. Others arrive through something closer to epistemic autonomy, a deliberate choice to weigh candidates and issues without a partisan shortcut. The two groups look identical on a standard party identification scale. They do not think alike. I trace the difference with pooled national survey data and a pair of survey experiments."}
   ],
-  "researchTitle": "More Projects",
-  "researchLede": "In addition to my dissertation work, I have research interests in why some individuals say they believe in conspiracies when they do not behave like they truly believe them, and how that signaling behavior maps onto their politics.",
-  "dataTag": "survey experiments, quantitative and qualitative methods",
+  "researchLede": "The dissertation argues that pure independence is not one thing. One pathway runs through <em>disaffection</em>, the other through <em>deliberative autonomy</em>, and the two carry different consequences for trust, engagement, and how people process political information.",
+  "dataTag": "Pooled ANES <b>2016–2024</b> · N = <b>13,061</b> · two survey experiments",
   "publications": [
-    {
-      "title": "[Dissertation paper title]",
-      "status": "Job market paper",
-      "meta": "Working paper",
-      "desc": "(abstract will go here)",
-      "links": []
-    }
+    {"title": "[Dissertation paper title]", "status": "Job market paper", "meta": "Working paper",
+     "desc": "One-sentence summary of the argument and the headline finding. Replace this with your own abstract-length description.",
+     "links": [{"label": "Draft on request", "href": "#"}]},
+    {"title": "Democratic Governance, Interpersonal Trust, and Interpersonal Responsibility: Do Values Predict Vote Choice in Hypothetical EU Membership Referenda?", "status": "MA thesis", "meta": "Stony Brook University, 2023",
+     "desc": "",
+     "links": []},
+    {"title": "Searching For Uniqueness in the Crowd: Conspiracies and their Believers", "status": "MSc thesis", "meta": "London School of Economics, 2021",
+     "desc": "",
+     "links": []}
   ],
-  "teachingTitle": "",
-  "teachingLede": "",
   "teaching": [
-    {
-      "title": "POL 309: Politics of the European Union",
-      "meta": "Instructor  ·  Summer 2025; Summer 2026; Fall 2026; Spring 2027",
-      "desc": "",
-      "links": []
-    },
-    {
-      "title": "[Course title]",
-      "meta": "Teaching Assistant · [Term]",
-      "desc": "",
-      "links": []
-    }
+    {"title": "POL309: Politics of the European Union", "meta": "Instructor of Record · Summer 2025; Summer 2026; Fall 2026; Spring 2027",
+     "desc": "Undergraduate survey course covering EU institutions, integration theory, and European public opinion.",
+     "links": []}
   ],
-  "cvTitle": "",
   "cvEducation": [
-    {
-      "year": "2028 (expected)",
-      "title": "PhD, Political Science",
-      "detail": "Stony Brook University"
-    }
+    {"year": "2023–2028", "title": "PhD, Political Science", "detail": "Stony Brook University · Committee: Leonie Huddy, Stephanie DeMora, Pazit Ben Nun-Bloom, Eric Groenendyk"},
+    {"year": "2022–2023", "title": "MA, Political Science", "detail": "Stony Brook University · Advisor: Gallya Lahav"},
+    {"year": "2020–2021", "title": "MSc, Culture and Conflict in a Global Europe", "detail": "London School of Economics and Political Science · Advisor: Cristóbal Garibay-Petersen"},
+    {"year": "2018–2020", "title": "BA, Politics", "detail": "University of California, Santa Cruz"},
+    {"year": "2014–2018", "title": "AA, Political Science; Liberal Arts: Social and Behavioral Sciences; Liberal Arts: Arts and Humanities", "detail": "Santa Barbara City College"}
   ],
   "cvFields": [
-    {
-      "year": "·",
-      "title": "Political psychology",
-      "detail": "Partisanship, independence, political reasoning"
-    },
-    {
-      "year": "·",
-      "title": "Comparative",
-      "detail": "European Union politics, public opinion"
-    }
-  ]
+    {"year": "·", "title": "Political psychology", "detail": "Partisanship, political independence, political reasoning"},
+    {"year": "·", "title": "Comparative politics", "detail": "European Union politics, public opinion"},
+    {"year": "·", "title": "Methods", "detail": "Survey experiments, R, Python, SPSS, Qualtrics, text-as-data"}
+  ],
+  "researchTitle": "Two ways of being independent",
+  "teachingTitle": "In the classroom",
+  "teachingLede": "I teach comparative and European politics, and I build courses around the gap between how institutions are supposed to work and how citizens actually reason about them.",
+  "cvTitle": "Curriculum vitae",
+  "cvLede": "A short version lives here. The full document, with all positions, presentations, and service, is in the PDF.",
+  "contactTitle": "Get in touch",
+  "contactLede": "Email is the surest way to reach me. I am happy to share drafts, materials, or replication code."
 }
