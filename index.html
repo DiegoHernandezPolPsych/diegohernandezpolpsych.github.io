@@ -275,6 +275,12 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
 }
 .hero-bio p { margin: 0 0 16px; max-width: 56ch; color: var(--ink); }
 .hero-bio p .lead { color: var(--ink); }
+:root[data-theme="dark"] .hero-bio p,
+:root[data-theme="dark"] .hero-name,
+:root[data-theme="dark"] .hero-role,
+:root[data-theme="dark"] .eyebrow {
+  text-shadow: 0 1px 12px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.7);
+}
 
 .links-row {
   display: flex; flex-wrap: wrap; gap: 10px;
@@ -320,6 +326,17 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   margin-top: 16px;
   font-family: var(--font-mono); font-size: .72rem; letter-spacing: .08em;
   color: var(--faint); text-align: center;
+}
+
+/* dark-mode scrim behind the hero text column */
+.hero-text { position: relative; }
+:root[data-theme="dark"] .hero-text::before {
+  content: "";
+  position: absolute;
+  inset: -24px -32px;
+  background: radial-gradient(ellipse at 40% 50%, rgba(20,19,14,0.55) 40%, transparent 100%);
+  z-index: -1;
+  pointer-events: none;
 }
 
 /* =========================================================
