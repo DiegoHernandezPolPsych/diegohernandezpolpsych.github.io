@@ -454,17 +454,16 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   position: fixed; inset: 0; z-index: -1;
   background: url('images/about-bg.jpg') center 15% / 100% auto no-repeat;
   opacity: 0;
+  filter: saturate(1.1);
   pointer-events: none;
   transition: opacity 0.3s ease;
+  view-transition-name: none;
   -webkit-mask-image: radial-gradient(ellipse 85% 80% at 60% 40%, black 30%, transparent 100%);
   mask-image: radial-gradient(ellipse 85% 80% at 60% 40%, black 30%, transparent 100%);
 }
-.about-bg.visible { opacity: 0.62; filter: saturate(1.1); }
-:root[data-theme="dark"] .about-bg {
-  filter: saturate(1.0) brightness(0.85);
-  opacity: 0;
-}
-:root[data-theme="dark"] .about-bg.visible { opacity: 0.45; filter: saturate(1.0) brightness(0.85); }
+.about-bg.visible { opacity: 0.62; }
+:root[data-theme="dark"] .about-bg { filter: saturate(1.0) brightness(0.85); }
+:root[data-theme="dark"] .about-bg.visible { opacity: 0.45; }
 
 /* corner brackets drift slightly with scroll, set via JS custom property */
 .portrait-wrap::before,
@@ -1101,8 +1100,13 @@ html.vt-on .panel.is-active { animation: none; }
     }
   }
 
-  document.addEventListener("section:active", function (e) {
-    enterAbout();
+  document.addEventListener("section:active", function () {
+    // defer until after any view transition has painted
+    if (document.startViewTransition) {
+      requestAnimationFrame(function () { requestAnimationFrame(enterAbout); });
+    } else {
+      enterAbout();
+    }
   });
   enterAbout();
 })();
