@@ -194,9 +194,9 @@ a { color: var(--accent); text-decoration: none; }
   white-space: nowrap;
 }
 .brand .triad span { width: 7px; height: 7px; }
-/* hide the nav name on About — the h1 already has it */
-:root[data-section="about"] .brand-name { opacity: 0; pointer-events: none; transition: opacity .3s ease; }
-.brand-name { transition: opacity .3s ease; }
+/* name fades out on About since the h1 already shows it */
+.brand-name { transition: opacity .5s ease; }
+:root[data-section="about"] .brand-name { opacity: 0; pointer-events: none; }
 
 .tabs {
   display: flex; gap: 2px; margin-left: auto;
@@ -455,7 +455,7 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   -webkit-mask-image: radial-gradient(ellipse 85% 80% at 60% 40%, black 30%, transparent 100%);
   mask-image: radial-gradient(ellipse 85% 80% at 60% 40%, black 30%, transparent 100%);
 }
-.about-bg.visible { opacity: 0.42; filter: saturate(1.1); }
+.about-bg.visible { opacity: 0.62; filter: saturate(1.1); }
 :root[data-theme="dark"] .about-bg {
   filter: saturate(0.6) brightness(0.9);
   opacity: 0;
