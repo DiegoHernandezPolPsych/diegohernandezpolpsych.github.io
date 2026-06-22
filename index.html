@@ -201,6 +201,10 @@ a { color: var(--accent); text-decoration: none; }
 .tabs {
   display: flex; gap: 2px; margin-left: auto;
   overflow-x: auto; scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  /* fade hint on the right edge so it's obvious there's more */
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 32px), transparent 100%);
+  mask-image: linear-gradient(to right, black calc(100% - 32px), transparent 100%);
 }
 .tabs::-webkit-scrollbar { display: none; }
 .tab {
@@ -347,7 +351,7 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   content: "";
   position: absolute;
   inset: -24px -32px;
-  background: radial-gradient(ellipse at 40% 50%, rgba(20,19,14,0.55) 40%, transparent 100%);
+  background: radial-gradient(ellipse at 40% 50%, rgba(20,19,14,0.72) 40%, transparent 100%);
   z-index: -1;
   pointer-events: none;
 }
@@ -451,16 +455,16 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   background: url('images/about-bg.jpg') center 15% / 100% auto no-repeat;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 2s ease;
+  transition: opacity 0.3s ease;
   -webkit-mask-image: radial-gradient(ellipse 85% 80% at 60% 40%, black 30%, transparent 100%);
   mask-image: radial-gradient(ellipse 85% 80% at 60% 40%, black 30%, transparent 100%);
 }
 .about-bg.visible { opacity: 0.62; filter: saturate(1.1); }
 :root[data-theme="dark"] .about-bg {
-  filter: saturate(0.6) brightness(0.9);
+  filter: saturate(1.0) brightness(0.85);
   opacity: 0;
 }
-:root[data-theme="dark"] .about-bg.visible { opacity: 0.13; filter: saturate(0.6) brightness(0.9); }
+:root[data-theme="dark"] .about-bg.visible { opacity: 0.45; filter: saturate(1.0) brightness(0.85); }
 
 /* corner brackets drift slightly with scroll, set via JS custom property */
 .portrait-wrap::before,
@@ -535,12 +539,41 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   .cv-grid, .contact-grid { grid-template-columns: 1fr; gap: 28px; }
 }
 @media (max-width: 560px) {
-  body { font-size: 16px; }
-  .header-inner { gap: 10px; }
+  /* smaller base font */
+  body { font-size: 15px; }
+  .header-inner { gap: 8px; }
+
+  /* hide brand name — h1 has it */
   .brand span.brand-name { display: none; }
+
+  /* fit all five tabs without scrolling: tighter padding, smaller text */
+  .tabs {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .tab { font-size: .72rem; padding: 8px 9px; letter-spacing: .02em; }
+
+  /* truncate labels */
+  .hide-mobile { display: none; }
+  .show-mobile { display: inline; }
+
+  /* hide colophon on mobile */
+  .colophon { display: none; }
+
+  /* card index inline rather than its own column */
   .card { grid-template-columns: 1fr; gap: 8px; }
   .card-index { padding-top: 0; }
+
+  /* slightly smaller portrait */
+  .portrait-wrap { max-width: 100%; }
+
+  /* links row wraps tighter */
+  .links-row { gap: 8px; }
+  .pill { font-size: .8rem; padding: 7px 12px; }
 }
+
+/* default show-mobile to none on desktop */
+.show-mobile { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -635,7 +668,7 @@ html.vt-on .panel.is-active { animation: none; }
     <div class="about-bg" id="aboutBg" aria-hidden="true"></div>
     <div class="hero">
       <div class="hero-text">
-        <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Political Psychology · Stony Brook University</p>
+        <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Political Psychology<span class="hide-mobile"> · Stony Brook University</span></p>
         <h1 class="hero-name" data-key="name">Diego Hernandez</h1>
         <p class="hero-role" data-key="role">PhD candidate in political science</p>
 
@@ -648,7 +681,7 @@ html.vt-on .panel.is-active { animation: none; }
           <!-- EDIT email -->
           <a class="pill is-primary" href="mailto:diego.hernandez@stonybrook.edu" data-email-href>Email</a>
           <!-- EDIT: point at your CV PDF once uploaded to /files/ -->
-          <a class="pill" href="files/cv.pdf">Curriculum Vitae</a>
+          <a class="pill" href="files/cv.pdf"><span class="hide-mobile">Curriculum Vitae</span><span class="show-mobile">CV</span></a>
           <a class="pill" href="https://scholar.google.com/" target="_blank" rel="noopener">Google Scholar</a>
           <a class="pill" href="https://sbsuny.academia.edu/DiegoHernandez" target="_blank" rel="noopener">Academia.edu</a>
         </div>
