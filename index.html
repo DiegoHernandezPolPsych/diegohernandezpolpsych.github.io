@@ -194,6 +194,9 @@ a { color: var(--accent); text-decoration: none; }
   white-space: nowrap;
 }
 .brand .triad span { width: 7px; height: 7px; }
+/* hide the nav name on About — the h1 already has it */
+:root[data-section="about"] .brand-name { opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+.brand-name { transition: opacity .3s ease; }
 
 .tabs {
   display: flex; gap: 2px; margin-left: auto;
@@ -645,7 +648,7 @@ html.vt-on .panel.is-active { animation: none; }
   <!-- ============================== RESEARCH ============================== -->
   <!-- EDIT: replace the placeholder cards with real titles, coauthors, links, and status. -->
   <section class="panel" id="research" role="tabpanel" aria-labelledby="tab-research" tabindex="0" hidden>
-    <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Research</p>
+    <p class="eyebrow">Research</p>
     <h2 class="section-title" data-key="researchTitle">Two ways of being independent</h2>
     <p class="lede" data-html="researchLede">The dissertation argues that pure independence is not one thing. One pathway runs through <em>disaffection</em>, the other through <em>deliberative autonomy</em>, and the two carry different consequences for trust, engagement, and how people process political information.</p>
     <span class="data-tag" data-html="dataTag">Pooled ANES <b>2016&ndash;2024</b> · N&nbsp;=&nbsp;<b>13,061</b> · two survey experiments</span>
@@ -695,7 +698,7 @@ html.vt-on .panel.is-active { animation: none; }
   <!-- ============================== TEACHING ============================== -->
   <!-- EDIT: courses, roles, terms, and a one-line teaching statement. -->
   <section class="panel" id="teaching" role="tabpanel" aria-labelledby="tab-teaching" tabindex="0" hidden>
-    <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Teaching</p>
+    <p class="eyebrow">Teaching</p>
     <h2 class="section-title" data-key="teachingTitle">In the classroom</h2>
     <p class="lede" data-html="teachingLede">I teach comparative and European politics, and I build courses around the gap between how institutions are supposed to work and how citizens actually reason about them.</p>
 
@@ -733,7 +736,7 @@ html.vt-on .panel.is-active { animation: none; }
   <!-- ============================== CV ============================== -->
   <!-- EDIT: education, appointments, and the download link. Upload the PDF to /files/cv.pdf -->
   <section class="panel" id="cv" role="tabpanel" aria-labelledby="tab-cv" tabindex="0" hidden>
-    <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Curriculum Vitae</p>
+    <p class="eyebrow">Curriculum Vitae</p>
     <h2 class="section-title" data-key="cvTitle">Curriculum vitae</h2>
     <p class="lede" data-html="cvLede">A short version lives here. The full document, with publications, presentations, and service, is in the PDF.</p>
     <div class="links-row" style="margin-top:0;margin-bottom:40px">
@@ -773,7 +776,7 @@ html.vt-on .panel.is-active { animation: none; }
   <!-- ============================== CONTACT ============================== -->
   <!-- EDIT email. The profile links below are pulled from your public pages. -->
   <section class="panel" id="contact" role="tabpanel" aria-labelledby="tab-contact" tabindex="0" hidden>
-    <p class="eyebrow"><span class="triad" aria-hidden="true"><span></span><span></span><span></span></span> Contact</p>
+    <p class="eyebrow">Contact</p>
     <h2 class="section-title" data-key="contactTitle">Get in touch</h2>
     <p class="lede" data-html="contactLede">Email is the surest way to reach me. I am happy to share drafts, materials, or replication code.</p>
 
