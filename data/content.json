@@ -5,8 +5,8 @@
   "bio": [
     {"text": "I study why some people refuse a partisan label, and how that refusal translates into political behavior. My research brings the methods of political psychology to understand a group that most accounts of partisanship treat as a residual category: the American independent."}
   ],
-  "researchLede": "The dissertation argues that pure independence is not one thing. One pathway runs through <em>disaffection</em>, the other through <em>deliberative autonomy</em>, and the two carry different consequences for trust, engagement, and how people process political information.",
-  "dataTag": "Pooled ANES <b>2016–2024</b> · N = <b>13,061</b> · two survey experiments",
+  "researchLede": "In addition to my dissertation work, I have research interests in why some individuals say they believe in conspiracies when they do not behave like they truly believe them, and how that signaling behavior maps onto their politics.",
+  "dataTag": "survey experiments, quantitative and qualitative methods",
   "publications": [
     {"title": "[Dissertation paper title]", "status": "Job market paper", "meta": "Working paper",
      "desc": "",
@@ -33,7 +33,7 @@
   "cvFields": [
     {"year": "·", "title": "Methods", "detail": "Quantitative social science, data analysis in R, Python, and SPSS programming languages, social science experiments, Qualtrics; qualitative methods including focus groups and interviews, text-as-data approaches"}
   ],
-  "researchTitle": "Two ways of being independent",
+  "researchTitle": "More Projects",
   "teachingTitle": "In the classroom",
   "teachingLede": "I teach comparative and European politics, and I build courses around the gap between how institutions are supposed to work and how citizens actually reason about them.",
   "cvTitle": "Curriculum vitae",
