@@ -526,18 +526,27 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
 .tools-sub {
   font-family: var(--font-display); font-weight: 500; font-size: 1.4rem;
   color: var(--ink); margin: 28px 0 6px; letter-spacing: -.01em;
-  text-shadow: 0 1px 8px rgba(255,255,255,0.9), 0 0 24px rgba(255,255,255,0.7);
-}
-:root[data-theme="dark"] .tools-sub {
-  text-shadow: 0 1px 12px rgba(0,0,0,0.95), 0 0 32px rgba(0,0,0,0.8);
 }
 .tools-note {
   font-family: var(--font-mono); font-size: .74rem; letter-spacing: .06em;
-  text-transform: uppercase; color: var(--faint); margin: 0 0 14px;
-  text-shadow: 0 1px 6px rgba(255,255,255,0.8);
+  text-transform: uppercase; color: var(--muted); margin: 0 0 14px;
 }
-:root[data-theme="dark"] .tools-note {
-  text-shadow: 0 1px 8px rgba(0,0,0,0.9);
+/* semi-transparent pill behind the tools intro text */
+#tools > .eyebrow,
+#tools > .section-title,
+#tools > .lede,
+#tools > .tools-sub,
+#tools > .tools-note {
+  position: relative; z-index: 1;
+}
+#tools > .section-title::before {
+  content: "";
+  position: absolute;
+  inset: -60px -32px 0;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  border-radius: 4px;
+  z-index: -1;
+  pointer-events: none;
 }
 .cv-builder-wrap {
   width: 100%; border: 1px solid var(--line);
@@ -560,16 +569,36 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   opacity: 1;
   pointer-events: none;
 }
-/* scrim behind the eyebrow/heading/lede so they stay legible */
+/* strong scrim behind all text above the iframe */
 #tools .eyebrow,
 #tools .section-title,
-#tools .lede {
-  text-shadow: 0 1px 8px rgba(255,255,255,0.9), 0 0 24px rgba(255,255,255,0.7);
+#tools .lede,
+#tools .tools-sub,
+#tools .tools-note {
+  text-shadow:
+    0 0 8px rgba(255,255,255,1),
+    0 0 16px rgba(255,255,255,0.9),
+    0 1px 2px rgba(255,255,255,1);
 }
 :root[data-theme="dark"] #tools .eyebrow,
 :root[data-theme="dark"] #tools .section-title,
-:root[data-theme="dark"] #tools .lede {
-  text-shadow: 0 1px 12px rgba(0,0,0,0.95), 0 0 32px rgba(0,0,0,0.8);
+:root[data-theme="dark"] #tools .lede,
+:root[data-theme="dark"] #tools .tools-sub,
+:root[data-theme="dark"] #tools .tools-note {
+  text-shadow:
+    0 0 8px rgba(0,0,0,1),
+    0 0 20px rgba(0,0,0,0.95),
+    0 1px 3px rgba(0,0,0,1);
+}
+
+/* hide CMS-driven elements until content.json resolves — eliminates flash */
+html:not(.cms-ready) [data-key],
+html:not(.cms-ready) [data-html],
+html:not(.cms-ready) [data-bio],
+html:not(.cms-ready) [data-list],
+html:not(.cms-ready) [data-email-href],
+html:not(.cms-ready) [data-email-link] {
+  visibility: hidden;
 }
 
 .site-footer {
@@ -847,7 +876,7 @@ html.vt-on .panel.is-active { animation: none; }
   <section class="panel" id="cv" role="tabpanel" aria-labelledby="tab-cv" tabindex="0" hidden>
     <p class="eyebrow">Curriculum Vitae</p>
     <h2 class="section-title" data-key="cvTitle">Curriculum vitae</h2>
-    <p class="lede" data-html="cvLede">A short version lives here. The full document, with publications, presentations, and service, is in the PDF.</p>
+    <p class="lede" data-html="cvLede">A short version lives here. The full document, with all positions, presentations, and service, is in the PDF.</p>
     <div class="links-row" style="margin-top:0;margin-bottom:40px">
       <a class="pill is-primary" href="files/cv.pdf" target="_blank" rel="noopener">Download CV (PDF)</a>
     </div>
@@ -1071,8 +1100,8 @@ document.addEventListener("section:active", function (e) {
 (function () {
   fetch("data/content.json")
     .then(function (r) { if (!r.ok) throw 0; return r.json(); })
-    .then(render)
-    .catch(function () { /* keep static fallback */ });
+    .then(function(c) { render(c); document.documentElement.classList.add("cms-ready"); })
+    .catch(function () { document.documentElement.classList.add("cms-ready"); });
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>]/g, function (c) {
