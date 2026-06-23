@@ -529,25 +529,10 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
 }
 .tools-note {
   font-family: var(--font-mono); font-size: .74rem; letter-spacing: .06em;
-  text-transform: uppercase; color: var(--muted); margin: 0 0 14px;
+  text-transform: uppercase; color: var(--ink); margin: 0 0 14px;
+  opacity: 0.7;
 }
-/* semi-transparent pill behind the tools intro text */
-#tools > .eyebrow,
-#tools > .section-title,
-#tools > .lede,
-#tools > .tools-sub,
-#tools > .tools-note {
-  position: relative; z-index: 1;
-}
-#tools > .section-title::before {
-  content: "";
-  position: absolute;
-  inset: -60px -32px 0;
-  background: color-mix(in srgb, var(--bg) 70%, transparent);
-  border-radius: 4px;
-  z-index: -1;
-  pointer-events: none;
-}
+/* no backdrop pseudo-element — text shadows handle legibility */
 .cv-builder-wrap {
   width: 100%; border: 1px solid var(--line);
   border-radius: var(--radius); overflow: hidden;
