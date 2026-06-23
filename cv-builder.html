@@ -437,15 +437,8 @@ var SCHEMAS = {
 var KEY = 'cvbuilder:v1';
 var state = { basics: {}, education: [], positions: [], publications: [], presentations: [], teaching: [], awards: [], skills: [] };
 
-function load() {
-  try {
-    var raw = localStorage.getItem(KEY);
-    if (raw) { var s = JSON.parse(raw); Object.assign(state, s); }
-  } catch(e) {}
-}
-function save() {
-  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {}
-}
+function load() { /* public version: always starts blank */ }
+function save() { /* public version: no persistence */ }
 
 /* ================================================================
    BASICS — bind inputs
@@ -700,7 +693,7 @@ document.getElementById('printBtn').addEventListener('click', function() {
 document.getElementById('resetBtn').addEventListener('click', function() {
   if (!confirm('Clear all CV data? This cannot be undone.')) return;
   state = { basics: {}, education: [], positions: [], publications: [], presentations: [], teaching: [], awards: [], skills: [] };
-  try { localStorage.removeItem(KEY); } catch(e) {}
+  // no localStorage to clear
   bindBasics();
   ['education','positions','publications','presentations','teaching','awards','skills'].forEach(renderList);
   renderPreview();
