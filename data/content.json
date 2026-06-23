@@ -21,7 +21,7 @@
   "teaching": [
     {"title": "POL309: Politics of the European Union", "meta": "Instructor of Record · Summer 2025; Summer 2026; Fall 2026; Spring 2027",
      "desc": "",
-     "links": []}
+     "links": [{"label": "Syllabus", "href": "files/POL309_Summer2026.pdf"}]}
   ],
   "cvEducation": [
     {"year": "2023–2028", "title": "PhD, Political Science", "detail": "Stony Brook University · Committee: Leonie Huddy, Stephanie DeMora, Pazit Ben Nun-Bloom, Eric Groenendyk"},
