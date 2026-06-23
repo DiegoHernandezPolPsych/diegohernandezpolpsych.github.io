@@ -520,6 +520,16 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
 /* =========================================================
    FOOTER
 ========================================================= */
+/* CV Builder iframe */
+.cv-builder-wrap {
+  width: 100%; border: 1px solid var(--line);
+  border-radius: var(--radius); overflow: hidden;
+  height: calc(100vh - 180px); min-height: 600px;
+}
+.cv-builder-wrap iframe {
+  width: 100%; height: 100%; border: 0; display: block;
+}
+
 .site-footer {
   border-top: 1px solid var(--line);
   margin-top: 40px;
@@ -654,6 +664,7 @@ html.vt-on .panel.is-active { animation: none; }
       <button class="tab" role="tab" id="tab-research" aria-controls="research" aria-selected="false" tabindex="-1">Research</button>
       <button class="tab" role="tab" id="tab-teaching" aria-controls="teaching" aria-selected="false" tabindex="-1">Teaching</button>
       <button class="tab" role="tab" id="tab-cv"       aria-controls="cv"       aria-selected="false" tabindex="-1">CV</button>
+      <button class="tab" role="tab" id="tab-tools"    aria-controls="tools"    aria-selected="false" tabindex="-1">CV Builder</button>
       <button class="tab" role="tab" id="tab-contact"  aria-controls="contact"  aria-selected="false" tabindex="-1">Contact</button>
     </nav>
 
@@ -830,6 +841,16 @@ html.vt-on .panel.is-active { animation: none; }
     </div>
   </section>
 
+  <!-- ============================== CV BUILDER ============================== -->
+  <section class="panel" id="tools" role="tabpanel" aria-labelledby="tab-tools" tabindex="0" hidden>
+    <p class="eyebrow">CV Builder</p>
+    <h2 class="section-title" data-key="toolsTitle">CV Builder</h2>
+    <p class="lede">Build and export a formatted CV directly in your browser. Your data stays on your device and is never sent anywhere.</p>
+    <div class="cv-builder-wrap">
+      <iframe id="cvBuilderFrame" src="" title="CV Builder" allowfullscreen></iframe>
+    </div>
+  </section>
+
   <!-- ============================== CONTACT ============================== -->
   <!-- EDIT email. The profile links below are pulled from your public pages. -->
   <section class="panel" id="contact" role="tabpanel" aria-labelledby="tab-contact" tabindex="0" hidden>
@@ -987,6 +1008,16 @@ html.vt-on .panel.is-active { animation: none; }
   var valid = panels.some(function (p) { return p.id === initial; });
   activate(valid ? initial : "about", false, false);
 })();
+
+// lazy-load the CV Builder iframe on first visit to that tab
+document.addEventListener("section:active", function (e) {
+  if (e.detail && e.detail.id === "tools") {
+    var frame = document.getElementById("cvBuilderFrame");
+    if (frame && !frame.getAttribute("src")) {
+      frame.setAttribute("src", "cv-builder.html");
+    }
+  }
+});
 
 /* =========================================================
    CONTENT — render editable fields from data/content.json

@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
+<title>CV Builder · Studio</title>
+<style media="print">
+  /* override the page title shown in browser print header */
+  head title::after { content: ""; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ================================================================
+   TOKENS — match the public site exactly
+================================================================ */
+:root {
+  --bg: #faf8f3; --surface: #fffefb; --tint: #f3efe3;
+  --ink: #211f18; --muted: #6a6453; --faint: #938d79;
+  --line: #e6dfcd; --line2: #d6cdb4;
+  --accent: #876417; --gold: #c39a22; --teal: #2f4b44;
+  --d: "Fraunces", Georgia, serif;
+  --b: "Hanken Grotesk", system-ui, sans-serif;
+  --m: "Spline Sans Mono", monospace;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--b); font-size: 15px; -webkit-font-smoothing: antialiased; }
+
+/* ================================================================
+   LAYOUT — top bar + two-pane split
+================================================================ */
+.app { display: flex; flex-direction: column; height: 100vh; }
+
+.topbar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 20px; border-bottom: 1px solid var(--line);
+  background: var(--surface); flex: none;
+}
+.logo {
+  font-family: var(--d); font-size: 1.05rem; font-weight: 500;
+  color: var(--ink); margin-right: 4px;
+}
+.logo span { color: var(--gold); font-style: italic; }
+.topbar-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+.btn {
+  font-family: var(--b); font-size: .82rem; font-weight: 500;
+  padding: 7px 14px; border-radius: 100px;
+  border: 1px solid var(--line2); background: var(--surface);
+  color: var(--ink); cursor: pointer;
+  transition: border-color .2s var(--ease), background .2s var(--ease);
+}
+.btn:hover { border-color: var(--gold); }
+.btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.btn.primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.danger { border-color: color-mix(in srgb, #c0392b 30%, var(--line)); color: #c0392b; }
+.btn.danger:hover { background: #fff5f5; }
+
+.panes { display: flex; flex: 1; overflow: hidden; }
+
+/* ================================================================
+   LEFT PANE — editor
+================================================================ */
+.editor-pane {
+  width: 420px; flex: none; display: flex; flex-direction: column;
+  border-right: 1px solid var(--line); overflow: hidden;
+}
+.section-nav {
+  display: flex; gap: 0; overflow-x: auto; scrollbar-width: none;
+  border-bottom: 1px solid var(--line); flex: none;
+}
+.section-nav::-webkit-scrollbar { display: none; }
+.snav-btn {
+  font-family: var(--m); font-size: .68rem; letter-spacing: .06em; text-transform: uppercase;
+  padding: 10px 14px; border: 0; background: transparent; color: var(--faint);
+  cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
+}
+.snav-btn:hover { color: var(--ink); }
+.snav-btn.active { color: var(--ink); border-bottom-color: var(--gold); }
+
+.editor-body { flex: 1; overflow-y: auto; padding: 20px; }
+
+/* section panels */
+.section-panel { display: none; }
+.section-panel.active { display: block; }
+
+.field-group { margin-bottom: 18px; }
+.field-label {
+  display: block; font-family: var(--m); font-size: .7rem;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--faint);
+  margin-bottom: 5px;
+}
+input[type=text], input[type=email], input[type=url], textarea, select {
+  width: 100%; background: var(--bg); color: var(--ink);
+  border: 1px solid var(--line2); border-radius: 3px;
+  padding: 8px 10px; font-family: var(--b); font-size: .92rem;
+  line-height: 1.5; resize: vertical;
+}
+input:focus, textarea:focus, select:focus {
+  outline: 2px solid var(--gold); border-color: var(--gold);
+}
+textarea { min-height: 72px; }
+
+/* list items (experience, publications, etc.) */
+.item-list { display: grid; gap: 10px; margin-bottom: 14px; }
+.item-card {
+  background: var(--tint); border: 1px solid var(--line);
+  border-radius: 3px; padding: 12px 14px;
+}
+.item-card-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px;
+}
+.item-card-title { font-weight: 600; font-size: .9rem; color: var(--ink); }
+.item-remove {
+  font-size: .72rem; color: var(--faint); background: transparent;
+  border: 0; cursor: pointer; padding: 2px 6px; border-radius: 3px;
+}
+.item-remove:hover { color: #c0392b; background: #fff5f5; }
+.item-fields { display: grid; gap: 8px; }
+.item-fields .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.add-item-btn {
+  width: 100%; padding: 9px; border: 1px dashed var(--line2);
+  background: transparent; border-radius: 3px; color: var(--muted);
+  font-family: var(--b); font-size: .85rem; cursor: pointer;
+  transition: border-color .2s, color .2s;
+}
+.add-item-btn:hover { border-color: var(--gold); color: var(--accent); }
+
+.section-title-edit {
+  font-family: var(--d); font-size: 1.1rem; font-weight: 500;
+  margin-bottom: 16px; color: var(--ink);
+}
+
+/* ================================================================
+   RIGHT PANE — live preview
+================================================================ */
+.preview-pane {
+  flex: 1; overflow-y: auto; background: #e8e4dc;
+  display: flex; justify-content: center; padding: 32px 24px;
+}
+.cv-sheet {
+  width: 100%; max-width: 780px; min-height: 1040px;
+  background: #fff; box-shadow: 0 4px 32px rgba(0,0,0,.12);
+  padding: 48px 56px 64px;
+  font-family: var(--b); font-size: 10.5pt; line-height: 1.5; color: #1a1810;
+}
+
+/* CV typography */
+.cv-name {
+  font-family: var(--d); font-size: 26pt; font-weight: 500;
+  letter-spacing: -.01em; line-height: 1.05; margin-bottom: 4px;
+}
+.cv-role {
+  font-family: var(--d); font-style: italic; font-size: 12pt;
+  color: #2f4b44; margin-bottom: 12px;
+}
+.cv-contact-line {
+  font-family: var(--m); font-size: 8pt; letter-spacing: .04em;
+  color: #6a6453; border-top: 1px solid #d6cdb4;
+  border-bottom: 1px solid #d6cdb4; padding: 7px 0; margin-bottom: 24px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0;
+}
+.cv-contact-line span { display: inline-flex; align-items: center; }
+.cv-contact-line span + span::before {
+  content: "·"; margin: 0 10px; color: #c39a22;
+}
+.cv-section { margin-bottom: 22px; }
+.cv-section-heading {
+  font-family: var(--m); font-size: 7pt; letter-spacing: .16em;
+  text-transform: uppercase; color: #c39a22;
+  border-bottom: 1px solid #e6dfcd; padding-bottom: 4px; margin-bottom: 10px;
+}
+.cv-entry { margin-bottom: 10px; }
+.cv-entry-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 8px;
+}
+.cv-entry-title { font-weight: 600; font-size: 10pt; }
+.cv-entry-date { font-family: var(--m); font-size: 8pt; color: #6a6453; white-space: nowrap; }
+.cv-entry-sub { font-size: 9pt; color: #6a6453; margin-bottom: 2px; }
+.cv-entry-body { font-size: 9pt; line-height: 1.5; color: #3a3527; margin-top: 2px; }
+.cv-entry-body p { margin-bottom: 2px; }
+/* skills: single column with category as a fixed-width label */
+.cv-skills-grid { display: grid; gap: 3px; }
+.cv-skill-row { font-size: 9pt; display: grid; grid-template-columns: 120px 1fr; gap: 8px; }
+.cv-skill-cat { font-weight: 600; color: #211f18; }
+.cv-skill-val { color: #6a6453; }
+.cv-pub { margin-bottom: 7px; font-size: 9pt; line-height: 1.5; }
+.cv-pub .cv-pub-title { font-style: italic; }
+
+/* empty state */
+.empty { color: var(--faint); font-style: italic; font-size: 9pt; }
+
+/* ================================================================
+   PRINT — suppress browser chrome, clean page output
+================================================================ */
+@media print {
+  /* hide browser-injected URL and timestamp */
+  @page {
+    size: letter;
+    margin: 0.65in 0.7in;
+    /* these suppress the URL/title in most browsers */
+    margin-top: 0.65in;
+  }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .editor-pane, .topbar { display: none !important; }
+  body, .app, .panes, .preview-pane {
+    display: block; background: #fff;
+    margin: 0; padding: 0;
+  }
+  .preview-pane { padding: 0; background: #fff; }
+  .cv-sheet {
+    box-shadow: none; padding: 0;
+    max-width: 100%; min-height: unset;
+    font-size: 10pt;
+  }
+  .cv-name { font-size: 22pt; }
+  .cv-role { font-size: 11pt; }
+  /* prevent section headings orphaning at bottom of page */
+  .cv-section { break-inside: avoid-column; }
+  .cv-section-heading { break-after: avoid; }
+  .cv-entry { break-inside: avoid; }
+}
+
+/* ================================================================
+   IMPORT MODAL
+================================================================ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(20,19,14,.6); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface); border: 1px solid var(--line2);
+  border-radius: 6px; padding: 28px 32px; max-width: 600px; width: 92%;
+  box-shadow: 0 24px 64px rgba(0,0,0,.18);
+}
+.modal h2 { font-family: var(--d); font-weight: 500; font-size: 1.2rem; margin-bottom: 4px; }
+.modal .sub { font-size: .86rem; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+.import-status { font-size: .88rem; color: var(--muted); margin: 10px 0; min-height: 20px; }
+.import-status.err { color: #c0392b; }
+.import-status.ok { color: #2f4b44; font-weight: 600; }
+.parsed-preview {
+  background: var(--tint); border: 1px solid var(--line); border-radius: 3px;
+  padding: 12px 14px; font-family: var(--m); font-size: .76rem; line-height: 1.75;
+  color: var(--muted); max-height: 240px; overflow-y: auto; margin-bottom: 14px;
+  white-space: pre-wrap; display: none;
+}
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
+#importLabel { cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <span class="logo">CV <span>Builder</span></span>
+    <div class="topbar-actions">
+      <label class="btn" id="importLabel" title="Import from existing CV PDF">
+        Import PDF
+        <input type="file" id="pdfUpload" accept=".pdf" style="display:none" />
+      </label>
+      <button class="btn" id="resetBtn">Reset</button>
+      <span style="font-family:var(--m);font-size:.68rem;color:var(--faint);letter-spacing:.04em">Uncheck "Headers &amp; footers" in print dialog</span>
+      <button class="btn primary" id="printBtn">Export PDF</button>
+    </div>
+  </header>
+
+  <div class="panes">
+
+    <!-- EDITOR PANE -->
+    <aside class="editor-pane">
+      <nav class="section-nav" role="tablist">
+        <button class="snav-btn active" data-section="basics">Basics</button>
+        <button class="snav-btn" data-section="education">Education</button>
+        <button class="snav-btn" data-section="positions">Positions</button>
+        <button class="snav-btn" data-section="publications">Publications</button>
+        <button class="snav-btn" data-section="presentations">Presentations</button>
+        <button class="snav-btn" data-section="teaching">Teaching</button>
+        <button class="snav-btn" data-section="awards">Awards</button>
+        <button class="snav-btn" data-section="skills">Skills</button>
+      </nav>
+
+      <div class="editor-body">
+
+        <!-- BASICS -->
+        <div class="section-panel active" id="panel-basics">
+          <div class="field-group">
+            <label class="field-label">Full name</label>
+            <input type="text" id="f-name" placeholder="Diego Hernandez" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Title / role</label>
+            <input type="text" id="f-role" placeholder="PhD Candidate in Political Science" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Email</label>
+            <input type="email" id="f-email" placeholder="diego.hernandez@stonybrook.edu" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Website</label>
+            <input type="url" id="f-website" placeholder="diegohernandezpolpsych.github.io" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Location</label>
+            <input type="text" id="f-location" placeholder="Stony Brook, NY" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Summary / research statement</label>
+            <textarea id="f-summary" rows="5" placeholder="Brief statement about your research…"></textarea>
+          </div>
+        </div>
+
+        <!-- EDUCATION -->
+        <div class="section-panel" id="panel-education">
+          <p class="section-title-edit">Education</p>
+          <div class="item-list" id="list-education"></div>
+          <button class="add-item-btn" data-list="education">+ Add degree</button>
+        </div>
+
+        <!-- POSITIONS -->
+        <div class="section-panel" id="panel-positions">
+          <p class="section-title-edit">Academic positions</p>
+          <div class="item-list" id="list-positions"></div>
+          <button class="add-item-btn" data-list="positions">+ Add position</button>
+        </div>
+
+        <!-- PUBLICATIONS -->
+        <div class="section-panel" id="panel-publications">
+          <p class="section-title-edit">Publications</p>
+          <div class="item-list" id="list-publications"></div>
+          <button class="add-item-btn" data-list="publications">+ Add publication</button>
+        </div>
+
+        <!-- PRESENTATIONS -->
+        <div class="section-panel" id="panel-presentations">
+          <p class="section-title-edit">Presentations</p>
+          <div class="item-list" id="list-presentations"></div>
+          <button class="add-item-btn" data-list="presentations">+ Add presentation</button>
+        </div>
+
+        <!-- TEACHING -->
+        <div class="section-panel" id="panel-teaching">
+          <p class="section-title-edit">Teaching</p>
+          <div class="item-list" id="list-teaching"></div>
+          <button class="add-item-btn" data-list="teaching">+ Add course</button>
+        </div>
+
+        <!-- AWARDS -->
+        <div class="section-panel" id="panel-awards">
+          <p class="section-title-edit">Fellowships, awards &amp; grants</p>
+          <div class="item-list" id="list-awards"></div>
+          <button class="add-item-btn" data-list="awards">+ Add award</button>
+        </div>
+
+        <!-- SKILLS -->
+        <div class="section-panel" id="panel-skills">
+          <p class="section-title-edit">Methods &amp; skills</p>
+          <div class="item-list" id="list-skills"></div>
+          <button class="add-item-btn" data-list="skills">+ Add skill row</button>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- PREVIEW PANE -->
+    <main class="preview-pane" id="previewPane">
+      <div class="cv-sheet" id="cvSheet">
+        <!-- rendered by JS -->
+      </div>
+    </main>
+
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   DATA SCHEMA
+================================================================ */
+var SCHEMAS = {
+  education: [
+    { key: 'degree',      label: 'Degree', placeholder: 'PhD, Political Science' },
+    { key: 'institution', label: 'Institution', placeholder: 'Stony Brook University' },
+    { key: 'date',        label: 'Year / date range', placeholder: '2019 –', half: true },
+    { key: 'note',        label: 'Note', placeholder: 'Committee: Huddy, DeMora, Groenendyk', half: true },
+    { key: 'detail',      label: 'Detail (optional)', placeholder: 'Dissertation: …', ta: true }
+  ],
+  positions: [
+    { key: 'title',       label: 'Title', placeholder: 'Instructor of Record' },
+    { key: 'institution', label: 'Institution / department', placeholder: 'Stony Brook University' },
+    { key: 'date',        label: 'Date range', placeholder: 'Fall 2023', half: true },
+    { key: 'location',    label: 'Location', placeholder: 'Stony Brook, NY', half: true }
+  ],
+  publications: [
+    { key: 'authors',  label: 'Authors', placeholder: 'Hernandez, D.' },
+    { key: 'year',     label: 'Year', placeholder: '2025', half: true },
+    { key: 'status',   label: 'Status', placeholder: 'Working paper', half: true },
+    { key: 'title',    label: 'Title', placeholder: 'Paper title…' },
+    { key: 'venue',    label: 'Journal / venue', placeholder: 'Working paper / Under review at…' }
+  ],
+  presentations: [
+    { key: 'title',    label: 'Paper title', placeholder: 'Two pathways into independence…' },
+    { key: 'venue',    label: 'Conference / venue', placeholder: 'APSA Annual Meeting' },
+    { key: 'date',     label: 'Date', placeholder: 'September 2024', half: true },
+    { key: 'location', label: 'Location', placeholder: 'Philadelphia, PA', half: true }
+  ],
+  teaching: [
+    { key: 'course',   label: 'Course title', placeholder: 'European Union Politics' },
+    { key: 'role',     label: 'Role', placeholder: 'Instructor of Record', half: true },
+    { key: 'date',     label: 'Term', placeholder: 'Fall 2023', half: true },
+    { key: 'institution', label: 'Institution', placeholder: 'Stony Brook University' }
+  ],
+  awards: [
+    { key: 'title',    label: 'Award / fellowship name', placeholder: 'Graduate Research Fellowship' },
+    { key: 'org',      label: 'Organization', placeholder: 'NSF', half: true },
+    { key: 'date',     label: 'Year', placeholder: '2023', half: true },
+    { key: 'detail',   label: 'Detail (optional)', placeholder: 'Amount, description…', ta: true }
+  ],
+  skills: [
+    { key: 'category', label: 'Category', placeholder: 'Methods', half: true },
+    { key: 'items',    label: 'Items', placeholder: 'Survey experiments, R, RMarkdown', half: true }
+  ]
+};
+
+/* ================================================================
+   STATE + PERSISTENCE
+================================================================ */
+var KEY = 'cvbuilder:v1';
+var state = { basics: {}, education: [], positions: [], publications: [], presentations: [], teaching: [], awards: [], skills: [] };
+
+function load() {
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) { var s = JSON.parse(raw); Object.assign(state, s); }
+  } catch(e) {}
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+/* ================================================================
+   BASICS — bind inputs
+================================================================ */
+var basicFields = ['name','role','email','website','location','summary'];
+function bindBasics() {
+  basicFields.forEach(function(k) {
+    var el = document.getElementById('f-' + k);
+    if (!el) return;
+    el.value = state.basics[k] || '';
+    el.addEventListener('input', function() {
+      state.basics[k] = el.value;
+      save(); renderPreview();
+    });
+  });
+}
+
+/* ================================================================
+   LIST SECTIONS — render editor cards
+================================================================ */
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>]/g, function(c) {
+    return { '&':'&amp;','<':'&lt;','>':'&gt;' }[c];
+  });
+}
+
+function renderList(listName) {
+  var container = document.getElementById('list-' + listName);
+  if (!container) return;
+  var schema = SCHEMAS[listName];
+  var items = state[listName] || [];
+  container.innerHTML = '';
+  items.forEach(function(item, idx) {
+    var card = document.createElement('div');
+    card.className = 'item-card';
+
+    var titleText = item[schema[0].key] || ('Item ' + (idx+1));
+    card.innerHTML =
+      '<div class="item-card-header">' +
+        '<span class="item-card-title">' + esc(titleText) + '</span>' +
+        '<button class="item-remove" data-list="' + listName + '" data-idx="' + idx + '">Remove</button>' +
+      '</div>' +
+      '<div class="item-fields">' + renderFields(schema, item, listName, idx) + '</div>';
+    container.appendChild(card);
+  });
+
+  // bind inputs
+  container.querySelectorAll('input,textarea').forEach(function(el) {
+    el.addEventListener('input', function() {
+      var l = el.dataset.list, i = parseInt(el.dataset.idx), k = el.dataset.key;
+      state[l][i][k] = el.value;
+      // update card title if first field changed
+      var firstKey = SCHEMAS[l][0].key;
+      if (k === firstKey) el.closest('.item-card').querySelector('.item-card-title').textContent = el.value || ('Item ' + (i+1));
+      save(); renderPreview();
+    });
+  });
+  container.querySelectorAll('.item-remove').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      state[btn.dataset.list].splice(parseInt(btn.dataset.idx), 1);
+      renderList(btn.dataset.list);
+      save(); renderPreview();
+    });
+  });
+}
+
+function renderFields(schema, item, listName, idx) {
+  var pairs = [];
+  var i = 0;
+  while (i < schema.length) {
+    var f = schema[i];
+    if (f.half && schema[i+1] && schema[i+1].half) {
+      pairs.push('<div class="row-2">' + field(f, item, listName, idx) + field(schema[i+1], item, listName, idx) + '</div>');
+      i += 2;
+    } else {
+      pairs.push(field(f, item, listName, idx));
+      i++;
+    }
+  }
+  return pairs.join('');
+}
+
+function field(f, item, listName, idx) {
+  var val = esc(item[f.key] || '');
+  var attrs = 'data-list="' + listName + '" data-idx="' + idx + '" data-key="' + f.key + '" placeholder="' + esc(f.placeholder || '') + '"';
+  return '<div class="field-group">' +
+    '<label class="field-label">' + esc(f.label) + '</label>' +
+    (f.ta
+      ? '<textarea ' + attrs + ' rows="2">' + val + '</textarea>'
+      : '<input type="text" ' + attrs + ' value="' + val + '" />') +
+    '</div>';
+}
+
+function addItem(listName) {
+  state[listName].push({});
+  renderList(listName);
+  save(); renderPreview();
+  // scroll to new card
+  var container = document.getElementById('list-' + listName);
+  if (container && container.lastChild) container.lastChild.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ================================================================
+   PREVIEW RENDERER
+================================================================ */
+function renderPreview() {
+  var b = state.basics;
+  var sheet = document.getElementById('cvSheet');
+  var html = '';
+
+  // Header
+  if (b.name || b.role) {
+    if (b.name) html += '<div class="cv-name">' + esc(b.name) + '</div>';
+    if (b.role) html += '<div class="cv-role">' + esc(b.role) + '</div>';
+  }
+
+  // Contact line
+  var contacts = [b.email, b.website, b.location].filter(Boolean);
+  if (contacts.length) {
+    html += '<div class="cv-contact-line">' + contacts.map(function(c) { return '<span>' + esc(c) + '</span>'; }).join('') + '</div>';
+  }
+
+  // Summary
+  if (b.summary) {
+    html += '<div class="cv-section"><div class="cv-entry-body"><p>' + esc(b.summary).replace(/\n/g,'</p><p>') + '</p></div></div>';
+  }
+
+  // Education
+  html += renderSection('Education', state.education, function(item) {
+    return '<div class="cv-entry">' +
+      '<div class="cv-entry-header">' +
+        '<span class="cv-entry-title">' + esc(item.degree || '') + '</span>' +
+        '<span class="cv-entry-date">' + esc(item.date || '') + '</span>' +
+      '</div>' +
+      (item.institution ? '<div class="cv-entry-sub">' + esc(item.institution) + (item.note ? ' · ' + esc(item.note) : '') + '</div>' : '') +
+      (item.detail ? '<div class="cv-entry-body"><p>' + esc(item.detail) + '</p></div>' : '') +
+    '</div>';
+  });
+
+  // Positions
+  html += renderSection('Academic Positions', state.positions, function(item) {
+    return '<div class="cv-entry">' +
+      '<div class="cv-entry-header">' +
+        '<span class="cv-entry-title">' + esc(item.title || '') + '</span>' +
+        '<span class="cv-entry-date">' + esc(item.date || '') + '</span>' +
+      '</div>' +
+      (item.institution ? '<div class="cv-entry-sub">' + esc(item.institution) + (item.location ? ', ' + esc(item.location) : '') + '</div>' : '') +
+    '</div>';
+  });
+
+  // Publications
+  html += renderSection('Publications', state.publications, function(item) {
+    return '<div class="cv-pub">' +
+      (item.authors ? esc(item.authors) + ' ' : '') +
+      (item.year ? '(' + esc(item.year) + '). ' : '') +
+      (item.title ? '<span class="cv-pub-title">' + esc(item.title) + '</span>. ' : '') +
+      (item.venue ? esc(item.venue) + '.' : '') +
+      (item.status ? ' <em>' + esc(item.status) + '.</em>' : '') +
+    '</div>';
+  });
+
+  // Presentations
+  html += renderSection('Presentations', state.presentations, function(item) {
+    return '<div class="cv-entry">' +
+      '<div class="cv-entry-header">' +
+        '<span class="cv-entry-title">' + esc(item.title || '') + '</span>' +
+        '<span class="cv-entry-date">' + esc(item.date || '') + '</span>' +
+      '</div>' +
+      (item.venue ? '<div class="cv-entry-sub">' + esc(item.venue) + (item.location ? ', ' + esc(item.location) : '') + '</div>' : '') +
+    '</div>';
+  });
+
+  // Teaching
+  html += renderSection('Teaching', state.teaching, function(item) {
+    return '<div class="cv-entry">' +
+      '<div class="cv-entry-header">' +
+        '<span class="cv-entry-title">' + esc(item.course || '') + '</span>' +
+        '<span class="cv-entry-date">' + esc(item.date || '') + '</span>' +
+      '</div>' +
+      (item.role || item.institution ? '<div class="cv-entry-sub">' + [item.role, item.institution].filter(Boolean).map(esc).join(', ') + '</div>' : '') +
+    '</div>';
+  });
+
+  // Awards
+  html += renderSection('Fellowships, Awards & Grants', state.awards, function(item) {
+    return '<div class="cv-entry">' +
+      '<div class="cv-entry-header">' +
+        '<span class="cv-entry-title">' + esc(item.title || '') + '</span>' +
+        '<span class="cv-entry-date">' + esc(item.date || '') + '</span>' +
+      '</div>' +
+      (item.org ? '<div class="cv-entry-sub">' + esc(item.org) + '</div>' : '') +
+      (item.detail ? '<div class="cv-entry-body"><p>' + esc(item.detail) + '</p></div>' : '') +
+    '</div>';
+  });
+
+  // Skills
+  if (state.skills && state.skills.length) {
+    html += '<div class="cv-section"><div class="cv-section-heading">Methods &amp; Skills</div>';
+    html += '<div class="cv-skills-grid">';
+    state.skills.forEach(function(s) {
+      if (!s.category && !s.items) return;
+      html += '<div class="cv-skill-row"><span class="cv-skill-cat">' + esc(s.category || '') + '</span><span class="cv-skill-val">' + esc(s.items || '') + '</span></div>';
+    });
+    html += '</div></div>';
+  }
+
+  if (!html) html = '<p class="empty">Start filling in Basics to see your CV here.</p>';
+  sheet.innerHTML = html;
+}
+
+function renderSection(heading, items, renderItem) {
+  if (!items || !items.length) return '';
+  var filled = items.filter(function(it) { return Object.values(it).some(function(v){ return v && v.trim(); }); });
+  if (!filled.length) return '';
+  return '<div class="cv-section"><div class="cv-section-heading">' + heading + '</div>' +
+    filled.map(renderItem).join('') +
+  '</div>';
+}
+
+/* ================================================================
+   NAV TABS
+================================================================ */
+document.querySelectorAll('.snav-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.snav-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.section-panel').forEach(function(p) { p.classList.remove('active'); });
+    btn.classList.add('active');
+    var panel = document.getElementById('panel-' + btn.dataset.section);
+    if (panel) panel.classList.add('active');
+  });
+});
+
+/* ================================================================
+   ADD ITEM BUTTONS
+================================================================ */
+document.querySelectorAll('.add-item-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() { addItem(btn.dataset.list); });
+});
+
+/* ================================================================
+   EXPORT PDF
+================================================================ */
+document.getElementById('printBtn').addEventListener('click', function() {
+  // Safari: in the print dialog, uncheck "Print headers and footers"
+  // Chrome: in More settings, uncheck "Headers and footers"
+  window.print();
+});
+
+/* ================================================================
+   RESET
+================================================================ */
+document.getElementById('resetBtn').addEventListener('click', function() {
+  if (!confirm('Clear all CV data? This cannot be undone.')) return;
+  state = { basics: {}, education: [], positions: [], publications: [], presentations: [], teaching: [], awards: [], skills: [] };
+  try { localStorage.removeItem(KEY); } catch(e) {}
+  bindBasics();
+  ['education','positions','publications','presentations','teaching','awards','skills'].forEach(renderList);
+  renderPreview();
+});
+
+/* ================================================================
+   BOOT
+================================================================ */
+load();
+bindBasics();
+['education','positions','publications','presentations','teaching','awards','skills'].forEach(renderList);
+renderPreview();
+</script>
+
+<!-- IMPORT MODAL -->
+<div class="modal-overlay" id="importOverlay">
+  <div class="modal">
+    <h2>Import from existing CV</h2>
+    <p class="sub">Upload a PDF of your CV. The tool will extract text and attempt to pre-fill your sections. Review everything after importing — auto-detection is imperfect and you'll want to check each section.</p>
+    <p class="import-status" id="importStatus"></p>
+    <div class="parsed-preview" id="parsedPreview"></div>
+    <div class="modal-actions">
+      <button class="btn" id="importCancelBtn">Cancel</button>
+      <button class="btn primary" id="importApplyBtn" disabled>Fill form from this CV</button>
+    </div>
+  </div>
+</div>
+
+<!-- PDF.js from cdnjs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+/* ================================================================
+   PDF IMPORT
+   Strategy: extract all text from the PDF, then run a set of
+   heuristic pattern matchers to identify sections and fill state.
+   This works well on text-layer PDFs (not scanned images).
+================================================================ */
+(function () {
+  if (typeof pdfjsLib === 'undefined') return;
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  var overlay   = document.getElementById('importOverlay');
+  var status    = document.getElementById('importStatus');
+  var preview   = document.getElementById('parsedPreview');
+  var applyBtn  = document.getElementById('importApplyBtn');
+  var cancelBtn = document.getElementById('importCancelBtn');
+  var fileInput = document.getElementById('pdfUpload');
+  var parsed    = null; // will hold { basics, education, … } when ready
+
+  // open modal when file selected
+  fileInput.addEventListener('change', function () {
+    if (!fileInput.files || !fileInput.files[0]) return;
+    overlay.classList.add('open');
+    status.className = 'import-status';
+    status.textContent = 'Reading PDF…';
+    preview.style.display = 'none';
+    applyBtn.disabled = true;
+    parsed = null;
+    extractPDF(fileInput.files[0]);
+    fileInput.value = ''; // reset so same file can be re-selected
+  });
+
+  cancelBtn.addEventListener('click', function () { overlay.classList.remove('open'); });
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.classList.remove('open'); });
+
+  applyBtn.addEventListener('click', function () {
+    if (!parsed) return;
+    // merge into state (don't clobber fields the user already filled unless extracted has content)
+    var b = parsed.basics;
+    Object.keys(b).forEach(function (k) { if (b[k]) state.basics[k] = b[k]; });
+    ['education','positions','publications','presentations','teaching','awards','skills'].forEach(function (sec) {
+      if (parsed[sec] && parsed[sec].length) state[sec] = parsed[sec];
+    });
+    save();
+    bindBasics();
+    ['education','positions','publications','presentations','teaching','awards','skills'].forEach(renderList);
+    renderPreview();
+    overlay.classList.remove('open');
+  });
+
+  /* ------------------------------------------------------------------
+     STEP 1: extract raw text from PDF using PDF.js
+  ------------------------------------------------------------------ */
+  function extractPDF(file) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      pdfjsLib.getDocument({ data: e.target.result }).promise
+        .then(function (pdf) {
+          var pages = [];
+          var chain = Promise.resolve();
+          for (var i = 1; i <= pdf.numPages; i++) {
+            (function(pageNum) {
+              chain = chain.then(function () {
+                return pdf.getPage(pageNum).then(function (page) {
+                  return page.getTextContent().then(function (tc) {
+                    pages.push(tc.items.map(function (it) { return it.str; }).join(' '));
+                  });
+                });
+              });
+            })(i);
+          }
+          chain.then(function () {
+            var fullText = pages.join('\n');
+            parseCV(fullText);
+          });
+        })
+        .catch(function (err) {
+          status.className = 'import-status err';
+          status.textContent = 'Could not read this PDF. Make sure it has a text layer (not a scanned image).';
+          console.error(err);
+        });
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  /* ------------------------------------------------------------------
+     STEP 2: parse raw CV text into structured data
+     The approach: split into sections by detecting all-caps headings,
+     then run field extractors on each section's lines.
+  ------------------------------------------------------------------ */
+  function parseCV(text) {
+    // normalize whitespace
+    text = text.replace(/\r\n/g, '\n').replace(/[ \t]+/g, ' ').trim();
+
+    // strip browser print header lines (URL, timestamp, page numbers)
+    // these appear when printing a webpage to PDF
+    var lines = text.split('\n');
+    lines = lines.filter(function(l) {
+      var t = l.trim();
+      return !(
+        /^https?:\/\//.test(t) ||                          // URLs
+        /\bPage \d+ of \d+\b/i.test(t) ||                 // "Page 1 of 2"
+        /^\d+\/\d+\/\d+,?\s+\d+:\d+/.test(t) ||           // timestamps like 6/22/26, 3:54 PM
+        /CV Builder.*Studio/i.test(t) ||                   // tool name header
+        t === ''
+      );
+    });
+    text = lines.join('\n');
+
+    // fix spaced-letter artifacts from some PDF renderers: "E D U C A T I O N" → "EDUCATION"
+    text = text.replace(/\b([A-Z]) (?=[A-Z] )/g, '$1').replace(/\b([A-Z]) ([A-Z])\b/g, '$1$2');
+    // fix broken words: "Po l itica l" → "Political", "S tu d ent" → "Student"
+    text = text.replace(/([a-zA-Z]) ([a-z])/g, function(_, a, b) {
+      // only collapse if the preceding char was a letter and the next is lowercase
+      return a + b;
+    });
+
+    // show raw text so user can verify
+    preview.textContent = text.slice(0, 2000) + (text.length > 2000 ? '\n\n[truncated for display…]' : '');
+    preview.style.display = 'block';
+
+    parsed = {
+      basics: extractBasics(text),
+      education: [],
+      positions: [],
+      publications: [],
+      presentations: [],
+      teaching: [],
+      awards: [],
+      skills: []
+    };
+
+    // split into labelled sections
+    var sections = splitSections(text);
+
+    sections.forEach(function (sec) {
+      var h = sec.heading.toLowerCase();
+      var lines = sec.body.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+
+      if (/education|degree/.test(h)) {
+        parsed.education = parseEntries(lines, 'education');
+      } else if (/position|appointment|employ/.test(h)) {
+        parsed.positions = parseEntries(lines, 'positions');
+      } else if (/publication|paper|working paper|manuscript/.test(h)) {
+        parsed.publications = parsePublications(lines);
+      } else if (/presentation|conference|talk/.test(h)) {
+        parsed.presentations = parseEntries(lines, 'presentations');
+      } else if (/teaching|course|instructor/.test(h)) {
+        parsed.teaching = parseEntries(lines, 'teaching');
+      } else if (/award|fellowship|grant|honor/.test(h)) {
+        parsed.awards = parseEntries(lines, 'awards');
+      } else if (/skill|method|software|language/.test(h)) {
+        parsed.skills = parseSkills(lines);
+      }
+    });
+
+    // summary
+    var stmt = extractStatement(text);
+    if (stmt) parsed.basics.summary = stmt;
+
+    // show summary of what was found
+    var found = [];
+    if (parsed.basics.name) found.push('Name: ' + parsed.basics.name);
+    if (parsed.basics.email) found.push('Email: ' + parsed.basics.email);
+    ['education','positions','publications','presentations','teaching','awards','skills'].forEach(function(s){
+      if (parsed[s] && parsed[s].length) found.push(s.charAt(0).toUpperCase() + s.slice(1) + ': ' + parsed[s].length + ' item(s)');
+    });
+
+    if (found.length) {
+      status.className = 'import-status ok';
+      status.textContent = 'Found: ' + found.join(' · ');
+      applyBtn.disabled = false;
+    } else {
+      status.className = 'import-status err';
+      status.textContent = 'Could not detect structured content. The PDF may be formatted in a way the parser cannot read. Review the text above and enter manually.';
+    }
+  }
+
+  /* ------------------------------------------------------------------
+     HELPERS
+  ------------------------------------------------------------------ */
+  var SECTION_HEADINGS = [
+    'education','academic positions','positions','employment',
+    'publications','working papers','manuscripts',
+    'conference presentations','presentations','talks',
+    'teaching experience','teaching','courses',
+    'awards','fellowships','grants','honors',
+    'skills','methods','software','references'
+  ];
+
+  function splitSections(text) {
+    // find lines that look like section headings: short, mostly caps or title-case, possibly bold
+    var lines = text.split('\n');
+    var sections = [];
+    var current = null;
+
+    lines.forEach(function (line) {
+      var clean = line.trim();
+      var isHeading = SECTION_HEADINGS.some(function(h){ return clean.toLowerCase() === h || clean.toLowerCase().startsWith(h + ' '); }) ||
+                      (clean.length < 60 && clean === clean.toUpperCase() && clean.length > 3 && /[A-Z]/.test(clean));
+      if (isHeading) {
+        if (current) sections.push(current);
+        current = { heading: clean, body: '' };
+      } else if (current) {
+        current.body += line + '\n';
+      }
+    });
+    if (current) sections.push(current);
+    return sections;
+  }
+
+  var DATE_RE = /\b((?:19|20)\d{2})\s*[-–—]\s*((?:19|20)\d{2}|[Pp]resent|[Cc]urrent)|\b((?:19|20)\d{2})\s*[-–—]\s*$|\b((?:19|20)\d{2})\b/;
+
+  function extractDate(line) {
+    var m = line.match(/(\b(?:19|20)\d{2}\b\s*[-–—]\s*(?:\b(?:19|20)\d{2}\b|[Pp]resent|[Cc]urrent)|\b(?:19|20)\d{2}\b[-–—]?\s*$|\b(?:19|20)\d{2}\b)/);
+    return m ? m[0].trim() : '';
+  }
+
+  function parseEntries(lines, type) {
+    var entries = [];
+    var i = 0;
+    while (i < lines.length) {
+      var line = lines[i];
+      if (!line) { i++; continue; }
+      var date = extractDate(line);
+      var titleLine = line.replace(/\b(?:19|20)\d{2}\b\s*[-–—]\s*(?:\b(?:19|20)\d{2}\b|[Pp]resent|[Cc]urrent)/g, '').trim();
+      titleLine = titleLine.replace(/,?\s*$/, '').trim();
+
+      // peek at next lines for sub-info
+      var sub = '', detail = '';
+      if (lines[i+1] && !extractDate(lines[i+1]) && lines[i+1].length < 120) {
+        sub = lines[i+1]; i++;
+        if (lines[i+1] && !extractDate(lines[i+1]) && lines[i+1].length < 200) {
+          detail = lines[i+1]; i++;
+        }
+      }
+
+      var entry = {};
+      if (type === 'education') {
+        entry = { degree: titleLine, institution: sub, date: date, note: detail };
+      } else if (type === 'positions') {
+        entry = { title: titleLine, institution: sub, date: date };
+      } else if (type === 'presentations') {
+        entry = { title: titleLine, venue: sub, date: date };
+      } else if (type === 'teaching') {
+        entry = { course: titleLine, role: sub, date: date, institution: detail };
+      } else if (type === 'awards') {
+        entry = { title: titleLine, org: sub, date: date, detail: detail };
+      }
+      if (titleLine) entries.push(entry);
+      i++;
+    }
+    return entries;
+  }
+
+  function parsePublications(lines) {
+    var pubs = [];
+    var current = '';
+    lines.forEach(function (line) {
+      if (!line) {
+        if (current) { pubs.push(parsePub(current)); current = ''; }
+      } else {
+        current += (current ? ' ' : '') + line;
+      }
+    });
+    if (current) pubs.push(parsePub(current));
+    return pubs.filter(function(p){ return p.title; });
+  }
+
+  function parsePub(text) {
+    var year = (text.match(/\b((?:19|20)\d{2})\b/) || [])[1] || '';
+    // try to find quoted or italicised title — look for text between quotes or after year
+    var title = '';
+    var m = text.match(/["""](.+?)["""]/);
+    if (m) { title = m[1]; }
+    else {
+      // heuristic: title is the longest sentence-like segment
+      var parts = text.split(/[.?!]/).map(function(s){ return s.trim(); }).filter(Boolean);
+      parts.sort(function(a,b){ return b.length - a.length; });
+      title = parts[0] || '';
+    }
+    // author is usually the first segment before the year
+    var yearIdx = text.indexOf(year);
+    var authors = yearIdx > 0 ? text.slice(0, yearIdx).replace(/[()]/g,'').trim() : '';
+    // venue is whatever comes after the title
+    var venueMatch = text.slice(text.indexOf(title) + title.length).replace(/^[.,\s]+/, '');
+    return { authors: authors, year: year, title: title, venue: venueMatch.slice(0, 120), status: '' };
+  }
+
+  function parseSkills(lines) {
+    return lines.map(function (line) {
+      var parts = line.split(/[:—–]/);
+      if (parts.length >= 2) {
+        return { category: parts[0].trim(), items: parts.slice(1).join(',').trim() };
+      }
+      return { category: '', items: line };
+    }).filter(function(s){ return s.items; });
+  }
+
+  function extractBasics(text) {
+    var basics = {};
+    // email
+    var em = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+    if (em) basics.email = em[0];
+    // website/URL
+    var url = text.match(/https?:\/\/[^\s,)>]+|(?:www\.|github\.io)[^\s,)>]*/);
+    if (url) basics.website = url[0];
+    // phone (optional)
+    // name: usually the first non-empty line that isn't a section heading
+    var lines = text.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+    for (var i = 0; i < Math.min(5, lines.length); i++) {
+      var l = lines[i];
+      if (l.length > 3 && l.length < 60 && !/[@.\/]/.test(l) && !DATE_RE.test(l)) {
+        basics.name = l; break;
+      }
+    }
+    // role: line after name often
+    if (basics.name) {
+      var ni = lines.indexOf(basics.name);
+      if (lines[ni+1] && lines[ni+1].length < 80 && !/[@]/.test(lines[ni+1])) {
+        basics.role = lines[ni+1];
+      }
+    }
+    return basics;
+  }
+
+  function extractStatement(text) {
+    // research statement often appears after contact line but before first section heading
+    var firstHeadingIdx = -1;
+    SECTION_HEADINGS.forEach(function(h) {
+      var re = new RegExp('^\\s*' + h + '\\s*$','im');
+      var m = text.search(re);
+      if (m > -1 && (firstHeadingIdx === -1 || m < firstHeadingIdx)) firstHeadingIdx = m;
+    });
+    if (firstHeadingIdx < 1) return '';
+    var preamble = text.slice(0, firstHeadingIdx);
+    // strip name/role/contact lines (first ~5 lines), keep remaining prose
+    var pLines = preamble.split('\n').map(function(l){ return l.trim(); }).filter(Boolean).slice(4);
+    var stmt = pLines.join(' ').trim();
+    return stmt.length > 30 ? stmt.slice(0, 800) : '';
+  }
+
+})();
+</script>
+</body>
+</html>
