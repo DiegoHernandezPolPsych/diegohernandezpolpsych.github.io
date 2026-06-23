@@ -523,6 +523,22 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
    FOOTER
 ========================================================= */
 /* CV Builder iframe */
+.tools-sub {
+  font-family: var(--font-display); font-weight: 500; font-size: 1.4rem;
+  color: var(--ink); margin: 28px 0 6px; letter-spacing: -.01em;
+  text-shadow: 0 1px 8px rgba(255,255,255,0.9), 0 0 24px rgba(255,255,255,0.7);
+}
+:root[data-theme="dark"] .tools-sub {
+  text-shadow: 0 1px 12px rgba(0,0,0,0.95), 0 0 32px rgba(0,0,0,0.8);
+}
+.tools-note {
+  font-family: var(--font-mono); font-size: .74rem; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--faint); margin: 0 0 14px;
+  text-shadow: 0 1px 6px rgba(255,255,255,0.8);
+}
+:root[data-theme="dark"] .tools-note {
+  text-shadow: 0 1px 8px rgba(0,0,0,0.9);
+}
 .cv-builder-wrap {
   width: 100%; border: 1px solid var(--line);
   border-radius: var(--radius); overflow: hidden;
@@ -868,9 +884,11 @@ html.vt-on .panel.is-active { animation: none; }
 
   <!-- ============================== CV BUILDER ============================== -->
   <section class="panel" id="tools" role="tabpanel" aria-labelledby="tab-tools" tabindex="0" hidden>
-    <p class="eyebrow">CV Builder</p>
-    <h2 class="section-title" data-key="toolsTitle">CV Builder</h2>
+    <p class="eyebrow">Tools</p>
+    <h2 class="section-title" data-key="toolsTitle">Tools</h2>
     <p class="lede">The tools on this page are applications I built to support my students as they pursue their degrees and careers after. Please feel free to use them.</p>
+    <h3 class="tools-sub">CV Builder</h3>
+    <p class="tools-note">Your data is entered and stored only in your browser. Nothing is sent to any server.</p>
     <div class="cv-builder-wrap">
       <iframe id="cvBuilderFrame" src="" title="CV Builder" allowfullscreen></iframe>
     </div>
