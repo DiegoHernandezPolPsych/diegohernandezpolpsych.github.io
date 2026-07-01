@@ -790,7 +790,7 @@ renderPreview();
               chain = chain.then(function () {
                 return pdf.getPage(pageNum).then(function (page) {
                   return page.getTextContent().then(function (tc) {
-                    pages.push(tc.items.map(function (it) { return it.str; }).join(' '));
+                    pages.push(itemsToText(tc.items));
                   });
                 });
               });
@@ -808,6 +808,43 @@ renderPreview();
         });
     };
     reader.readAsArrayBuffer(file);
+  }
+
+  /* ------------------------------------------------------------------
+     Reconstruct text from PDF.js items using their positions rather
+     than blindly joining every item with a space. PDF.js frequently
+     splits a single word into multiple items (kerning, font changes),
+     so a naive join(' ') inserts phantom spaces mid-word. Instead we
+     compare the horizontal gap between consecutive items to the font
+     size on that line: a real word boundary has a proportionally
+     large gap, a within-word artifact does not. Vertical jumps in y
+     position mark line breaks.
+  ------------------------------------------------------------------ */
+  function itemsToText(items) {
+    var out = '';
+    var lastEndX = null, lastY = null, lastHeight = 10;
+    items.forEach(function (item) {
+      if (!item.str) return; // skip empty/whitespace marker items
+      var tx = item.transform;
+      var x = tx[4], y = tx[5];
+      var height = item.height || Math.hypot(tx[2], tx[3]) || lastHeight;
+
+      if (lastY === null) {
+        out += item.str;
+      } else if (Math.abs(y - lastY) > height * 0.4) {
+        // vertical jump = new line
+        out += '\n' + item.str;
+      } else {
+        var gap = x - lastEndX;
+        // real word gap is roughly proportional to font size;
+        // kerning/ligature artifacts within a word are much smaller
+        out += (gap > height * 0.25 ? ' ' : '') + item.str;
+      }
+      lastY = y;
+      lastHeight = height;
+      lastEndX = x + item.width;
+    });
+    return out;
   }
 
   /* ------------------------------------------------------------------
@@ -836,11 +873,6 @@ renderPreview();
 
     // fix spaced-letter artifacts from some PDF renderers: "E D U C A T I O N" → "EDUCATION"
     text = text.replace(/\b([A-Z]) (?=[A-Z] )/g, '$1').replace(/\b([A-Z]) ([A-Z])\b/g, '$1$2');
-    // fix broken words: "Po l itica l" → "Political", "S tu d ent" → "Student"
-    text = text.replace(/([a-zA-Z]) ([a-z])/g, function(_, a, b) {
-      // only collapse if the preceding char was a letter and the next is lowercase
-      return a + b;
-    });
 
     // show raw text so user can verify
     preview.textContent = text.slice(0, 2000) + (text.length > 2000 ? '\n\n[truncated for display…]' : '');
