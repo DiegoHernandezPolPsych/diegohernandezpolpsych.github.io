@@ -776,29 +776,31 @@ renderPreview();
   });
 
   /* ------------------------------------------------------------------
-     STEP 1: extract raw text from PDF using PDF.js
+     STEP 1: extract text from PDF using PDF.js, keeping per-line font
+     size metadata rather than collapsing straight to a flat string.
+     The size data is what lets us detect section headings by their
+     visual style (below) instead of guessing from keywords or casing.
   ------------------------------------------------------------------ */
   function extractPDF(file) {
     var reader = new FileReader();
     reader.onload = function (e) {
       pdfjsLib.getDocument({ data: e.target.result }).promise
         .then(function (pdf) {
-          var pages = [];
+          var allLines = [];
           var chain = Promise.resolve();
           for (var i = 1; i <= pdf.numPages; i++) {
             (function(pageNum) {
               chain = chain.then(function () {
                 return pdf.getPage(pageNum).then(function (page) {
                   return page.getTextContent().then(function (tc) {
-                    pages.push(itemsToText(tc.items));
+                    allLines = allLines.concat(extractLines(tc.items));
                   });
                 });
               });
             })(i);
           }
           chain.then(function () {
-            var fullText = pages.join('\n');
-            parseCV(fullText);
+            parseCV(allLines);
           });
         })
         .catch(function (err) {
@@ -811,56 +813,89 @@ renderPreview();
   }
 
   /* ------------------------------------------------------------------
-     Reconstruct text from PDF.js items using their positions rather
+     Reconstruct lines from PDF.js items using their positions rather
      than blindly joining every item with a space. PDF.js frequently
      splits a single word into multiple items (kerning, font changes),
      so a naive join(' ') inserts phantom spaces mid-word. Instead we
      compare the horizontal gap between consecutive items to the font
      size on that line: a real word boundary has a proportionally
      large gap, a within-word artifact does not. Vertical jumps in y
-     position mark line breaks.
+     position mark line breaks. Each returned line also carries the
+     dominant font size of its characters, used later for layout-aware
+     heading detection instead of keyword/casing guesses.
   ------------------------------------------------------------------ */
-  function itemsToText(items) {
-    var out = '';
+  function extractLines(items) {
+    var lines = [];
+    var current = null; // { text, sizes: { "10.5": charCount, ... } }
     var lastEndX = null, lastY = null, lastHeight = 10;
+
+    function pushCurrent() {
+      if (current && current.text) {
+        var dominant = 0, dominantSize = lastHeight;
+        Object.keys(current.sizes).forEach(function (key) {
+          if (current.sizes[key] > dominant) { dominant = current.sizes[key]; dominantSize = parseFloat(key); }
+        });
+        lines.push({ text: current.text, size: dominantSize });
+      }
+      current = { text: '', sizes: {} };
+    }
+    pushCurrent();
+
     items.forEach(function (item) {
-      if (!item.str) return; // skip empty/whitespace marker items
       var tx = item.transform;
       var x = tx[4], y = tx[5];
       var height = item.height || Math.hypot(tx[2], tx[3]) || lastHeight;
 
-      if (lastY === null) {
-        out += item.str;
-      } else if (Math.abs(y - lastY) > height * 0.4) {
-        // vertical jump = new line
-        out += '\n' + item.str;
-      } else {
-        var gap = x - lastEndX;
-        // real word gap is roughly proportional to font size;
-        // kerning/ligature artifacts within a word are much smaller
-        out += (gap > height * 0.25 ? ' ' : '') + item.str;
+      if (!item.str) {
+        // empty marker item (typically hasEOL) signals an explicit line break
+        pushCurrent();
+        lastY = null; lastEndX = null; lastHeight = height;
+        return;
       }
+
+      if (lastY === null) {
+        current.text += item.str;
+      } else if (Math.abs(y - lastY) > height * 0.4) {
+        pushCurrent();
+        current.text += item.str;
+      } else {
+        var gap = (lastEndX === null) ? 0 : x - lastEndX;
+        current.text += (gap > height * 0.25 ? ' ' : '') + item.str;
+      }
+
+      var key = height.toFixed(1);
+      current.sizes[key] = (current.sizes[key] || 0) + item.str.length;
+
       lastY = y;
       lastHeight = height;
       lastEndX = x + item.width;
     });
-    return out;
+    pushCurrent();
+    return lines;
   }
 
   /* ------------------------------------------------------------------
-     STEP 2: parse raw CV text into structured data
-     The approach: split into sections by detecting all-caps headings,
-     then run field extractors on each section's lines.
+     STEP 2: parse CV lines into structured data.
+     Sections are now split by visual heading style (font size that
+     repeats across short standalone lines) rather than by keyword
+     matching or ALL-CAPS guessing, so this holds up across different
+     CV layouts. Field extraction within a section is unchanged.
   ------------------------------------------------------------------ */
-  function parseCV(text) {
-    // normalize whitespace
-    text = text.replace(/\r\n/g, '\n').replace(/[ \t]+/g, ' ').trim();
-
-    // strip browser print header lines (URL, timestamp, page numbers)
-    // these appear when printing a webpage to PDF
-    var lines = text.split('\n');
-    lines = lines.filter(function(l) {
-      var t = l.trim();
+  function parseCV(rawLines) {
+    // per-line cleanup: collapse letter-spaced caps FIRST, while a real
+    // word boundary (double space between two tracked-caps words, e.g.
+    // "A C A D E M I C  P O S I T I O N S") is still distinguishable
+    // from a single-space letter-tracking gap. Only after that do we
+    // collapse all whitespace runs down to one space — doing it in the
+    // other order destroys the double-space signal and merges words.
+    var lines = rawLines.map(function (l) {
+      var t = l.text;
+      // fix spaced-letter artifacts from some PDF renderers: "E D U C A T I O N" → "EDUCATION"
+      t = t.replace(/\b(?:[A-Z] ){1,}[A-Z]\b/g, function (m) { return m.replace(/ /g, ''); });
+      t = t.replace(/[ \t]+/g, ' ').replace(/\s+,/g, ',').trim();
+      return { text: t, size: l.size };
+    }).filter(function (l) {
+      var t = l.text;
       return !(
         /^https?:\/\//.test(t) ||                          // URLs
         /\bPage \d+ of \d+\b/i.test(t) ||                 // "Page 1 of 2"
@@ -869,17 +904,15 @@ renderPreview();
         t === ''
       );
     });
-    text = lines.join('\n');
 
-    // fix spaced-letter artifacts from some PDF renderers: "E D U C A T I O N" → "EDUCATION"
-    text = text.replace(/\b([A-Z]) (?=[A-Z] )/g, '$1').replace(/\b([A-Z]) ([A-Z])\b/g, '$1$2');
+    var text = lines.map(function (l) { return l.text; }).join('\n');
 
     // show raw text so user can verify
     preview.textContent = text.slice(0, 2000) + (text.length > 2000 ? '\n\n[truncated for display…]' : '');
     preview.style.display = 'block';
 
     parsed = {
-      basics: extractBasics(text),
+      basics: extractBasics(text, lines),
       education: [],
       positions: [],
       publications: [],
@@ -889,32 +922,32 @@ renderPreview();
       skills: []
     };
 
-    // split into labelled sections
-    var sections = splitSections(text);
+    // split into labelled sections using layout + keyword detection
+    var sections = splitSections(lines);
 
     sections.forEach(function (sec) {
       var h = sec.heading.toLowerCase();
-      var lines = sec.body.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+      var bodyLines = sec.body.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
 
       if (/education|degree/.test(h)) {
-        parsed.education = parseEntries(lines, 'education');
+        parsed.education = parseEntries(bodyLines, 'education');
       } else if (/position|appointment|employ/.test(h)) {
-        parsed.positions = parseEntries(lines, 'positions');
+        parsed.positions = parseEntries(bodyLines, 'positions');
       } else if (/publication|paper|working paper|manuscript/.test(h)) {
-        parsed.publications = parsePublications(lines);
+        parsed.publications = parsePublications(bodyLines);
       } else if (/presentation|conference|talk/.test(h)) {
-        parsed.presentations = parseEntries(lines, 'presentations');
+        parsed.presentations = parseEntries(bodyLines, 'presentations');
       } else if (/teaching|course|instructor/.test(h)) {
-        parsed.teaching = parseEntries(lines, 'teaching');
+        parsed.teaching = parseEntries(bodyLines, 'teaching');
       } else if (/award|fellowship|grant|honor/.test(h)) {
-        parsed.awards = parseEntries(lines, 'awards');
+        parsed.awards = parseEntries(bodyLines, 'awards');
       } else if (/skill|method|software|language/.test(h)) {
-        parsed.skills = parseSkills(lines);
+        parsed.skills = parseSkills(bodyLines);
       }
     });
 
     // summary
-    var stmt = extractStatement(text);
+    var stmt = extractStatement(text, sections);
     if (stmt) parsed.basics.summary = stmt;
 
     // show summary of what was found
@@ -947,21 +980,61 @@ renderPreview();
     'skills','methods','software','references'
   ];
 
-  function splitSections(text) {
-    // find lines that look like section headings: short, mostly caps or title-case, possibly bold
-    var lines = text.split('\n');
+  function splitSections(lines) {
+    // Layout-aware heading detection: instead of guessing from keywords
+    // or requiring ALL CAPS, use the font size PDF.js reports for each
+    // line. A section-label style (bold, small-caps, colored, whatever)
+    // is used repeatedly across a CV — the name, contact line, and
+    // subtitle are each a unique one-off size, but a real heading style
+    // recurs on multiple short lines. We disqualify any size that's
+    // also used by long prose lines, since that's clearly body text
+    // even if it happens to repeat.
+    var proseSizes = {};
+    lines.forEach(function (l) {
+      if (l.text.length > 60) proseSizes[l.size.toFixed(1)] = true;
+    });
+
+    var shortSizeCounts = {};
+    lines.forEach(function (l) {
+      if (l.text.length >= 2 && l.text.length <= 45) {
+        var key = l.size.toFixed(1);
+        shortSizeCounts[key] = (shortSizeCounts[key] || 0) + 1;
+      }
+    });
+    var headingSizes = {};
+    Object.keys(shortSizeCounts).forEach(function (key) {
+      if (shortSizeCounts[key] >= 2 && !proseSizes[key]) headingSizes[key] = true;
+    });
+
     var sections = [];
     var current = null;
 
-    lines.forEach(function (line) {
-      var clean = line.trim();
-      var isHeading = SECTION_HEADINGS.some(function(h){ return clean.toLowerCase() === h || clean.toLowerCase().startsWith(h + ' '); }) ||
-                      (clean.length < 60 && clean === clean.toUpperCase() && clean.length > 3 && /[A-Z]/.test(clean));
+    lines.forEach(function (l) {
+      var clean = l.text;
+      // Guard against the keyword whitelist matching an entry line that
+      // simply starts with a heading word, e.g. "Teaching Assistant
+      // 2024" starts with "teaching ". Real section labels are short
+      // standalone words and never contain a year; CV entries almost
+      // always do — so a year anywhere in the line disqualifies it.
+      var hasYear = DATE_RE.test(clean);
+      var isShortLabel = clean.length >= 2 && clean.length <= 45;
+      var isKeywordHeading = !hasYear && isShortLabel && SECTION_HEADINGS.some(function(h){
+        return clean.toLowerCase() === h || clean.toLowerCase().startsWith(h + ' ');
+      });
+      // Recurring size alone isn't enough — entry titles (e.g. "Teaching
+      // Assistant 2024") also repeat at a consistent short-line size.
+      // Requiring the line to be ALL CAPS as well reliably separates
+      // genuine section-label styling from repeated entry titles, which
+      // are always mixed case.
+      var isAllCaps = clean === clean.toUpperCase() && /[A-Z]/.test(clean);
+      var isStyleHeading = !hasYear && isShortLabel && isAllCaps && headingSizes[l.size.toFixed(1)];
+      var isHeading = isKeywordHeading || isStyleHeading;
+
       if (isHeading) {
         if (current) sections.push(current);
         current = { heading: clean, body: '' };
       } else if (current) {
-        current.body += line + '\n';
+        current.body += clean + '\n';
       }
     });
     if (current) sections.push(current);
@@ -1056,7 +1129,7 @@ renderPreview();
     }).filter(function(s){ return s.items; });
   }
 
-  function extractBasics(text) {
+  function extractBasics(text, lines) {
     var basics = {};
     // email
     var em = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
@@ -1065,35 +1138,44 @@ renderPreview();
     var url = text.match(/https?:\/\/[^\s,)>]+|(?:www\.|github\.io)[^\s,)>]*/);
     if (url) basics.website = url[0];
     // phone (optional)
-    // name: usually the first non-empty line that isn't a section heading
-    var lines = text.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
-    for (var i = 0; i < Math.min(5, lines.length); i++) {
-      var l = lines[i];
-      if (l.length > 3 && l.length < 60 && !/[@.\/]/.test(l) && !DATE_RE.test(l)) {
-        basics.name = l; break;
+
+    // name: a CV header almost always renders the name at the largest
+    // font size on the page, so prefer that signal over line order.
+    var head = (lines || []).slice(0, 8).filter(function (l) {
+      return l.text.length > 3 && l.text.length < 60 && !/[@\/]/.test(l.text) && !DATE_RE.test(l.text);
+    }).sort(function (a, b) { return b.size - a.size; });
+    if (head.length) basics.name = head[0].text;
+
+    var flatLines = text.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+    if (!basics.name) {
+      // fallback: first non-empty line that isn't a section heading
+      for (var i = 0; i < Math.min(5, flatLines.length); i++) {
+        var l = flatLines[i];
+        if (l.length > 3 && l.length < 60 && !/[@.\/]/.test(l) && !DATE_RE.test(l)) {
+          basics.name = l; break;
+        }
       }
     }
     // role: line after name often
     if (basics.name) {
-      var ni = lines.indexOf(basics.name);
-      if (lines[ni+1] && lines[ni+1].length < 80 && !/[@]/.test(lines[ni+1])) {
-        basics.role = lines[ni+1];
+      var ni = flatLines.indexOf(basics.name);
+      if (flatLines[ni+1] && flatLines[ni+1].length < 80 && !/[@]/.test(flatLines[ni+1])) {
+        basics.role = flatLines[ni+1];
       }
     }
     return basics;
   }
 
-  function extractStatement(text) {
-    // research statement often appears after contact line but before first section heading
-    var firstHeadingIdx = -1;
-    SECTION_HEADINGS.forEach(function(h) {
-      var re = new RegExp('^\\s*' + h + '\\s*$','im');
-      var m = text.search(re);
-      if (m > -1 && (firstHeadingIdx === -1 || m < firstHeadingIdx)) firstHeadingIdx = m;
-    });
+  function extractStatement(text, sections) {
+    // research statement often appears after contact line but before
+    // the first detected section — use the actual heading text found
+    // by splitSections (style- or keyword-based) rather than re-deriving
+    // the boundary from the keyword list alone.
+    var firstHeading = sections && sections.length ? sections[0].heading : null;
+    var firstHeadingIdx = firstHeading ? text.indexOf('\n' + firstHeading) : -1;
     if (firstHeadingIdx < 1) return '';
     var preamble = text.slice(0, firstHeadingIdx);
-    // strip name/role/contact lines (first ~5 lines), keep remaining prose
+    // strip name/role/contact lines (first ~4 lines), keep remaining prose
     var pLines = preamble.split('\n').map(function(l){ return l.trim(); }).filter(Boolean).slice(4);
     var stmt = pLines.join(' ').trim();
     return stmt.length > 30 ? stmt.slice(0, 800) : '';
