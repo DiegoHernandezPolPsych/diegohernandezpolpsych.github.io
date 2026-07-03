@@ -104,3 +104,20 @@ collections:
 
           - { name: contactTitle, label: "Contact — section heading", widget: string, required: false }
           - { name: contactLede, label: "Contact — intro", widget: text, required: false }
+
+          - { name: galleryTitle, label: "Gallery — section heading", widget: string, required: false }
+          - { name: galleryLede, label: "Gallery — intro", widget: text, required: false }
+
+          - name: gallery
+            label: "Gallery — paintings"
+            widget: list
+            summary: "{{fields.title}}"
+            fields:
+              - { name: title, label: Title, widget: string }
+              - { name: year, label: Year, widget: string, required: false }
+              - { name: medium, label: Medium line, widget: string, required: false }
+              - { name: desc, label: Placard text, widget: text, required: false }
+              - { name: image, label: Image, widget: image }
+              - { name: pos, label: "Background position (e.g. center 15%)", widget: string, required: false }
+              - { name: scrimDark, label: "Opacity in dark mode (0 to 1)", widget: number, value_type: float, min: 0, max: 1, step: 0.01, required: false }
+              - { name: scrimLight, label: "Opacity in light mode (0 to 1)", widget: number, value_type: float, min: 0, max: 1, step: 0.01, required: false }
