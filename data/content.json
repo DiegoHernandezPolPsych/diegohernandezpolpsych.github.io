@@ -7,6 +7,7 @@
       "text": "I study why some people refuse a partisan label, and how that refusal translates into political behavior. My research brings the methods of political psychology to understand a group that most accounts of partisanship treat as a residual category: the American independent."
     }
   ],
+  "researchTitle": "More Projects",
   "researchLede": "In addition to my dissertation work, I have research interests in why some individuals say they believe in conspiracies when they do not behave like they truly believe them, and how that signaling behavior maps onto their politics.",
   "dataTag": "survey experiments, quantitative and qualitative methods",
   "publications": [
@@ -17,7 +18,7 @@
       "desc": "",
       "links": [
         {
-          "label": "Draft on request",
+          "label": "no link currently",
           "href": "#"
         }
       ]
@@ -37,6 +38,8 @@
       "links": []
     }
   ],
+  "teachingTitle": "In the classroom",
+  "teachingLede": "I teach comparative and European Union politics, and I build courses around the gap between how institutions are supposed to work and how citizens actually reason about them.",
   "teaching": [
     {
       "title": "POL309: Politics of the European Union",
@@ -50,6 +53,8 @@
       ]
     }
   ],
+  "cvTitle": "Curriculum vitae",
+  "cvLede": "A short version lives here. The full document, with all positions, presentations, and service, is in the PDF.",
   "cvEducation": [
     {
       "year": "2023–2028",
@@ -84,20 +89,15 @@
       "detail": "Quantitative social science, data analysis in R, Python, and SPSS programming languages, social science experiments, Qualtrics; qualitative methods including focus groups and interviews, text-as-data approaches"
     }
   ],
-  "researchTitle": "More Projects",
-  "teachingTitle": "In the classroom",
-  "teachingLede": "I teach comparative and European politics, and I build courses around the gap between how institutions are supposed to work and how citizens actually reason about them.",
-  "cvTitle": "Curriculum vitae",
-  "cvLede": "A short version lives here. The full document, with all positions, presentations, and service, is in the PDF.",
   "contactTitle": "Get in touch",
-  "contactLede": "Email is the best way to reach me. I am happy to share drafts, materials, or replication code.",
+  "contactLede": "Email is the best way to reach me. I am happy to share materials, or replication code when appropriate.",
   "galleryTitle": "Gallery",
-  "galleryLede": "The art on this site began on a trip to Vienna, where the painters of the Secession got under my skin: Klimt's gold, Hoffmann's squares, ornament laid flat against the wall. Each piece was prompted in Anthropic's Claude Sonnet and created by Midjourney. Pick one and hang it. The About page keeps your choice until you change it.",
+  "galleryLede": "The inspiration for the color themes and art on this website came from a 2019 trip to Vienna, where Klimt's gold, Hoffmann's squares, and ornament laid flat against the wall stayed with me. Each of these AI-generated pieces were prompted in Anthropic's Claude Sonnet and created by Midjourney. Pick one and hang it. The About page keeps your choice until you change it.",
   "gallery": [
     {
       "title": "The Tree",
       "year": "2026",
-      "medium": "Midjourney and Gigapixel, digital",
+      "medium": "Midjourney, digital",
       "desc": "The original About background and the first in the series. A tree grows out of a pale gridded wall, its canopy built from raised amber and copper cubes, with dark mosaic water collecting below.",
       "image": "images/about-bg.jpg",
       "pos": "center 15%",
@@ -107,7 +107,7 @@
     {
       "title": "The Archive",
       "year": "2026",
-      "medium": "Midjourney and Gigapixel, digital",
+      "medium": "Midjourney, digital",
       "desc": "Rectangles stacked like folios seen edge-on. Umber and slate under matte varnish, with gold leaf catching a few exposed edges.",
       "image": "images/gallery/archive.jpg",
       "pos": "center 30%",
@@ -117,7 +117,7 @@
     {
       "title": "The River",
       "year": "2026",
-      "medium": "Midjourney and Gigapixel, digital",
+      "medium": "Midjourney, digital",
       "desc": "Two eddies turn against the current, banded in viridian and oxblood with threads of gold. Mosaic squares collect along the banks.",
       "image": "images/gallery/river.jpg",
       "pos": "center 30%",
@@ -127,7 +127,7 @@
     {
       "title": "The Laurel",
       "year": "2026",
-      "medium": "Midjourney and Gigapixel, digital",
+      "medium": "Midjourney, digital",
       "desc": "Laurel branches flattened into ornament, antique gold and muted teal on a dark umber ground. The closest of these to a Wiener Werkstätte frieze.",
       "image": "images/gallery/laurel.jpg",
       "pos": "center 30%",
@@ -137,7 +137,7 @@
     {
       "title": "The Currents",
       "year": "2026",
-      "medium": "Midjourney and Gigapixel, digital",
+      "medium": "Midjourney, digital",
       "desc": "A second river. The bands run looser here, crossed by hairlines of gold, with pale gold leaf above and a shore of small squares along the bottom.",
       "image": "images/gallery/currents.jpg",
       "pos": "center 30%",
