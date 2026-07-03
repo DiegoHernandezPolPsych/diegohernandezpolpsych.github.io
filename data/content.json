@@ -90,5 +90,59 @@
   "cvTitle": "Curriculum vitae",
   "cvLede": "A short version lives here. The full document, with all positions, presentations, and service, is in the PDF.",
   "contactTitle": "Get in touch",
-  "contactLede": "Email is the best way to reach me. I am happy to share drafts, materials, or replication code."
+  "contactLede": "Email is the best way to reach me. I am happy to share drafts, materials, or replication code.",
+  "galleryTitle": "Gallery",
+  "galleryLede": "The art on this site began on a trip to Vienna, where the painters of the Secession got under my skin: Klimt's gold, Hoffmann's squares, ornament laid flat against the wall. Each piece was prompted in Anthropic's Claude Sonnet and created by Midjourney. Pick one and hang it. The About page keeps your choice until you change it.",
+  "gallery": [
+    {
+      "title": "The Tree",
+      "year": "2026",
+      "medium": "Midjourney and Gigapixel, digital",
+      "desc": "The original About background and the first in the series. A tree grows out of a pale gridded wall, its canopy built from raised amber and copper cubes, with dark mosaic water collecting below.",
+      "image": "images/about-bg.jpg",
+      "pos": "center 15%",
+      "scrimDark": 0.35,
+      "scrimLight": 0.62
+    },
+    {
+      "title": "The Archive",
+      "year": "2026",
+      "medium": "Midjourney and Gigapixel, digital",
+      "desc": "Rectangles stacked like folios seen edge-on. Umber and slate under matte varnish, with gold leaf catching a few exposed edges.",
+      "image": "images/gallery/archive.jpg",
+      "pos": "center 30%",
+      "scrimDark": 0.49,
+      "scrimLight": 0.57
+    },
+    {
+      "title": "The River",
+      "year": "2026",
+      "medium": "Midjourney and Gigapixel, digital",
+      "desc": "Two eddies turn against the current, banded in viridian and oxblood with threads of gold. Mosaic squares collect along the banks.",
+      "image": "images/gallery/river.jpg",
+      "pos": "center 30%",
+      "scrimDark": 0.42,
+      "scrimLight": 0.61
+    },
+    {
+      "title": "The Laurel",
+      "year": "2026",
+      "medium": "Midjourney and Gigapixel, digital",
+      "desc": "Laurel branches flattened into ornament, antique gold and muted teal on a dark umber ground. The closest of these to a Wiener Werkstätte frieze.",
+      "image": "images/gallery/laurel.jpg",
+      "pos": "center 30%",
+      "scrimDark": 0.41,
+      "scrimLight": 0.66
+    },
+    {
+      "title": "The Currents",
+      "year": "2026",
+      "medium": "Midjourney and Gigapixel, digital",
+      "desc": "A second river. The bands run looser here, crossed by hairlines of gold, with pale gold leaf above and a shore of small squares along the bottom.",
+      "image": "images/gallery/currents.jpg",
+      "pos": "center 30%",
+      "scrimDark": 0.41,
+      "scrimLight": 0.59
+    }
+  ]
 }

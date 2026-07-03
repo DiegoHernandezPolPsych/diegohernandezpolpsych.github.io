@@ -67,6 +67,26 @@
   })();
 </script>
 
+<!-- ============================================================
+     Apply the visitor's hung gallery painting before paint,
+     same trick as the theme above. Values are written only by
+     this site's own Hang button, but sanitize anyway.
+============================================================ -->
+<script>
+  (function () {
+    try {
+      var hung = JSON.parse(localStorage.getItem("hungArt") || "null");
+      if (!hung || typeof hung.image !== "string") return;
+      if (!/^images\/[\w\-./]+$/.test(hung.image)) return;
+      var s = document.documentElement.style;
+      s.setProperty("--about-art", 'url("' + hung.image + '")');
+      if (typeof hung.pos === "string" && /^[\w\s%\-]+$/.test(hung.pos)) s.setProperty("--about-pos", hung.pos);
+      if (isFinite(hung.opDark))  s.setProperty("--about-op-dark",  String(Math.min(1, Math.max(0, +hung.opDark))));
+      if (isFinite(hung.opLight)) s.setProperty("--about-op-light", String(Math.min(1, Math.max(0, +hung.opLight))));
+    } catch (e) {}
+  })();
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -453,7 +473,10 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
 #about { position: relative; isolation: isolate; }
 .about-bg {
   position: fixed; inset: 0; z-index: -1;
-  background: url('images/about-bg.jpg') center 15% / 100% auto no-repeat;
+  background-image: var(--about-art, url('images/about-bg.jpg'));
+  background-position: var(--about-pos, center 15%);
+  background-size: 100% auto;
+  background-repeat: no-repeat;
   opacity: 0;
   filter: saturate(1.1);
   pointer-events: none;
@@ -466,9 +489,9 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
               linear-gradient(to bottom, black 60%, transparent 100%);
   mask-composite: intersect;
 }
-.about-bg.visible { opacity: 0.62; }
+.about-bg.visible { opacity: var(--about-op-light, 0.62); }
 :root[data-theme="dark"] .about-bg { filter: saturate(1.0) brightness(0.85); }
-:root[data-theme="dark"] .about-bg.visible { opacity: 0.35; }
+:root[data-theme="dark"] .about-bg.visible { opacity: var(--about-op-dark, 0.35); }
 
 /* corner brackets drift slightly with scroll, set via JS custom property */
 .portrait-wrap::before,
@@ -576,6 +599,112 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
     0 1px 3px rgba(0,0,0,1);
 }
 
+/* =========================================================
+   GALLERY — a wall of paintings, each framed with the same
+   corner brackets as the portrait, placard beneath in the
+   manner of a museum label. "Hang on About" swaps the About
+   background for this visitor only (localStorage).
+========================================================= */
+.gallery-wall {
+  display: grid;
+  gap: clamp(44px, 6vw, 76px);
+  margin-top: 8px;
+  max-width: 880px;
+}
+.piece-frame {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  padding: clamp(10px, 1.6vw, 16px); /* the mat */
+  box-shadow: var(--shadow);
+}
+.piece-frame img { display: block; width: 100%; height: auto; }
+.piece-frame::before,
+.piece-frame::after {
+  content: ""; position: absolute; width: 22px; height: 22px;
+  border: 2px solid var(--gold);
+}
+.piece-frame::before { top: -6px; left: -6px; border-right: 0; border-bottom: 0; }
+.piece-frame::after  { bottom: -6px; right: -6px; border-left: 0; border-top: 0; }
+
+.placard {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 20px;
+  margin: 14px 4px 0;
+}
+.placard-title {
+  font-family: var(--font-display);
+  font-weight: 500; font-style: italic;
+  font-size: 1.15rem; line-height: 1.3;
+  margin: 0 0 2px;
+}
+.placard-meta {
+  font-family: var(--font-mono); font-size: .72rem; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--faint);
+  margin: 0 0 8px;
+}
+.placard-desc {
+  margin: 0; color: var(--muted);
+  font-size: .93rem; line-height: 1.55; max-width: 52ch;
+}
+.hang-btn {
+  appearance: none; flex: none; margin-top: 2px;
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--font-body); font-size: .85rem; font-weight: 500;
+  padding: 8px 15px;
+  border: 1px solid var(--line-strong); border-radius: 100px;
+  background: transparent; color: var(--ink); cursor: pointer;
+  transition: border-color .2s var(--ease), background .2s var(--ease), color .2s var(--ease);
+}
+.hang-btn:hover { border-color: var(--gold); background: var(--bg-tint); color: var(--accent-strong); }
+.piece.is-hung .hang-btn {
+  border-color: color-mix(in srgb, var(--gold) 55%, var(--line-strong));
+  color: var(--accent-strong);
+  cursor: default;
+}
+.hang-btn .triad span { width: 5px; height: 5px; }
+
+@media (max-width: 560px) {
+  .placard { flex-direction: column; gap: 12px; }
+}
+
+/* =========================================================
+   GILT — the Beethoven Frieze easter egg. Triple-click the
+   name on About: gold floods from the click point, shimmers,
+   and recedes. Layer sits above everything, blocks nothing.
+========================================================= */
+.gilt {
+  position: fixed; inset: 0; z-index: 200;
+  pointer-events: none;
+  background: url('images/gold-flood.jpg') repeat;
+  background-size: 420px auto;
+  display: none;
+}
+.gilt::after {
+  /* travelling sheen so the gold reads as metal, not wallpaper */
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 45% at var(--gx, 50%) var(--gy, 50%),
+              rgba(255, 244, 200, .5), transparent 70%);
+  mix-blend-mode: overlay;
+  animation: gilt-sheen 4.2s var(--ease) both;
+}
+.gilt.on { display: block; animation: gilt-run 4.2s var(--ease) both; }
+@keyframes gilt-run {
+  0%   { clip-path: circle(0% at var(--gx, 50%) var(--gy, 50%)); opacity: 1; }
+  24%  { clip-path: circle(140% at var(--gx, 50%) var(--gy, 50%)); opacity: 1; }
+  74%  { clip-path: circle(140% at var(--gx, 50%) var(--gy, 50%)); opacity: 1; }
+  100% { clip-path: circle(140% at var(--gx, 50%) var(--gy, 50%)); opacity: 0; }
+}
+@keyframes gilt-sheen {
+  0%   { transform: translateY(6%) scale(.9); opacity: 0; }
+  30%  { opacity: 1; }
+  70%  { transform: translateY(-4%) scale(1.15); opacity: .7; }
+  100% { transform: translateY(-8%) scale(1.2); opacity: 0; }
+}
+/* under prefers-reduced-motion the easter egg is skipped in JS,
+   because the global reduced-motion rule cancels all animations
+   and would otherwise leave this layer stuck on screen */
+
 /* hide CMS-driven elements until content.json resolves — eliminates flash */
 html:not(.cms-ready) [data-key],
 html:not(.cms-ready) [data-html],
@@ -615,11 +744,8 @@ html:not(.cms-ready) [data-email-link] {
   /* hide brand name — h1 has it */
   .brand span.brand-name { display: none; }
 
-  /* fit all five tabs without scrolling: tighter padding, smaller text */
-  .tabs {
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
+  /* seven tabs no longer fit: keep tight sizing, keep the
+     right-edge fade so the overflow is discoverable by scroll */
   .tab { font-size: .72rem; padding: 8px 9px; letter-spacing: .02em; }
 
   /* truncate labels */
@@ -722,6 +848,7 @@ html.vt-on .panel.is-active { animation: none; }
       <button class="tab" role="tab" id="tab-cv"       aria-controls="cv"       aria-selected="false" tabindex="-1">CV</button>
       <button class="tab" role="tab" id="tab-contact"  aria-controls="contact"  aria-selected="false" tabindex="-1">Contact</button>
       <button class="tab" role="tab" id="tab-tools"    aria-controls="tools"    aria-selected="false" tabindex="-1">Tools</button>
+      <button class="tab" role="tab" id="tab-gallery"  aria-controls="gallery"  aria-selected="false" tabindex="-1">Gallery</button>
     </nav>
 
     <button class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark theme">
@@ -908,6 +1035,32 @@ html.vt-on .panel.is-active { animation: none; }
     </div>
   </section>
 
+  <!-- ============================== GALLERY ============================== -->
+  <!-- EDIT: pieces live in content.json under "gallery" (editable at /admin).
+       Write your own titles, years, and placard text. "Hang on About" swaps
+       the About background for the visitor who clicks it, stored locally. -->
+  <section class="panel" id="gallery" role="tabpanel" aria-labelledby="tab-gallery" tabindex="0" hidden>
+    <p class="eyebrow">Gallery</p>
+    <h2 class="section-title" data-key="galleryTitle">Gallery</h2>
+    <p class="lede" data-html="galleryLede">[One or two sentences introducing the paintings, in your own words.]</p>
+
+    <div class="gallery-wall" data-list="gallery">
+      <article class="piece is-hung">
+        <figure class="piece-frame" style="margin:0">
+          <img src="images/about-bg.jpg" alt="[Painting title]" loading="lazy" />
+        </figure>
+        <div class="placard">
+          <div>
+            <h3 class="placard-title">[Painting title]</h3>
+            <p class="placard-meta">[Year] · Midjourney and Gigapixel, digital</p>
+            <p class="placard-desc">[A line or two about the piece, written by you.]</p>
+          </div>
+          <button class="hang-btn" type="button" disabled>Hanging on About</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
   <!-- ============================== CONTACT ============================== -->
   <!-- EDIT email. The profile links below are pulled from your public pages. -->
   <section class="panel" id="contact" role="tabpanel" aria-labelledby="tab-contact" tabindex="0" hidden>
@@ -969,6 +1122,9 @@ html.vt-on .panel.is-active { animation: none; }
     <span>Stony Brook University</span>
   </div>
 </footer>
+
+<!-- gilt flood layer, activated by the easter egg below -->
+<div class="gilt" id="gilt" aria-hidden="true"></div>
 
 <script>
 /* =========================================================
@@ -1123,6 +1279,7 @@ document.addEventListener("section:active", function (e) {
     if (Array.isArray(c.teaching)) renderCards("teaching", c.teaching, true, c.name);
     if (Array.isArray(c.cvEducation)) renderCv("cvEducation", c.cvEducation);
     if (Array.isArray(c.cvFields)) renderCv("cvFields", c.cvFields);
+    if (Array.isArray(c.gallery)) renderGallery(c.gallery);
   }
 
   function linksHtml(links) {
@@ -1173,6 +1330,69 @@ document.addEventListener("section:active", function (e) {
              '<span class="cv-item"><b>' + esc(it.title) + "</b><span>" + esc(it.detail) + "</span></span></li>";
     }).join("");
   }
+
+  /* GALLERY — paintings from content.json. Hanging one swaps the
+     About background for this visitor only, via the custom
+     properties the boot script also reads. The first piece in the
+     list is the house default. */
+  function renderGallery(items) {
+    var box = document.querySelector('[data-list="gallery"]');
+    if (!box || !items.length) return;
+
+    function hungImage() {
+      try {
+        var h = JSON.parse(localStorage.getItem("hungArt") || "null");
+        if (h && h.image) return h.image;
+      } catch (e) {}
+      return items[0].image;
+    }
+
+    function applyHang(it) {
+      var img = String(it.image || "").replace(/["'\\)]/g, "");
+      var s = document.documentElement.style;
+      s.setProperty("--about-art", 'url("' + img + '")');
+      if (it.pos) s.setProperty("--about-pos", String(it.pos).replace(/[^\w\s%\-]/g, ""));
+      else s.removeProperty("--about-pos");
+      if (isFinite(it.scrimDark))  s.setProperty("--about-op-dark",  String(it.scrimDark));
+      else s.removeProperty("--about-op-dark");
+      if (isFinite(it.scrimLight)) s.setProperty("--about-op-light", String(it.scrimLight));
+      else s.removeProperty("--about-op-light");
+      try {
+        localStorage.setItem("hungArt", JSON.stringify({
+          image: img, pos: it.pos || "", opDark: it.scrimDark, opLight: it.scrimLight
+        }));
+      } catch (e) {}
+    }
+
+    function draw() {
+      var current = hungImage();
+      box.innerHTML = items.map(function (it, i) {
+        var hung = it.image === current;
+        var meta = [it.year, it.medium].filter(Boolean).map(esc).join(" · ");
+        return '<article class="piece' + (hung ? " is-hung" : "") + '" data-i="' + i + '">' +
+          '<figure class="piece-frame" style="margin:0">' +
+            '<img src="' + esc(it.image) + '" alt="' + esc(it.title || "Painting") + '" loading="lazy" />' +
+          "</figure>" +
+          '<div class="placard"><div>' +
+            '<h3 class="placard-title">' + esc(it.title) + "</h3>" +
+            (meta ? '<p class="placard-meta">' + meta + "</p>" : "") +
+            (it.desc ? '<p class="placard-desc">' + esc(it.desc) + "</p>" : "") +
+          "</div>" +
+          '<button class="hang-btn" type="button"' + (hung ? " disabled" : "") + ">" +
+            (hung ? "Hanging on About" : "Hang on About") +
+          "</button></div></article>";
+      }).join("");
+
+      box.querySelectorAll(".piece:not(.is-hung) .hang-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var it = items[+btn.closest(".piece").getAttribute("data-i")];
+          applyHang(it);
+          draw();
+        });
+      });
+    }
+    draw();
+  }
 })();
 
 /* =========================================================
@@ -1222,6 +1442,50 @@ document.addEventListener("section:active", function (e) {
     if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
   }, { passive: true });
   update();
+})();
+
+/* =========================================================
+   GILT — triple-click the name on About and gold floods the
+   page from the click point, then recedes. A nod to the
+   Beethoven Frieze. Skipped under reduced motion because the
+   global rule there cancels animations, which would strand
+   the layer on screen.
+========================================================= */
+(function () {
+  var name = document.querySelector(".hero-name");
+  var gilt = document.getElementById("gilt");
+  if (!name || !gilt) return;
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  var loaded = false;
+  function preload() {
+    if (loaded) return;
+    loaded = true;
+    var img = new Image();
+    img.src = "images/gold-flood.jpg";
+  }
+  name.addEventListener("pointerenter", preload, { once: true });
+  name.addEventListener("touchstart", preload, { once: true, passive: true });
+
+  var taps = 0, lastTap = 0, running = false;
+  name.addEventListener("click", function (e) {
+    var now = Date.now();
+    taps = (now - lastTap < 500) ? taps + 1 : 1;
+    lastTap = now;
+    if (Math.max(taps, e.detail || 0) < 3 || running) return;
+    taps = 0;
+    running = true;
+    var root = document.documentElement;
+    root.style.setProperty("--gx", e.clientX + "px");
+    root.style.setProperty("--gy", e.clientY + "px");
+    gilt.classList.add("on");
+    gilt.addEventListener("animationend", function handler(ev) {
+      if (ev.target !== gilt) return;
+      gilt.classList.remove("on");
+      gilt.removeEventListener("animationend", handler);
+      running = false;
+    });
+  });
 })();
 
 document.getElementById("year").textContent = new Date().getFullYear();
