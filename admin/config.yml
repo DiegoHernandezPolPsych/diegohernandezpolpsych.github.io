@@ -107,7 +107,8 @@ collections:
 
           - name: paintings
             label: "About background — painting rotation"
-            hint: "The About page background cycles through these on every reload or return visit. No page displays this list; it's just the rotation order."
+            label_singular: "Painting"
+            hint: "The About page background cycles through these on every reload or return visit. No page displays this list; it's just the rotation order. Click \"Add Painting\" below to add a new one."
             widget: list
             summary: "{{fields.title}}"
             fields:

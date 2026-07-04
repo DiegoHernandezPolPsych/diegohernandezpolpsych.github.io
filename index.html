@@ -465,6 +465,11 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
   display: flex; align-items: flex-start; gap: 14px;
 }
 .colophon-inner .triad { flex: none; margin-top: 4px; opacity: .7; }
+/* daily frieze medallion, replaces the triad marks when JS runs */
+.frieze-mark { display: inline-flex; align-items: center; }
+.frieze-mark svg { display: block; height: 22px; width: auto; max-width: 40vw; }
+.colophon-inner .frieze-mark { flex: none; margin-top: 2px; opacity: .8; }
+.footer-inner .frieze-mark { opacity: .85; }
 .colophon-inner p {
   margin: 0; max-width: 62ch;
   font-size: .82rem; line-height: 1.6; color: var(--faint);
@@ -1021,15 +1026,15 @@ html.vt-on .panel.is-active { animation: none; }
 <!-- ============================================================ COLOPHON ============================================================ -->
 <section class="colophon" aria-label="About this site">
   <div class="colophon-inner">
-    <span class="triad" aria-hidden="true"><span></span><span></span><span></span></span>
-    <p>Set in Fraunces and Hanken Grotesk. Built by hand, no template, hosted on GitHub Pages.</p>
+    <span class="frieze-mark" id="friezeColophon" aria-hidden="true"><span class="triad"><span></span><span></span><span></span></span></span>
+    <p>Set in Fraunces and Hanken Grotesk. Built by hand, no template, hosted on GitHub Pages.<span id="friezeEdition"></span></p>
   </div>
 </section>
 
 <footer class="site-footer">
   <div class="footer-inner">
     <span>© <span id="year"></span> Diego Hernandez</span>
-    <span class="triad" aria-hidden="true"><span></span><span></span><span></span></span>
+    <span class="frieze-mark" id="friezeFooter" aria-hidden="true"><span class="triad"><span></span><span></span><span></span></span></span>
     <span>Stony Brook University</span>
   </div>
 </footer>
@@ -1319,6 +1324,143 @@ document.addEventListener("section:active", function (e) {
    re-enabled later by restoring the trigger script that used
    to live here (triple-click on .hero-name, gilt.classList.add("on")).
 ========================================================= */
+
+/* =========================================================
+   DAILY FRIEZE — date-seeded generative Secession ornament.
+   The same date always draws the same composition, so every
+   visitor sees today's edition. Rendered as a single repeat
+   cell (a medallion) in the colophon and footer, replacing
+   the static triad marks; the triads remain as the no-JS
+   fallback. Inks come from CSS custom properties, so the
+   medallion recolors with the theme and the section accent.
+========================================================= */
+(function () {
+  var H = 36, U = 6, MID = H / 2;
+
+  function hash(str) {
+    var h = 5381;
+    for (var i = 0; i < str.length; i++) h = ((h << 5) + h) ^ str.charCodeAt(i);
+    return h >>> 0;
+  }
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function friezeCell(seedStr) {
+    var rnd = mulberry32(hash(String(seedStr)));
+    var pick = function (arr) { return arr[Math.floor(rnd() * arr.length)]; };
+    var GOLD = "var(--gold)", ACC = "var(--section, var(--gold))", LINE = "var(--line-strong)";
+
+    function rect(buf, x, y, w, h, ink, sw) {
+      buf.push('<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '"' +
+        (sw ? ' fill="none" stroke="' + ink + '" stroke-width="' + sw + '"' : ' fill="' + ink + '"') + '/>');
+    }
+    function concentric(buf, cx, size, rings, ink) {
+      var s = size;
+      for (var i = 0; i < rings; i++) {
+        rect(buf, cx - s / 2, MID - s / 2, s, s, ink, 1.5);
+        s -= U * 2;
+        if (s < U) break;
+      }
+      if (s >= U * 0.9) rect(buf, cx - U / 2, MID - U / 2, U, U, ink);
+    }
+    function checker(buf, cx, n, cell, ink) {
+      var start = cx - (n * cell) / 2, top = MID - (n * cell) / 2;
+      for (var r = 0; r < n; r++) for (var c = 0; c < n; c++)
+        if ((r + c) % 2 === 0) rect(buf, start + c * cell, top + r * cell, cell, cell, ink);
+    }
+    function triadM(buf, cx, s, gap, ink) {
+      var total = 3 * s + 2 * gap, x0 = cx - total / 2;
+      rect(buf, x0, MID - s / 2, s, s, ink);
+      rect(buf, x0 + s + gap, MID - s / 2, s, s, ink, 1.5);
+      rect(buf, x0 + 2 * (s + gap), MID - s / 2, s, s, ink);
+    }
+    function solidSq(buf, cx, s, ink) { rect(buf, cx - s / 2, MID - s / 2, s, s, ink); }
+    function stepsOut(buf, cx, ink) {
+      for (var i = 0; i < 3; i++)
+        rect(buf, cx + i * U - U / 2, MID - U * 1.5 + i * U, U, U, ink);
+    }
+    function dotRun(buf, x1, x2, ink) {
+      var s = U * 0.66, step = U * 2;
+      for (var x = x1; x + s <= x2; x += step)
+        rect(buf, x, MID - s / 2, s, s, ink);
+    }
+
+    var R = pick([120, 240, 240, 300]);
+    var railStyle = pick(["none", "single", "double", "double"]);
+    var centerKind = pick(["concentric", "concentric", "checker", "triad"]);
+    var maxPairs = R === 120 ? 1 : 3;
+    var flankPairs = 1 + Math.floor(rnd() * maxPairs);
+    var useDots = rnd() < 0.55;
+
+    var band = [];
+    if (railStyle !== "none") {
+      rect(band, 0, 2, R, 1.5, LINE);
+      rect(band, 0, H - 3.5, R, 1.5, LINE);
+      if (railStyle === "double") { rect(band, 0, 6, R, 1, LINE); rect(band, 0, H - 7, R, 1, LINE); }
+    }
+
+    var cx = R / 2, center = [], centerHalf;
+    if (centerKind === "concentric") {
+      var size = pick([24, 24, 36]); var rings = pick([2, 3, 3]);
+      concentric(center, cx, size, rings, GOLD); centerHalf = size / 2;
+    } else if (centerKind === "checker") {
+      var n = pick([3, 3, 5]); checker(center, cx, n, U, GOLD); centerHalf = (n * U) / 2;
+    } else {
+      triadM(center, cx, U * 1.5, U, GOLD); centerHalf = (3 * U * 1.5 + 2 * U) / 2;
+    }
+
+    var right = [];
+    var minOff = centerHalf + U * 3, maxOff = R / 2 - U * 2.5;
+    var offs = [];
+    for (var i = 0; i < flankPairs; i++) {
+      var lo = minOff + (maxOff - minOff) * (i / flankPairs);
+      var hi = minOff + (maxOff - minOff) * ((i + 1) / flankPairs);
+      var o = Math.round((lo + rnd() * (hi - lo)) / U) * U;
+      if (!offs.length || o - offs[offs.length - 1] >= U * 3) offs.push(o);
+    }
+    offs.forEach(function (o, idx) {
+      var kind = pick(["solid", "solid", "mini", "steps"]);
+      var ink = idx % 2 === 0 ? ACC : GOLD;
+      var fx = cx + o;
+      if (kind === "solid") solidSq(right, fx, pick([U, U * 1.5]), ink);
+      else if (kind === "mini") concentric(right, fx, 12, 2, ink);
+      else stepsOut(right, fx, ink);
+    });
+    if (useDots && offs.length) {
+      dotRun(right, cx + centerHalf + U * 1.2, cx + offs[0] - U * 1.8, LINE);
+    }
+
+    var cell = center.join("") +
+      "<g>" + right.join("") + "</g>" +
+      '<g transform="translate(' + (2 * cx) + ',0) scale(-1,1)">' + right.join("") + "</g>";
+
+    return '<svg viewBox="0 0 ' + R + " " + H + '" height="22" preserveAspectRatio="xMidYMid meet" ' +
+      'xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">' + band.join("") + cell + "</svg>";
+  }
+
+  function dayOfYear(d) {
+    return Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 86400000);
+  }
+
+  var now = new Date();
+  var seed = now.getFullYear() + "-" +
+    String(now.getMonth() + 1).padStart(2, "0") + "-" +
+    String(now.getDate()).padStart(2, "0");
+  var svg = friezeCell(seed);
+
+  var a = document.getElementById("friezeColophon");
+  var b = document.getElementById("friezeFooter");
+  if (a) a.innerHTML = svg;
+  if (b) b.innerHTML = svg;
+  var note = document.getElementById("friezeEdition");
+  if (note) note.textContent = " Frieze No. " + dayOfYear(now) + " of " + now.getFullYear() + ".";
+})();
 
 document.getElementById("year").textContent = new Date().getFullYear();
 </script>
