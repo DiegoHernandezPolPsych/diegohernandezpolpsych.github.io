@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>POL309 · This Week</title>
+<meta name="description" content="Week-by-week pacing tracker for POL309: Politics of the European Union, Summer II 2026." />
+<link rel="icon" href="favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --bg: #faf8f3; --surface: #fffefb; --ink: #211f18; --muted: #6a6453; --faint: #938d79;
+  --line: #e7e0cd; --line-strong: #d6cdb4; --gold: #c39a22; --accent: #876417; --accent-strong: #6c4f12;
+  --rose: #9e5b4b;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Hanken Grotesk", system-ui, sans-serif;
+  --font-mono: "Spline Sans Mono", ui-monospace, monospace;
+}
+:root[data-theme="dark"] {
+  --bg: #14130e; --surface: #1e1c15; --ink: #ece6d6; --muted: #a7a18c; --faint: #7d7765;
+  --line: #2b2819; --line-strong: #3a3527; --gold: #e0c04a; --accent: #d8b54c; --accent-strong: #e8c869;
+  --rose: #cf9080;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.55;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding: 40px 22px 60px; }
+.topline { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.back { color: var(--faint); text-decoration: none; font-size: .85rem; }
+.back:hover { color: var(--accent); }
+.theme-btn {
+  background: transparent; border: 1px solid var(--line-strong); color: var(--ink);
+  border-radius: 100px; padding: 5px 13px; cursor: pointer; font: inherit; font-size: .8rem;
+}
+.eyebrow {
+  font-family: var(--font-mono); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--rose); display: flex; align-items: center; gap: 10px; margin: 34px 0 8px;
+}
+.triad { display: inline-flex; gap: 4px; }
+.triad span { width: 7px; height: 7px; background: var(--rose); }
+.triad span:nth-child(2) { background: transparent; border: 1.5px solid var(--rose); }
+h1 { font-family: var(--font-display); font-weight: 500; font-size: 2rem; margin: 0 0 4px; }
+.sub { color: var(--muted); margin: 0 0 28px; }
+.now {
+  border: 1px solid var(--line-strong); background: var(--surface); padding: 24px 26px;
+  position: relative;
+}
+.now::before, .now::after {
+  content: ""; position: absolute; width: 18px; height: 18px; border: 2px solid var(--gold);
+}
+.now::before { top: -5px; left: -5px; border-right: 0; border-bottom: 0; }
+.now::after { bottom: -5px; right: -5px; border-left: 0; border-top: 0; }
+.now .week-label { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+.now h2 { font-family: var(--font-display); font-weight: 500; font-size: 1.5rem; margin: 6px 0 2px; }
+.now .dates { color: var(--faint); font-size: .88rem; margin: 0 0 14px; }
+.tasks { margin: 0; padding: 0 0 0 2px; list-style: none; }
+.tasks li { padding: 7px 0; border-top: 1px solid var(--line); display: flex; gap: 10px; }
+.tasks li:first-child { border-top: 0; }
+.tasks .sq { flex: none; width: 8px; height: 8px; margin-top: 7px; background: var(--gold); }
+.deadline {
+  margin-top: 16px; padding: 12px 14px; border: 1px solid var(--line-strong);
+  display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: baseline; font-size: .92rem;
+}
+.deadline b { color: var(--accent-strong); font-weight: 600; }
+.count { font-family: var(--font-mono); font-size: .85rem; color: var(--gold); }
+.cal-btn {
+  display: inline-block; margin-top: 16px; padding: 9px 18px; border: 1px solid var(--gold);
+  border-radius: 100px; color: var(--accent-strong); text-decoration: none; font-weight: 500; font-size: .92rem;
+}
+.cal-btn:hover { background: var(--gold); color: var(--bg); }
+.all { margin-top: 40px; }
+.all h3 { font-family: var(--font-mono); font-weight: 500; font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+.wk { border-top: 1px solid var(--line); padding: 14px 2px; display: grid; grid-template-columns: 92px 1fr; gap: 14px; }
+.wk.current { background: var(--surface); border-left: 3px solid var(--gold); padding-left: 12px; margin-left: -15px; }
+.wk.past { opacity: .55; }
+.wk .no { font-family: var(--font-mono); font-size: .8rem; color: var(--faint); padding-top: 2px; }
+.wk h4 { margin: 0 0 3px; font-weight: 600; font-size: .98rem; }
+.wk p { margin: 0; color: var(--muted); font-size: .9rem; }
+.wk .due { color: var(--rose); font-size: .84rem; margin-top: 3px; }
+.note { margin-top: 36px; color: var(--faint); font-size: .82rem; border-top: 1px solid var(--line); padding-top: 14px; }
+.note a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topline">
+    <a class="back" href="index.html#teaching">&larr; diegohernandezpolpsych.github.io</a>
+    <button class="theme-btn" id="themeBtn" type="button">Theme</button>
+  </div>
+
+  <p class="eyebrow"><span class="triad"><span></span><span></span><span></span></span> POL309 · Summer II 2026</p>
+  <h1>This week in POL309</h1>
+  <p class="sub">Politics of the European Union · online, asynchronous · July 6 to August 15</p>
+
+  <div class="now" id="now"></div>
+
+  <div class="all">
+    <h3>Full schedule</h3>
+    <div id="weeks"></div>
+  </div>
+
+  <p class="note">
+    This page is a pacing aid, not the official record. Deadlines, submissions, and announcements
+    live on Brightspace, which is authoritative if anything here disagrees. Times are US Eastern.
+    Questions: <a href="mailto:diego.hernandez@stonybrook.edu">diego.hernandez@stonybrook.edu</a>.
+  </p>
+</div>
+
+<script>
+/* The schedule loads from data/content.json (editable at /admin under
+   "POL309 schedule"). The copy below is the fallback if that fetch
+   fails, and the shape reference for what the CMS emits. Deadlines are
+   ISO strings in US Eastern (-04:00 during summer). An empty deadline
+   date renders "see Brightspace" without a countdown. */
+var CALENDLY = "https://calendly.com/diego-hernandez-political-science/pol309-politics-in-the-european-union";
+var SCHEDULE = [
+  { n: 1, title: "The Idea of Europe, the Foundation of the Union",
+    start: "2026-07-06T00:00:00-04:00", end: "2026-07-12T23:59:59-04:00",
+    tasks: ["Read Chapter 2, \u201cThe Idea of Europe\u201d (McCormick)",
+            "Watch \u201cThe Idea of Europe\u201d introduction video, up to the 9:50 mark",
+            "Reading-check quiz on Brightspace"],
+    deadline: { label: "Week 1 quiz", when: "2026-07-10T23:59:00-04:00", text: "Friday, July 10, 11:59pm" } },
+  { n: 2, title: "The Political History of the European Union",
+    start: "2026-07-13T00:00:00-04:00", end: "2026-07-19T23:59:59-04:00",
+    tasks: ["Read Chapter 3, \u201cThe Evolution of the EU\u201d first",
+            "Then read Chapter 1, \u201cWhat is the European Union\u201d",
+            "Reading-check quiz on Brightspace"],
+    deadline: { label: "Week 2 quiz", when: "2026-07-17T23:59:00-04:00", text: "Friday, July 17, 11:59pm" } },
+  { n: 3, title: "Institutions of the European Union",
+    start: "2026-07-20T00:00:00-04:00", end: "2026-07-26T23:59:59-04:00",
+    tasks: ["Read Chapter 4, \u201cThe European Institutions\u201d",
+            "Read Chapter 6, \u201cThe EU Policy Process\u201d",
+            "Watch the six institution videos on Brightspace",
+            "Writing assignment (25% of your grade): browse euractiv.com, pick an issue, and write 500+ words on how two EU institutions would engage it"],
+    deadline: { label: "Writing assignment", when: null, text: "due this week; see Brightspace for the exact deadline" } },
+  { n: 4, title: "The Single Market and a Diversity of Opinions",
+    start: "2026-07-27T00:00:00-04:00", end: "2026-08-02T23:59:59-04:00",
+    tasks: ["Read Chapter 7, \u201cEconomic Policy\u201d",
+            "Read Chapter 5, \u201cThe EU and its Citizens\u201d",
+            "Reading-check quiz on Brightspace",
+            "Book your one-to-one meeting about the final paper (this week or next; earlier is better)"],
+    deadline: { label: "Week 4 quiz", when: "2026-07-31T23:59:00-04:00", text: "Friday, July 31, 11:59pm" },
+    calendly: true },
+  { n: 5, title: "The Politics of Crisis and Europe's Response",
+    start: "2026-08-03T00:00:00-04:00", end: "2026-08-09T23:59:59-04:00",
+    tasks: ["Read Chapter 8, \u201cInternal Policies\u201d",
+            "Read Chapter 9, \u201cThe EU in the World\u201d",
+            "If you have not met with me yet, book your one-to-one now"],
+    deadline: null,
+    calendly: true },
+  { n: 6, title: "Final Papers",
+    start: "2026-08-10T00:00:00-04:00", end: "2026-08-15T23:59:59-04:00",
+    tasks: ["Write and submit your final paper (50% of your grade): 6 to 7 pages, double spaced, MLA or APA, substantially referencing the textbook",
+            "Submit on Brightspace"],
+    deadline: { label: "Final paper", when: "2026-08-15T23:59:00-04:00", text: "Saturday, August 15, 11:59pm EST" } }
+];
+
+(function () {
+  var CAL = CALENDLY, WEEKS = SCHEDULE;
+
+  /* flattened CMS shape -> internal shape */
+  function fromCms(p) {
+    if (!p || !Array.isArray(p.weeks) || !p.weeks.length) return false;
+    WEEKS = p.weeks.map(function (w, i) {
+      return {
+        n: +w.n || (i + 1),
+        title: w.title || "",
+        start: w.start, end: w.end,
+        tasks: Array.isArray(w.tasks) ? w.tasks : [],
+        deadline: (w.deadlineLabel || w.deadlineText) ? {
+          label: w.deadlineLabel || "Deadline",
+          when: w.deadlineWhen || null,
+          text: w.deadlineText || ""
+        } : null,
+        calendly: !!w.calendly
+      };
+    });
+    if (p.calendly) CAL = p.calendly;
+    return true;
+  }
+
+  var COURSE_START, COURSE_END;
+  function bounds() {
+    COURSE_START = new Date(WEEKS[0].start);
+    COURSE_END = new Date(WEEKS[WEEKS.length - 1].end);
+  }
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  function fmtRange(w) {
+    var opts = { month: "short", day: "numeric" };
+    var a = new Date(w.start).toLocaleDateString("en-US", opts);
+    var b = new Date(w.end).toLocaleDateString("en-US", opts);
+    return a + " \u2013 " + b;
+  }
+
+  function countdown(target) {
+    var ms = target - new Date();
+    if (ms <= 0) return null;
+    var d = Math.floor(ms / 86400000);
+    var h = Math.floor((ms % 86400000) / 3600000);
+    var m = Math.floor((ms % 3600000) / 60000);
+    return (d ? d + "d " : "") + h + "h " + m + "m left";
+  }
+
+  function nextDeadline(now) {
+    for (var i = 0; i < WEEKS.length; i++) {
+      var dl = WEEKS[i].deadline;
+      if (dl && dl.when && new Date(dl.when) > now) return { week: WEEKS[i].n, dl: dl };
+    }
+    return null;
+  }
+
+  function currentWeek(now) {
+    for (var i = 0; i < WEEKS.length; i++)
+      if (now >= new Date(WEEKS[i].start) && now <= new Date(WEEKS[i].end)) return WEEKS[i];
+    return null;
+  }
+
+  function render() {
+    var now = new Date();
+    var box = document.getElementById("now");
+    var html = "";
+
+    if (now < COURSE_START) {
+      var days = Math.ceil((COURSE_START - now) / 86400000);
+      html = '<span class="week-label">Before the course</span>' +
+        "<h2>POL309 starts " + (days === 1 ? "tomorrow" : "in " + days + " days") + "</h2>" +
+        '<p class="dates">First week begins Monday, July 6</p>' +
+        '<ul class="tasks"><li><span class="sq"></span><span>Get the textbook: McCormick, <i>Understanding the European Union</i>, 8th edition (2021)</span></li>' +
+        '<li><span class="sq"></span><span>Log in to Brightspace and turn on announcement notifications</span></li></ul>';
+    } else if (now > COURSE_END) {
+      html = '<span class="week-label">After the course</span>' +
+        "<h2>Summer II 2026 has ended</h2>" +
+        '<p class="dates">Grades: expect about a week from each deadline to your grade</p>';
+    } else {
+      var w = currentWeek(now) || WEEKS[WEEKS.length - 1];
+      html = '<span class="week-label">Week ' + w.n + " of " + WEEKS.length + " &middot; " + fmtRange(w) + "</span>" +
+        "<h2>" + esc(w.title) + "</h2>" +
+        '<ul class="tasks">' + w.tasks.map(function (t) {
+          return '<li><span class="sq"></span><span>' + esc(t) + "</span></li>";
+        }).join("") + "</ul>";
+      if (w.deadline) {
+        var c = w.deadline.when ? countdown(new Date(w.deadline.when)) : null;
+        html += '<div class="deadline"><span><b>' + esc(w.deadline.label) + ":</b> " + esc(w.deadline.text) + "</span>" +
+          (c ? '<span class="count">' + c + "</span>" : "") + "</div>";
+      } else {
+        var nd = nextDeadline(now);
+        if (nd) html += '<div class="deadline"><span>No deadline this week. Next up: <b>' +
+          esc(nd.dl.label) + "</b>, " + esc(nd.dl.text) + "</span></div>";
+      }
+      if (w.calendly) html += '<a class="cal-btn" href="' + esc(CAL) + '" target="_blank" rel="noopener">Book your one-to-one meeting</a>';
+    }
+    box.innerHTML = html;
+
+    document.getElementById("weeks").innerHTML = WEEKS.map(function (w) {
+      var state = now > new Date(w.end) ? "past" : (now >= new Date(w.start) ? "current" : "");
+      return '<div class="wk ' + state + '"><div class="no">Week ' + w.n + "<br>" + fmtRange(w) + "</div>" +
+        "<div><h4>" + esc(w.title) + "</h4><p>" + w.tasks.map(esc).join(" &middot; ") + "</p>" +
+        (w.deadline ? '<p class="due">' + esc(w.deadline.label) + ": " + esc(w.deadline.text) + "</p>" : "") +
+        "</div></div>";
+    }).join("");
+  }
+
+  function start() {
+    bounds();
+    render();
+    setInterval(render, 60000);
+  }
+
+  /* prefer the CMS copy; fall back to the inline schedule */
+  if (typeof fetch === "function") {
+    fetch("data/content.json", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (c) { if (c) fromCms(c.pol309); })
+      .catch(function () {})
+      .then(start);
+  } else {
+    start();
+  }
+
+  document.getElementById("themeBtn").onclick = function () {
+    var r = document.documentElement;
+    r.setAttribute("data-theme", r.getAttribute("data-theme") === "dark" ? "light" : "dark");
+  };
+})();
+</script>
+</body>
+</html>

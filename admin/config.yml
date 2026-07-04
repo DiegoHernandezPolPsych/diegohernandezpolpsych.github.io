@@ -117,3 +117,29 @@ collections:
               - { name: pos, label: "Background position (e.g. center 15%)", widget: string, required: false }
               - { name: scrimDark, label: "Opacity in dark mode (0 to 1)", widget: number, value_type: float, min: 0, max: 1, step: 0.01, required: false }
               - { name: scrimLight, label: "Opacity in light mode (0 to 1)", widget: number, value_type: float, min: 0, max: 1, step: 0.01, required: false }
+
+          - name: pol309
+            label: "POL309 — This Week tracker"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: calendly, label: "Calendly booking link", widget: string, required: false }
+              - name: weeks
+                label: "Schedule"
+                label_singular: "Week"
+                widget: list
+                summary: "Week {{fields.n}}: {{fields.title}}"
+                fields:
+                  - { name: n, label: "Week number", widget: number, value_type: int }
+                  - { name: title, label: "Week title", widget: string }
+                  - { name: start, label: "Starts (e.g. 2026-07-06T00:00:00-04:00)", widget: string }
+                  - { name: end, label: "Ends (e.g. 2026-07-12T23:59:59-04:00)", widget: string }
+                  - name: tasks
+                    label: "Tasks"
+                    label_singular: "Task"
+                    widget: list
+                    field: { name: task, label: Task, widget: string }
+                  - { name: deadlineLabel, label: "Deadline name (blank for none)", widget: string, required: false }
+                  - { name: deadlineWhen, label: "Deadline datetime (blank hides the countdown)", widget: string, required: false }
+                  - { name: deadlineText, label: "Deadline shown to students (e.g. Friday, July 10, 11:59pm)", widget: string, required: false }
+                  - { name: calendly, label: "Show the meeting booking button this week", widget: boolean, required: false, default: false }

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>POL309 · Grade Calculator</title>
+<meta name="description" content="Grade calculator for POL309: Politics of the European Union, using the exact syllabus weights, letter scale, and late policy." />
+<link rel="icon" href="favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --bg: #faf8f3; --surface: #fffefb; --ink: #211f18; --muted: #6a6453; --faint: #938d79;
+  --line: #e7e0cd; --line-strong: #d6cdb4; --gold: #c39a22; --accent: #876417; --accent-strong: #6c4f12;
+  --rose: #9e5b4b; --teal: #2f4b44;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Hanken Grotesk", system-ui, sans-serif;
+  --font-mono: "Spline Sans Mono", ui-monospace, monospace;
+}
+:root[data-theme="dark"] {
+  --bg: #14130e; --surface: #1e1c15; --ink: #ece6d6; --muted: #a7a18c; --faint: #7d7765;
+  --line: #2b2819; --line-strong: #3a3527; --gold: #e0c04a; --accent: #d8b54c; --accent-strong: #e8c869;
+  --rose: #cf9080; --teal: #82b6a6;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5; }
+.wrap { max-width: 760px; margin: 0 auto; padding: 40px 22px 60px; }
+.topline { display: flex; justify-content: space-between; align-items: center; }
+.back { color: var(--faint); text-decoration: none; font-size: .85rem; }
+.back:hover { color: var(--accent); }
+.theme-btn { background: transparent; border: 1px solid var(--line-strong); color: var(--ink); border-radius: 100px; padding: 5px 13px; cursor: pointer; font: inherit; font-size: .8rem; }
+.eyebrow { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--rose); display: flex; align-items: center; gap: 10px; margin: 34px 0 8px; }
+.triad { display: inline-flex; gap: 4px; }
+.triad span { width: 7px; height: 7px; background: var(--rose); }
+.triad span:nth-child(2) { background: transparent; border: 1.5px solid var(--rose); }
+h1 { font-family: var(--font-display); font-weight: 500; font-size: 2rem; margin: 0 0 4px; }
+.sub { color: var(--muted); margin: 0 0 26px; }
+table.inputs { width: 100%; border-collapse: collapse; }
+table.inputs th {
+  text-align: left; font-family: var(--font-mono); font-weight: 500; font-size: .7rem;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--faint);
+  padding: 6px 8px 6px 0; border-bottom: 1px solid var(--line-strong);
+}
+table.inputs td { padding: 9px 8px 9px 0; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.aname b { font-weight: 600; } .aname span { color: var(--faint); font-size: .82rem; display: block; }
+input[type="number"] {
+  width: 78px; padding: 7px 9px; font: inherit; font-size: .95rem;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 4px;
+}
+input[type="number"]:focus { outline: 2px solid var(--gold); border-color: transparent; }
+.late-note { color: var(--faint); font-size: .78rem; }
+.result {
+  margin-top: 26px; border: 1px solid var(--line-strong); background: var(--surface);
+  padding: 20px 24px; position: relative;
+}
+.result::before, .result::after { content: ""; position: absolute; width: 18px; height: 18px; border: 2px solid var(--gold); }
+.result::before { top: -5px; left: -5px; border-right: 0; border-bottom: 0; }
+.result::after { bottom: -5px; right: -5px; border-left: 0; border-top: 0; }
+.result .rl { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+.result .big { font-family: var(--font-display); font-size: 2.2rem; font-weight: 500; margin: 4px 0 0; }
+.result .big b { color: var(--accent-strong); }
+.result p { margin: 8px 0 0; color: var(--muted); font-size: .9rem; }
+h2.q { font-family: var(--font-display); font-weight: 500; font-size: 1.35rem; margin: 40px 0 6px; }
+.qsub { color: var(--muted); margin: 0 0 14px; font-size: .93rem; }
+table.targets { width: 100%; border-collapse: collapse; font-size: .95rem; }
+table.targets td, table.targets th { padding: 8px 10px 8px 0; border-bottom: 1px solid var(--line); text-align: left; }
+table.targets th { font-family: var(--font-mono); font-weight: 500; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); border-bottom: 1px solid var(--line-strong); }
+.t-ok { color: var(--teal); font-weight: 600; }
+.t-need { font-family: var(--font-mono); }
+.t-no { color: var(--faint); }
+.secured { color: var(--teal); }
+.note { margin-top: 36px; color: var(--faint); font-size: .82rem; border-top: 1px solid var(--line); padding-top: 14px; }
+.note a { color: var(--accent); text-decoration: none; }
+@media (max-width: 560px) {
+  input[type="number"] { width: 64px; }
+  table.inputs td, table.inputs th { padding-right: 5px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topline">
+    <a class="back" href="index.html#teaching">&larr; diegohernandezpolpsych.github.io</a>
+    <button class="theme-btn" id="themeBtn" type="button">Theme</button>
+  </div>
+
+  <p class="eyebrow"><span class="triad"><span></span><span></span><span></span></span> POL309 · Summer II 2026</p>
+  <h1>Grade calculator</h1>
+  <p class="sub">Uses the exact weights, letter scale, and late policy from the syllabus. Leave anything you have not received blank.</p>
+
+  <table class="inputs">
+    <thead><tr><th>Assignment</th><th>Weight</th><th>Score /100</th><th>Days late</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <p class="late-note">Late work: 5 points per day off that assignment, weekends included. More than a week late may not be accepted.</p>
+
+  <div class="result" id="result"></div>
+
+  <h2 class="q">What do I need on the final?</h2>
+  <p class="qsub">Each number below is the minimum final paper score that keeps a grade possible. Until every other score is entered, the calculator gives the missing work the benefit of the doubt and assumes it comes back perfect, so read these as floors rather than forecasts. They tighten into real requirements as your actual scores come in.</p>
+  <table class="targets">
+    <thead><tr><th>Target</th><th>Cutoff</th><th>Needed on final</th></tr></thead>
+    <tbody id="targets"></tbody>
+  </table>
+  <p class="late-note">One graceful margin, applied throughout: a course total that lands within a single point of the next letter grade rounds up to it. A 92.2 counts as an A rather than an A-. Anything further than a point away stands as earned.</p>
+
+  <p class="note">
+    This calculator is an aid, not the official record. Grades on Brightspace are authoritative,
+    and the syllabus governs if anything here disagrees.
+    Questions: <a href="mailto:diego.hernandez@stonybrook.edu">diego.hernandez@stonybrook.edu</a>.
+  </p>
+</div>
+
+<script>
+(function () {
+  /* the syllabus, encoded exactly */
+  var ITEMS = [
+    { id: "q1", name: "Week 1 quiz", sub: "reading check", w: 5 },
+    { id: "q2", name: "Week 2 quiz", sub: "reading check", w: 5 },
+    { id: "q4", name: "Week 4 quiz", sub: "reading check", w: 5 },
+    { id: "writing", name: "Writing assignment", sub: "week 3, Euractiv piece", w: 25 },
+    { id: "meeting", name: "One-to-one meeting", sub: "weeks 4 to 5", w: 10 },
+    { id: "final", name: "Final paper", sub: "due August 15", w: 50 }
+  ];
+  var SCALE = [
+    ["A", 93], ["A-", 90], ["B+", 87], ["B", 83], ["B-", 80],
+    ["C+", 77], ["C", 73], ["C-", 70], ["D+", 67], ["D", 63], ["D-", 60], ["F", 0]
+  ];
+  /* the grace margin: a course total within one point of the next
+     cutoff rounds up to it, so each letter effectively begins one
+     point below its listed cutoff (F excepted) */
+  var GRACE = 1;
+  function letter(pct) {
+    for (var i = 0; i < SCALE.length; i++) {
+      var floor = SCALE[i][1] === 0 ? 0 : SCALE[i][1] - GRACE;
+      if (pct >= floor) return SCALE[i][0];
+    }
+    return "F";
+  }
+
+  var KEY = "pol309-grades";
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
+
+  var rows = document.getElementById("rows");
+  rows.innerHTML = ITEMS.map(function (it) {
+    return "<tr><td class='aname'><b>" + it.name + "</b><span>" + it.sub + "</span></td>" +
+      "<td>" + it.w + "%</td>" +
+      "<td><input type='number' min='0' max='100' step='1' id='s_" + it.id + "' value='" + (saved["s_" + it.id] || "") + "' /></td>" +
+      "<td><input type='number' min='0' max='14' step='1' id='l_" + it.id + "' value='" + (saved["l_" + it.id] || "") + "' /></td></tr>";
+  }).join("");
+
+  function val(id) {
+    var v = document.getElementById(id).value.trim();
+    return v === "" ? null : Math.min(100, Math.max(0, parseFloat(v)));
+  }
+  function adjusted(it) {
+    var s = val("s_" + it.id);
+    if (s === null) return null;
+    var late = val("l_" + it.id) || 0;
+    return Math.max(0, s - 5 * late);
+  }
+
+  function recalc() {
+    var store = {};
+    var earnedW = 0, earnedPts = 0, allW = 0, allPts = 0, anyLate = false, finalEntered = false;
+    ITEMS.forEach(function (it) {
+      store["s_" + it.id] = document.getElementById("s_" + it.id).value;
+      store["l_" + it.id] = document.getElementById("l_" + it.id).value;
+      var a = adjusted(it);
+      if ((val("l_" + it.id) || 0) > 0) anyLate = true;
+      if (a !== null) {
+        earnedW += it.w; earnedPts += it.w * a / 100;
+        if (it.id === "final") finalEntered = true;
+      }
+    });
+    try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {}
+
+    var box = document.getElementById("result");
+    if (earnedW === 0) {
+      box.innerHTML = '<span class="rl">Standing</span><p style="margin-top:6px">Enter a score to see where you stand.</p>';
+    } else {
+      var standing = earnedPts / earnedW * 100;
+      var html = '<span class="rl">' + (earnedW === 100 ? "Course grade" : "Current standing, " + earnedW + "% of the grade in") + "</span>" +
+        '<div class="big">' + standing.toFixed(1) + " &middot; <b>" + letter(standing) + "</b></div>";
+      if (earnedW < 100) {
+        var floor = earnedPts;   // everything remaining scores 0
+        var ceil = earnedPts + (100 - earnedW); // everything remaining scores 100
+        html += "<p>Guaranteed range so far: " + floor.toFixed(1) + " (" + letter(floor) + ") to " +
+          ceil.toFixed(1) + " (" + letter(ceil) + "), depending on what is still out.</p>";
+      }
+      if (anyLate) html += "<p>Late penalties are included: 5 points per day off the affected assignment.</p>";
+      box.innerHTML = html;
+    }
+
+    /* what do I need on the final: use adjusted non-final scores; blanks count as unknown,
+       so the table also reports how much weight is still unknown besides the final */
+    var otherPts = 0, unknownW = 0;
+    ITEMS.forEach(function (it) {
+      if (it.id === "final") return;
+      var a = adjusted(it);
+      if (a === null) unknownW += it.w;
+      else otherPts += it.w * a / 100;
+    });
+    var tbody = document.getElementById("targets");
+    if (finalEntered) {
+      tbody.innerHTML = '<tr><td colspan="3" class="t-no">You already entered a final paper score, so the course grade above is the answer.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = SCALE.slice(0, 11).map(function (row) {
+      var target = row[1] - GRACE;   // the grace margin lowers each effective cutoff by one point
+      var needed = (target - otherPts - unknownW) / 0.5;
+      var cell;
+      if (needed <= 0) cell = '<span class="secured">already secured' + (unknownW ? " if the rest of your work comes back perfect" : "") + "</span>";
+      else if (needed > 100) cell = '<span class="t-no">out of reach</span>';
+      else cell = '<span class="t-need">' + Math.max(0, needed).toFixed(1) + "+" +
+        (unknownW ? '</span> <span class="t-no">(a floor, not a forecast: it assumes the ' + unknownW + "% you have not entered comes back perfect)" : "</span>");
+      return "<tr><td class='t-ok'>" + row[0] + "</td><td>" + row[1] + "+</td><td>" + cell + "</td></tr>";
+    }).join("");
+  }
+
+  document.querySelectorAll("input").forEach(function (i) { i.addEventListener("input", recalc); });
+  document.getElementById("themeBtn").onclick = function () {
+    var r = document.documentElement;
+    r.setAttribute("data-theme", r.getAttribute("data-theme") === "dark" ? "light" : "dark");
+  };
+  recalc();
+})();
+</script>
+</body>
+</html>
