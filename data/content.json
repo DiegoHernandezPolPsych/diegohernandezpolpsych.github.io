@@ -7,6 +7,7 @@
       "text": "I study why some people refuse a partisan label, and how that refusal translates into political behavior. My research brings the methods of political psychology to understand a group that most accounts of partisanship treat as a residual category: the American independent."
     }
   ],
+  "researchTitle": "More Projects",
   "researchLede": "In addition to my dissertation work, I have research interests in why some individuals say they believe in conspiracies when they do not behave like they truly believe them, and how that signaling behavior maps onto their politics.",
   "dataTag": "survey experiments, quantitative and qualitative methods",
   "publications": [
@@ -37,6 +38,8 @@
       "links": []
     }
   ],
+  "teachingTitle": "In the classroom",
+  "teachingLede": "I teach comparative and European politics, and I build courses around the gap between how institutions are supposed to work and how citizens actually reason about them.",
   "teaching": [
     {
       "title": "POL309: Politics of the European Union",
@@ -48,7 +51,7 @@
           "href": "files/POL309_Summer2026.pdf"
         },
         {
-          "label": "This Week",
+          "label": "This Week at a Glance",
           "href": "pol309-tracker.html"
         },
         {
@@ -58,6 +61,8 @@
       ]
     }
   ],
+  "cvTitle": "Curriculum vitae",
+  "cvLede": "A short version lives here. The full document, with all positions, presentations, and service, is in the PDF.",
   "cvEducation": [
     {
       "year": "2023–2028",
@@ -92,11 +97,6 @@
       "detail": "Quantitative social science, data analysis in R, Python, and SPSS programming languages, social science experiments, Qualtrics; qualitative methods including focus groups and interviews, text-as-data approaches"
     }
   ],
-  "researchTitle": "More Projects",
-  "teachingTitle": "In the classroom",
-  "teachingLede": "I teach comparative and European politics, and I build courses around the gap between how institutions are supposed to work and how citizens actually reason about them.",
-  "cvTitle": "Curriculum vitae",
-  "cvLede": "A short version lives here. The full document, with all positions, presentations, and service, is in the PDF.",
   "contactTitle": "Get in touch",
   "contactLede": "Email is the best way to reach me. I am happy to share drafts, materials, or replication code.",
   "paintings": [
