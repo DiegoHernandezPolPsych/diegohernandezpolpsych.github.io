@@ -46,6 +46,14 @@
         {
           "label": "Syllabus",
           "href": "files/POL309_Summer2026.pdf"
+        },
+        {
+          "label": "This Week",
+          "href": "pol309-tracker.html"
+        },
+        {
+          "label": "Grade Calculator",
+          "href": "pol309-grades.html"
         }
       ]
     }
@@ -127,5 +135,101 @@
       "scrimDark": 0.41,
       "scrimLight": 0.59
     }
-  ]
+  ],
+  "pol309": {
+    "calendly": "https://calendly.com/diego-hernandez-political-science/pol309-politics-in-the-european-union",
+    "weeks": [
+      {
+        "n": 1,
+        "title": "The Idea of Europe, the Foundation of the Union",
+        "start": "2026-07-06T00:00:00-04:00",
+        "end": "2026-07-12T23:59:59-04:00",
+        "tasks": [
+          "Read Chapter 2, “The Idea of Europe” (McCormick)",
+          "Watch “The Idea of Europe” introduction video, up to the 9:50 mark",
+          "Reading-check quiz on Brightspace"
+        ],
+        "deadlineLabel": "Week 1 quiz",
+        "deadlineWhen": "2026-07-10T23:59:00-04:00",
+        "deadlineText": "Friday, July 10, 11:59pm",
+        "calendly": false
+      },
+      {
+        "n": 2,
+        "title": "The Political History of the European Union",
+        "start": "2026-07-13T00:00:00-04:00",
+        "end": "2026-07-19T23:59:59-04:00",
+        "tasks": [
+          "Read Chapter 3, “The Evolution of the EU” first",
+          "Then read Chapter 1, “What is the European Union”",
+          "Reading-check quiz on Brightspace"
+        ],
+        "deadlineLabel": "Week 2 quiz",
+        "deadlineWhen": "2026-07-17T23:59:00-04:00",
+        "deadlineText": "Friday, July 17, 11:59pm",
+        "calendly": false
+      },
+      {
+        "n": 3,
+        "title": "Institutions of the European Union",
+        "start": "2026-07-20T00:00:00-04:00",
+        "end": "2026-07-26T23:59:59-04:00",
+        "tasks": [
+          "Read Chapter 4, “The European Institutions”",
+          "Read Chapter 6, “The EU Policy Process”",
+          "Watch the six institution videos on Brightspace",
+          "Writing assignment (25% of your grade): browse euractiv.com, pick an issue, and write 500+ words on how two EU institutions would engage it"
+        ],
+        "deadlineLabel": "Writing assignment",
+        "deadlineWhen": "",
+        "deadlineText": "due this week; see Brightspace for the exact deadline",
+        "calendly": false
+      },
+      {
+        "n": 4,
+        "title": "The Single Market and a Diversity of Opinions",
+        "start": "2026-07-27T00:00:00-04:00",
+        "end": "2026-08-02T23:59:59-04:00",
+        "tasks": [
+          "Read Chapter 7, “Economic Policy”",
+          "Read Chapter 5, “The EU and its Citizens”",
+          "Reading-check quiz on Brightspace",
+          "Book your one-to-one meeting about the final paper (this week or next; earlier is better)"
+        ],
+        "deadlineLabel": "Week 4 quiz",
+        "deadlineWhen": "2026-07-31T23:59:00-04:00",
+        "deadlineText": "Friday, July 31, 11:59pm",
+        "calendly": true
+      },
+      {
+        "n": 5,
+        "title": "The Politics of Crisis and Europe's Response",
+        "start": "2026-08-03T00:00:00-04:00",
+        "end": "2026-08-09T23:59:59-04:00",
+        "tasks": [
+          "Read Chapter 8, “Internal Policies”",
+          "Read Chapter 9, “The EU in the World”",
+          "If you have not met with me yet, book your one-to-one now"
+        ],
+        "deadlineLabel": "",
+        "deadlineWhen": "",
+        "deadlineText": "",
+        "calendly": true
+      },
+      {
+        "n": 6,
+        "title": "Final Papers",
+        "start": "2026-08-10T00:00:00-04:00",
+        "end": "2026-08-15T23:59:59-04:00",
+        "tasks": [
+          "Write and submit your final paper (50% of your grade): 6 to 7 pages, double spaced, MLA or APA, substantially referencing the textbook",
+          "Submit on Brightspace"
+        ],
+        "deadlineLabel": "Final paper",
+        "deadlineWhen": "2026-08-15T23:59:00-04:00",
+        "deadlineText": "Saturday, August 15, 11:59pm EST",
+        "calendly": false
+      }
+    ]
+  }
 }
