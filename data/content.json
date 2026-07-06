@@ -146,12 +146,11 @@
         "end": "2026-07-12T23:59:59-04:00",
         "tasks": [
           "Read Chapter 2, “The Idea of Europe” (McCormick)",
-          "Watch “The Idea of Europe” introduction video, up to the 9:50 mark",
-          "Reading-check quiz on Brightspace"
+          "Watch “The Idea of Europe” introduction video, up to the 9:50 mark"
         ],
-        "deadlineLabel": "Week 1 quiz",
-        "deadlineWhen": "2026-07-10T23:59:00-04:00",
-        "deadlineText": "Friday, July 10, 11:59pm",
+        "deadlineLabel": "",
+        "deadlineWhen": "",
+        "deadlineText": "",
         "calendly": false
       },
       {
@@ -162,9 +161,9 @@
         "tasks": [
           "Read Chapter 3, “The Evolution of the EU” first",
           "Then read Chapter 1, “What is the European Union”",
-          "Reading-check quiz on Brightspace"
+          "Reading-check quiz on Brightspace (covers Weeks 1 & 2)"
         ],
-        "deadlineLabel": "Week 2 quiz",
+        "deadlineLabel": "Weeks 1 & 2 quiz",
         "deadlineWhen": "2026-07-17T23:59:00-04:00",
         "deadlineText": "Friday, July 17, 11:59pm",
         "calendly": false
