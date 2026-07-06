@@ -98,12 +98,12 @@ table.targets th { font-family: var(--font-mono); font-weight: 500; font-size: .
   <div class="result" id="result"></div>
 
   <h2 class="q">What do I need on the final?</h2>
-  <p class="qsub">Each number below is the minimum final paper score that keeps a grade possible. Until every other score is entered, the calculator gives the missing work the benefit of the doubt and assumes it comes back perfect, so read these as floors rather than forecasts. They tighten into real requirements as your actual scores come in.</p>
+  <p class="qsub">Each number below is the minimum final paper score that keeps a grade possible, against the raw syllabus cutoffs. Until every other score is entered, the calculator gives the missing work the benefit of the doubt and assumes it comes back perfect, so read these as floors rather than forecasts. They tighten into real requirements as your actual scores come in. These cutoffs do not include any end-of-term rounding; see the note below.</p>
   <table class="targets">
     <thead><tr><th>Target</th><th>Cutoff</th><th>Needed on final</th></tr></thead>
     <tbody id="targets"></tbody>
   </table>
-  <p class="late-note">One graceful margin, applied throughout: a course total that lands within a single point of the next letter grade rounds up to it. A 92.2 counts as an A rather than an A-. Anything further than a point away stands as earned.</p>
+  <p class="late-note">Course totals that fall short of the next letter grade boundary may round up, depending on how reliably the term's grades measured student performance. I use statistical procedure to determine the Standard Error of Measurement, or SEM: a data-based estimate of how far a reported total might reasonably drift from your actual performance across the term, using McDonald's omega to account for differing weights of assignments. A course total within one SEM of the next grade boundary rounds up to that grade; anything further away stands as earned. This buffer is calculated once, after all grades are finalized, and applied identically to every student, so it is not something that can be requested or negotiated individually, and it limits grade inflation.</p>
 
   <p class="note">
     This calculator is an aid, not the official record. Grades on Brightspace are authoritative,
@@ -127,14 +127,13 @@ table.targets th { font-family: var(--font-mono); font-weight: 500; font-size: .
     ["A", 93], ["A-", 90], ["B+", 87], ["B", 83], ["B-", 80],
     ["C+", 77], ["C", 73], ["C-", 70], ["D+", 67], ["D", 63], ["D-", 60], ["F", 0]
   ];
-  /* the grace margin: a course total within one point of the next
-     cutoff rounds up to it, so each letter effectively begins one
-     point below its listed cutoff (F excepted) */
-  var GRACE = 1;
+  /* Note: this calculator reports raw, unrounded standing. It does not
+     attempt to model the SEM-based rounding described in the note below,
+     since that buffer can only be computed once all of a term's grades
+     are final, and isn't knowable while the course is still in progress. */
   function letter(pct) {
     for (var i = 0; i < SCALE.length; i++) {
-      var floor = SCALE[i][1] === 0 ? 0 : SCALE[i][1] - GRACE;
-      if (pct >= floor) return SCALE[i][0];
+      if (pct >= SCALE[i][1]) return SCALE[i][0];
     }
     return "F";
   }
@@ -191,6 +190,7 @@ table.targets th { font-family: var(--font-mono); font-weight: 500; font-size: .
           ceil.toFixed(1) + " (" + letter(ceil) + "), depending on what is still out.</p>";
       }
       if (anyLate) html += "<p>Late penalties are included: 5 points per day off the affected assignment.</p>";
+      html += '<p style="margin-top:6px">This is your raw, unrounded standing. If your final total lands close to a grade boundary, see the note below on how rounding is determined.</p>';
       box.innerHTML = html;
     }
 
@@ -209,7 +209,7 @@ table.targets th { font-family: var(--font-mono); font-weight: 500; font-size: .
       return;
     }
     tbody.innerHTML = SCALE.slice(0, 11).map(function (row) {
-      var target = row[1] - GRACE;   // the grace margin lowers each effective cutoff by one point
+      var target = row[1];   // raw syllabus cutoff, unrounded
       var needed = (target - otherPts - unknownW) / 0.5;
       var cell;
       if (needed <= 0) cell = '<span class="secured">already secured' + (unknownW ? " if the rest of your work comes back perfect" : "") + "</span>";
