@@ -72,6 +72,22 @@ table.targets th { font-family: var(--font-mono); font-weight: 500; font-size: .
 .secured { color: var(--teal); }
 .note { margin-top: 36px; color: var(--faint); font-size: .82rem; border-top: 1px solid var(--line); padding-top: 14px; }
 .note a { color: var(--accent); text-decoration: none; }
+.calc-explainer { margin: 10px 0 18px; border: 1px solid var(--line-strong); background: var(--surface); }
+.calc-explainer summary {
+  cursor: pointer; list-style: none; padding: 10px 16px; font-size: .85rem; color: var(--accent);
+  display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); letter-spacing: .02em;
+}
+.calc-explainer summary::-webkit-details-marker { display: none; }
+.calc-explainer summary::before { content: "+"; font-family: var(--font-body); font-size: 1rem; color: var(--gold); width: 1em; }
+.calc-explainer[open] summary::before { content: "\2212"; }
+.calc-explainer summary:hover { color: var(--accent-strong); }
+.calc-explainer-body { padding: 4px 16px 18px; border-top: 1px solid var(--line); }
+.calc-explainer-body p { color: var(--muted); font-size: .88rem; }
+table.calc-example { width: 100%; border-collapse: collapse; font-size: .82rem; margin: 12px 0; }
+table.calc-example th, table.calc-example td { padding: 6px 8px 6px 0; border-bottom: 1px solid var(--line); text-align: left; }
+table.calc-example th { font-family: var(--font-mono); font-weight: 500; font-size: .65rem; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); border-bottom: 1px solid var(--line-strong); }
+table.calc-example .yes { color: var(--teal); font-weight: 600; }
+table.calc-example .no { color: var(--faint); }
 @media (max-width: 560px) {
   input[type="number"] { width: 64px; }
   table.inputs td, table.inputs th { padding-right: 5px; }
@@ -104,6 +120,42 @@ table.targets th { font-family: var(--font-mono); font-weight: 500; font-size: .
     <tbody id="targets"></tbody>
   </table>
   <p class="late-note">Course totals that fall short of the next letter grade boundary may round up, depending on how reliably the term's grades measured student performance. I use statistical procedure to determine the Standard Error of Measurement, or SEM: a data-based estimate of how far a reported total might reasonably drift from your actual performance across the term, using McDonald's omega to account for differing weights of assignments. A course total within one SEM of the next grade boundary rounds up to that grade; anything further away stands as earned. This buffer is calculated once, after all grades are finalized, and applied identically to every student, so it is not something that can be requested or negotiated individually, and it limits grade inflation.</p>
+
+  <details class="calc-explainer">
+    <summary>See how this calculation works</summary>
+    <div class="calc-explainer-body">
+      <p>SEM = SD &times; &radic;(1 &minus; omega). SD is how spread out course totals are across the class. Omega measures how consistently your performance on one graded component (quizzes, the writing assignment, the meeting, the final paper) predicts your performance on the others, weighted for how much each one counts. A course total within one SEM of the next boundary rounds up. Both SD and omega can only be calculated once every student's final grade is in, so the number below is illustrative, not this term's actual figure.</p>
+      <p>Say SD works out to 5.4 and omega to 0.82: SEM = 5.4 &times; &radic;(1 &minus; 0.82) &asymp; 2.3 points. Here is how that plays out for two made-up students, both graded on the syllabus weights above, against the 90-point A&minus;/A boundary:</p>
+      <table class="calc-example">
+        <thead><tr><th></th><th>Quizzes (15%)</th><th>Writing (25%)</th><th>Meeting (10%)</th><th>Final paper (50%)</th><th>Total</th><th>Gap to 90</th><th>Rounds up?</th></tr></thead>
+        <tbody>
+          <tr><td>Maya</td><td>90</td><td>85</td><td>100</td><td>87</td><td>88.3</td><td>1.75</td><td class="yes">Yes, 1.75 &lt; 2.3</td></tr>
+          <tr><td>Jordan</td><td>65</td><td>88</td><td>100</td><td>89</td><td>86.3</td><td>3.75</td><td class="no">No, 3.75 &gt; 2.3</td></tr>
+        </tbody>
+      </table>
+      <p>Maya's total sits close enough to 90 that measurement noise alone could plausibly explain the gap, so her A&minus; becomes an A. Jordan's total, mostly pulled down by a low quiz average, sits too far from the boundary for that explanation, so it stands as earned. Neither student negotiates anything: the same line applies to both once the term's actual SD and omega are known.</p>
+    </div>
+  </details>
+
+  <details class="calc-explainer">
+    <summary>Why this instead of a simpler method?</summary>
+    <div class="calc-explainer-body">
+      <p>Most instructors handle borderline grades one of a few common ways, and each has a real cost to students:</p>
+      <p><b>A blanket curve, adding points to every total.</b> Mechanically, this is the same as applying a flat margin at every letter boundary at once, so it inherits the same problem a fixed margin has: the size of the boost has nothing to do with how reliable that term's grades actually were. It is also worse in one specific way. A boundary-based margin only changes anything for students near a cutoff. A blanket curve changes the reported number for everyone, including students who were never at risk of anything, so a 96 becomes a fabricated 99 for no reason. That said, blanket adjustments will be used if an assignment turns out to have been miscalibrated for the whole class, which is a different problem than any one student's measurement uncertainty, and would be handled according to the below.</p>
+      <p><b>Emailing to ask for a bump.</b> This rewards whoever thinks to ask, knows the option exists, or feels comfortable requesting an exception, not whoever actually has the strongest case. Two students with the same total can end up with different grades depending on who reaches out.</p>
+      <p><b>A fixed margin decided in advance, such as always rounding within a point.</b> This is simple to state but arbitrary in size. It hands out the same benefit whether that term's grades were highly consistent, meaning there was little real uncertainty to correct for, or genuinely noisy, meaning a bigger margin was warranted.</p>
+      <p><b>Curving to fit a target class average.</b> This ties your grade partly to how your classmates did rather than to an absolute standard, so the same performance can land you a different grade in a strong cohort than in a weak one.</p>
+      <p>The SEM method sidesteps all four problems the same way: the margin comes from this term's actual measurement precision, not a guess, a favor, or the rest of the class. It applies identically to everyone the moment final grades are set, so nothing about it depends on asking, timing, or who else is in the room. The tradeoff is that it takes more explaining than "I round to the nearest point," and the exact number can't exist until the term is over.</p>
+    </div>
+  </details>
+
+  <details class="calc-explainer">
+    <summary>What if the assignment itself was the problem?</summary>
+    <div class="calc-explainer-body">
+      <p>The same data used to calculate omega can also flag when a low score reflects a flawed assessment rather than weak performance, not just individual rounding. Omega is built from how each graded component relates to the others: how much of a component's variation tracks the same underlying performance as everything else, and how much doesn't. A component with a low class-wide average and a weak relationship to the rest of the term's grades, meaning it doesn't predict how students did elsewhere the way a typical component does, is a signal that the item measured something other than course mastery: maybe a confusing prompt, an ambiguous question, essentially something I did poorly. A component with a low average but a strong relationship to the rest of the term's grades tells a different story: students who understood the material did better than those who didn't, the usual pattern, which points to difficult material rather than a flawed assessment.</p>
+      <p>When the data does point to a flawed component, it's handled the same way the rounding buffer is: applied to the whole class at once, decided from the evidence rather than case by case. Depending on what the diagnostic shows, that might mean dropping the component from everyone's total and reweighting the rest or giving uniform credit for a specific question while leaving the rest of the assignment as scored. What it doesn't mean is negotiating adjustments student by student, or assuming a low average by itself proves the assessment was at fault.</p>
+    </div>
+  </details>
 
   <p class="note">
     This calculator is an aid, not the official record. Grades on Brightspace are authoritative,
