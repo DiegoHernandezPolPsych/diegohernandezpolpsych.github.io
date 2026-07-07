@@ -285,7 +285,7 @@ table.calc-example .no { color: var(--faint); }
       if (needed <= 0) cell = '<span class="secured">already secured' + (unknownW ? " if the rest of your work comes back perfect" : "") + "</span>";
       else if (needed > 100) cell = '<span class="t-no">out of reach</span>';
       else cell = '<span class="t-need">' + Math.max(0, needed).toFixed(1) + "+" +
-        (unknownW ? '</span> <span class="t-no">(a floor, not a forecast: it assumes the ' + unknownW + "% you have not entered comes back perfect)" : "</span>");
+        (unknownW ? '</span> <span class="t-no">(a floor, not a forecast: it assumes the ' + unknownW + "% of your grade outside the final paper that's not yet entered comes back perfect)" : "</span>");
       return "<tr><td class='t-ok'>" + row[0] + "</td><td>" + row[1] + "+</td><td>" + cell + "</td></tr>";
     }).join("");
   }
