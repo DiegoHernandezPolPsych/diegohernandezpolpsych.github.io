@@ -157,6 +157,24 @@ table.calc-example .no { color: var(--faint); }
     </div>
   </details>
 
+  <details class="calc-explainer">
+    <summary>A note on statistics, for the nerds</summary>
+    <div class="calc-explainer-body">
+      <p>With something like 30 students, one erratic data point carries outsized influence on the calculation of omega. A single student who has a rough week or misses a deadline can drag down the whole class's internal consistency score, even though nothing about the course itself changed. Calculated once from a small sample, omega is an unstable statistic, swinging based on the specific handful of people enrolled rather than the actual quality of the assessments.</p>
+      <p>Instead of computing omega only once from the class's scores, I resample the data thousands of times, drawing simulated classes from the same score distribution, and calculate omega on each resample. Averaging across that many resamples dampens the effect any single student's data point can have, since an outlier only shows up in some of the resampled draws instead of deciding the one and only calculation. The result is a steadier SEM, one that reflects the term's assessments rather than the luck of exactly who happened to enroll that term.</p>
+      <p>This matters for you. Without it, a small seminar's rounding buffer could shrink or swell based on one classmate's unrelated bad week, which has nothing to do with your own performance. This bootstrapping method keeps that from happening, so a small class gets a buffer that's considerably steadier than a single raw calculation would produce.</p>
+    </div>
+  </details>
+
+  <details class="calc-explainer">
+    <summary>Why I choose this method</summary>
+    <div class="calc-explainer-body">
+      <p>Most grading treats a final percentage as an exact, unquestionable outcome. A 92.9 and a 93.0 get sorted into different tiers as if the difference between them means something real, as if every rubric, every essay prompt, and every quiz question measures performance with perfect precision. I don't assume that they do. Any form of academic assessment carries some amount of noise: an ambiguous prompt, a rubric that reads two different ways, a rough night's sleep before a quiz. None of that is a flaw unique to this course. It's just what measurement looks like.</p>
+      <p>Using omega to calculate a real, term-specific SEM means the grading scale can check itself and I can know where to improve my teaching and assessment for future semesters without disadvantaging yours now. If a particular assignment turns out to have been inconsistent or poorly calibrated across this class, the buffer widens to reflect that, automatically, without me having to notice and adjust it by hand.</p>
+      <p>The point of building the buffer this way is to take the guesswork and any bias I may have out of it. Nobody has to email me and make a case for a decimal point at the end of the term. If a student's actual performance can't be reliably distinguished from the next letter grade, the same rule applies to them as to everyone else, without exception and without anyone having to ask.</p>
+    </div>
+  </details>
+
   <p class="note">
     This calculator is an aid, not the official record. Grades on Brightspace are authoritative,
     and the syllabus governs if anything here disagrees.
