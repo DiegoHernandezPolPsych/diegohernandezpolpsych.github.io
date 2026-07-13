@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+<script>document.documentElement.classList.add('js');</script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Diego Hernandez · Political Psychology</title>
@@ -646,13 +647,17 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
    because the global reduced-motion rule cancels all animations
    and would otherwise leave this layer stuck on screen */
 
-/* hide CMS-driven elements until content.json resolves — eliminates flash */
-html:not(.cms-ready) [data-key],
-html:not(.cms-ready) [data-html],
-html:not(.cms-ready) [data-bio],
-html:not(.cms-ready) [data-list],
-html:not(.cms-ready) [data-email-href],
-html:not(.cms-ready) [data-email-link] {
+/* hide CMS-driven elements until content.json resolves — eliminates flash.
+   Gated on html.js (added by the tiny inline script in <head>) so that if
+   JavaScript never runs at all, this rule never applies and the static
+   fallback content already in the HTML stays visible, rather than being
+   hidden forever with no script around to reveal it. */
+html.js:not(.cms-ready) [data-key],
+html.js:not(.cms-ready) [data-html],
+html.js:not(.cms-ready) [data-bio],
+html.js:not(.cms-ready) [data-list],
+html.js:not(.cms-ready) [data-email-href],
+html.js:not(.cms-ready) [data-email-link] {
   visibility: hidden;
 }
 
@@ -850,39 +855,21 @@ html.vt-on .panel.is-active { animation: none; }
       <article class="card">
         <div class="card-index">01</div>
         <div>
-          <h3>[Dissertation paper title]<span class="status">Job market paper</span></h3>
-          <p class="meta">Working paper</p>
-          <p>One-sentence summary of the argument and the headline finding. Replace this with your own abstract-length description.</p>
-          <div class="card-links">
-            <a href="#">PDF</a>
-            <a href="#">Pre-registration</a>
-            <a href="#">Replication data</a>
-          </div>
+          <h3>[Dissertation paper title]<span class="status">Job market paper</span></h3><p class="meta">Working paper</p><div class="card-links"><a href="#">Draft on request</a></div>
         </div>
       </article>
 
       <article class="card">
         <div class="card-index">02</div>
         <div>
-          <h3>[Second paper title]<span class="status">Under review</span></h3>
-          <p class="meta">With [coauthors] · [Journal]</p>
-          <p>Short description of the question, the design, and what you found.</p>
-          <div class="card-links">
-            <a href="#">PDF</a>
-            <a href="#">Materials</a>
-          </div>
+          <h3>Democratic Governance, Interpersonal Trust, and Interpersonal Responsibility: Do Values Predict Vote Choice in Hypothetical EU Membership Referenda?<span class="status">MA thesis</span></h3><p class="meta">Stony Brook University, 2023</p>
         </div>
       </article>
 
       <article class="card">
         <div class="card-index">03</div>
         <div>
-          <h3>[Work in progress]<span class="status">In progress</span></h3>
-          <p class="meta">Work in progress</p>
-          <p>A line or two on what this project asks. Draft available on request.</p>
-          <div class="card-links">
-            <a href="#">Draft on request</a>
-          </div>
+          <h3>Searching For Uniqueness in the Crowd: Conspiracies and their Believers<span class="status">MSc thesis</span></h3><p class="meta">London School of Economics, 2021</p>
         </div>
       </article>
     </div>
@@ -899,28 +886,7 @@ html.vt-on .panel.is-active { animation: none; }
       <article class="card">
         <div class="card-index">→</div>
         <div>
-          <h3>European Union Politics</h3>
-          <p class="meta">Instructor / Teaching Assistant · [Term]</p>
-          <p>Short description of the course and your role. Add a link to the syllabus if you want it public.</p>
-          <div class="card-links"><a href="#">Syllabus</a></div>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-index">→</div>
-        <div>
-          <h3>[Course title]</h3>
-          <p class="meta">Teaching Assistant · [Term]</p>
-          <p>What the course covered and what you handled.</p>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-index">→</div>
-        <div>
-          <h3>[Course title]</h3>
-          <p class="meta">Teaching Assistant · [Term]</p>
-          <p>What the course covered and what you handled.</p>
+          <h3>POL309: Politics of the European Union</h3><p class="meta">Instructor of Record · Summer 2025; Summer 2026; Fall 2026; Spring 2027</p><div class="card-links"><a href="files/POL309_Summer2026.pdf">Syllabus</a><a href="pol309-tracker.html">This Week at a Glance</a><a href="pol309-grades.html">Grade Calculator</a></div>
         </div>
       </article>
     </div>
@@ -941,16 +907,24 @@ html.vt-on .panel.is-active { animation: none; }
         <p class="cv-sub-title">Education</p>
         <ul class="cv-list" data-list="cvEducation">
           <li>
-            <span class="cv-year">20XX–</span>
-            <span class="cv-item"><b>PhD, Political Science</b><span>Stony Brook University · Political psychology</span></span>
+            <span class="cv-year">2023–2028</span>
+            <span class="cv-item"><b>PhD, Political Science</b><span>Stony Brook University · Committee: Leonie Huddy, Stephanie DeMora, Pazit Ben Nun-Bloom, Eric Groenendyk</span></span>
           </li>
           <li>
-            <span class="cv-year">20XX</span>
-            <span class="cv-item"><b>MA, [field]</b><span>[Institution]</span></span>
+            <span class="cv-year">2022–2023</span>
+            <span class="cv-item"><b>MA, Political Science</b><span>Stony Brook University · Advisor: Gallya Lahav</span></span>
           </li>
           <li>
-            <span class="cv-year">20XX</span>
-            <span class="cv-item"><b>MSc, [field]</b><span>[Institution]</span></span>
+            <span class="cv-year">2020–2021</span>
+            <span class="cv-item"><b>MSc, Culture and Conflict in a Global Europe</b><span>London School of Economics and Political Science · Advisor: Cristóbal Garibay-Petersen</span></span>
+          </li>
+          <li>
+            <span class="cv-year">2018–2020</span>
+            <span class="cv-item"><b>BA, Politics</b><span>University of California, Santa Cruz</span></span>
+          </li>
+          <li>
+            <span class="cv-year">2014–2018</span>
+            <span class="cv-item"><b>AA, Political Science; Liberal Arts: Social and Behavioral Sciences; Liberal Arts: Arts and Humanities</b><span>Santa Barbara City College</span></span>
           </li>
         </ul>
       </div>
@@ -958,9 +932,7 @@ html.vt-on .panel.is-active { animation: none; }
       <div>
         <p class="cv-sub-title">Fields &amp; methods</p>
         <ul class="cv-list" data-list="cvFields">
-          <li><span class="cv-year">·</span><span class="cv-item"><b>Political psychology</b><span>Partisanship, independence, political reasoning</span></span></li>
-          <li><span class="cv-year">·</span><span class="cv-item"><b>Comparative</b><span>European Union politics, public opinion</span></span></li>
-          <li><span class="cv-year">·</span><span class="cv-item"><b>Methods</b><span>Survey experiments, R, reproducible workflows</span></span></li>
+          <li><span class="cv-year cv-year-dot">·</span><span class="cv-item"><b>Methods</b><span>Quantitative social science, data analysis in R, Python, and SPSS programming languages, social science experiments, Qualtrics; qualitative methods including focus groups and interviews, text-as-data approaches</span></span></li>
         </ul>
       </div>
     </div>
@@ -983,7 +955,7 @@ html.vt-on .panel.is-active { animation: none; }
   <section class="panel" id="contact" role="tabpanel" aria-labelledby="tab-contact" tabindex="0" hidden>
     <p class="eyebrow">Contact</p>
     <h2 class="section-title" data-key="contactTitle">Get in touch</h2>
-    <p class="lede" data-html="contactLede">Email is the surest way to reach me. I am happy to share drafts, materials, or replication code.</p>
+    <p class="lede" data-html="contactLede">Email is the best way to reach me. I am happy to share drafts, materials, or replication code.</p>
 
     <div class="contact-grid">
       <ul class="contact-list">
