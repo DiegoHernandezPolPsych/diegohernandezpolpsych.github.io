@@ -114,7 +114,8 @@ table.calc-example .no { color: var(--faint); }
   <div class="result" id="result"></div>
 
   <h2 class="q">What do I need on the final?</h2>
-  <p class="qsub">Each number below is the minimum final paper score that keeps a grade possible, against the raw syllabus cutoffs. Until every other score is entered, the calculator gives the missing work the benefit of the doubt and assumes it comes back perfect, so read these as floors rather than forecasts. They tighten into real requirements as your actual scores come in. These cutoffs do not include any end-of-term rounding; see the note below.</p>
+  <p class="qsub">Each number below is the minimum final paper score that keeps a grade possible, against the raw syllabus cutoffs. These cutoffs do not include any end-of-term rounding; see the note below.</p>
+  <p class="qsub" id="targetsNote"></p>
   <table class="targets">
     <thead><tr><th>Target</th><th>Cutoff</th><th>Needed on final</th></tr></thead>
     <tbody id="targets"></tbody>
@@ -274,18 +275,22 @@ table.calc-example .no { color: var(--faint); }
       else otherPts += it.w * a / 100;
     });
     var tbody = document.getElementById("targets");
+    var note = document.getElementById("targetsNote");
     if (finalEntered) {
       tbody.innerHTML = '<tr><td colspan="3" class="t-no">You already entered a final paper score, so the course grade above is the answer.</td></tr>';
+      note.textContent = "";
       return;
     }
+    note.textContent = unknownW
+      ? "Right now, " + unknownW + "% of your grade (everything outside the final paper) is not yet entered, so these are floors, not forecasts. They tighten into real requirements as your actual scores come in."
+      : "";
     tbody.innerHTML = SCALE.slice(0, 11).map(function (row) {
       var target = row[1];   // raw syllabus cutoff, unrounded
       var needed = (target - otherPts - unknownW) / 0.5;
       var cell;
       if (needed <= 0) cell = '<span class="secured">already secured' + (unknownW ? " if the rest of your work comes back perfect" : "") + "</span>";
       else if (needed > 100) cell = '<span class="t-no">out of reach</span>';
-      else cell = '<span class="t-need">' + Math.max(0, needed).toFixed(1) + "+" +
-        (unknownW ? '</span> <span class="t-no">(a floor, not a forecast: it assumes the ' + unknownW + "% of your grade outside the final paper that's not yet entered comes back perfect)" : "</span>");
+      else cell = '<span class="t-need">' + Math.max(0, needed).toFixed(1) + "+</span>";
       return "<tr><td class='t-ok'>" + row[0] + "</td><td>" + row[1] + "+</td><td>" + cell + "</td></tr>";
     }).join("");
   }
