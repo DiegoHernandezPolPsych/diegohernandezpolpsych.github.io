@@ -88,6 +88,50 @@ table.calc-example th, table.calc-example td { padding: 6px 8px 6px 0; border-bo
 table.calc-example th { font-family: var(--font-mono); font-weight: 500; font-size: .65rem; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); border-bottom: 1px solid var(--line-strong); }
 table.calc-example .yes { color: var(--teal); font-weight: 600; }
 table.calc-example .no { color: var(--faint); }
+
+.sandbox-presets { display: flex; gap: 8px; margin: 10px 0 16px; flex-wrap: wrap; }
+.sandbox-preset-btn {
+  font-family: var(--font-mono); font-size: .72rem; letter-spacing: .04em;
+  background: var(--bg); color: var(--muted); border: 1px solid var(--line-strong);
+  padding: 6px 12px; cursor: pointer;
+}
+.sandbox-preset-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+.sandbox-controls { display: flex; flex-direction: column; gap: 14px; margin: 4px 0 16px; }
+.sandbox-slider-row { display: flex; flex-direction: column; gap: 4px; }
+.sandbox-label { font-size: .82rem; color: var(--muted); display: flex; justify-content: space-between; }
+.sandbox-label b { font-family: var(--font-mono); color: var(--ink); font-weight: 600; }
+.sandbox-slider-row input[type="range"] { width: 100%; accent-color: var(--gold); }
+
+.sandbox-formula {
+  font-family: var(--font-mono); font-size: .95rem; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line-strong); padding: 12px 14px;
+  margin: 0 0 12px;
+}
+.sandbox-formula b { color: var(--accent); }
+
+.sandbox-lowrel {
+  font-size: .82rem; color: var(--rose); border-left: 2px solid var(--rose);
+  padding: 6px 10px; margin: 0 0 16px;
+}
+
+.sandbox-numberline { width: 100%; height: auto; margin: 4px 0 18px; display: block; }
+.sandbox-nl-axis { stroke: var(--line-strong); stroke-width: 2; }
+.sandbox-nl-tick { stroke: var(--line); stroke-width: 1; }
+.sandbox-nl-tick-label { fill: var(--faint); font-family: var(--font-mono); font-size: 9px; }
+.sandbox-nl-buffer { fill: var(--gold); opacity: .35; }
+.sandbox-nl-boundary { stroke: var(--rose); stroke-width: 2; }
+.sandbox-nl-boundary-label { fill: var(--muted); font-family: var(--font-mono); font-size: 10px; }
+.sandbox-nl-marker { fill: var(--teal); }
+.sandbox-nl-marker-label { fill: var(--teal); font-family: var(--font-mono); font-size: 10px; font-weight: 600; }
+
+.sandbox-test { display: flex; flex-direction: column; gap: 8px; }
+.sandbox-test label { font-size: .85rem; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.sandbox-test input[type="number"] { width: 90px; }
+.sandbox-test p { margin: 0; font-size: .88rem; }
+.sandbox-test .yes { color: var(--teal); font-weight: 600; }
+.sandbox-test .no { color: var(--faint); }
+
 @media (max-width: 560px) {
   input[type="number"] { width: 64px; }
   table.inputs td, table.inputs th { padding-right: 5px; }
@@ -166,6 +210,171 @@ table.calc-example .no { color: var(--faint); }
       <p>This matters for you. Without it, a small seminar's rounding buffer could shrink or swell based on one classmate's unrelated bad week, which has nothing to do with your own performance. This bootstrapping method keeps that from happening, so a small class gets a buffer that's considerably steadier than a single raw calculation would produce.</p>
     </div>
   </details>
+
+  <details class="calc-explainer">
+    <summary>Try it yourself: a SEM sandbox</summary>
+    <div class="calc-explainer-body">
+      <p>Drag the sliders to see how SD and omega change the buffer, or use a preset. This is a teaching tool with made-up numbers, not this term's actual figures.</p>
+
+      <div class="sandbox-presets">
+        <button type="button" class="sandbox-preset-btn" data-sd="5.4" data-omega="0.9">High reliability</button>
+        <button type="button" class="sandbox-preset-btn" data-sd="5.4" data-omega="0.7">Low reliability</button>
+      </div>
+
+      <div class="sandbox-controls">
+        <label class="sandbox-slider-row">
+          <span class="sandbox-label">SD, spread of course totals <b id="sbSdVal">5.4</b></span>
+          <input type="range" id="sbSd" min="2" max="12" step="0.1" value="5.4" />
+        </label>
+        <label class="sandbox-slider-row">
+          <span class="sandbox-label">Omega, reliability <b id="sbOmegaVal">0.82</b></span>
+          <input type="range" id="sbOmega" min="0.5" max="0.99" step="0.01" value="0.82" />
+        </label>
+      </div>
+
+      <div class="sandbox-formula">
+        SEM = <span id="sbSdEcho">5.4</span> &times; &radic;(1 &minus; <span id="sbOmegaEcho">0.82</span>) = <b id="sbSemResult">2.29</b> points
+      </div>
+
+      <p class="sandbox-lowrel" id="sbLowRel" hidden>An omega this low is also the kind of signal that might point to a flawed assignment rather than just normal variation, see "What if the assignment itself was the problem?" above.</p>
+
+      <svg class="sandbox-numberline" viewBox="0 0 600 90" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Number line showing the rounding buffer around the grade boundary">
+        <line class="sandbox-nl-axis" x1="20" y1="45" x2="580" y2="45" />
+        <g id="sbTicks"></g>
+        <rect id="sbBufferRect" class="sandbox-nl-buffer" x="0" y="30" width="0" height="30" />
+        <line id="sbBoundaryLine" class="sandbox-nl-boundary" x1="468" y1="18" x2="468" y2="72" />
+        <text id="sbBoundaryLabel" class="sandbox-nl-boundary-label" x="468" y="12" text-anchor="middle">90 (boundary)</text>
+        <circle id="sbMarker" class="sandbox-nl-marker" cx="0" cy="45" r="5" style="display:none" />
+        <text id="sbMarkerLabel" class="sandbox-nl-marker-label" x="0" y="86" text-anchor="middle"></text>
+      </svg>
+
+      <div class="sandbox-test">
+        <label>Test a score: <input type="number" id="sbTestScore" step="0.1" placeholder="e.g. 88.2" /></label>
+        <p id="sbTestResult"></p>
+      </div>
+    </div>
+  </details>
+
+  <script>
+  (function () {
+    var BOUNDARY = 90, VIEW_MIN = 74, VIEW_MAX = 94, SVG_X_MIN = 20, SVG_X_MAX = 580;
+
+    var sdSlider = document.getElementById("sbSd");
+    var omegaSlider = document.getElementById("sbOmega");
+    var sdVal = document.getElementById("sbSdVal");
+    var omegaVal = document.getElementById("sbOmegaVal");
+    var sdEcho = document.getElementById("sbSdEcho");
+    var omegaEcho = document.getElementById("sbOmegaEcho");
+    var semResult = document.getElementById("sbSemResult");
+    var lowRel = document.getElementById("sbLowRel");
+    var bufferRect = document.getElementById("sbBufferRect");
+    var boundaryLine = document.getElementById("sbBoundaryLine");
+    var boundaryLabel = document.getElementById("sbBoundaryLabel");
+    var testScore = document.getElementById("sbTestScore");
+    var testResult = document.getElementById("sbTestResult");
+    var marker = document.getElementById("sbMarker");
+    var markerLabel = document.getElementById("sbMarkerLabel");
+    var ticksGroup = document.getElementById("sbTicks");
+
+    function scoreToX(score) {
+      var clamped = Math.max(VIEW_MIN, Math.min(VIEW_MAX, score));
+      return SVG_X_MIN + (clamped - VIEW_MIN) / (VIEW_MAX - VIEW_MIN) * (SVG_X_MAX - SVG_X_MIN);
+    }
+
+    function drawTicks() {
+      var html = "";
+      for (var s = 75; s <= 94; s += 5) {
+        var x = scoreToX(s);
+        html += '<line class="sandbox-nl-tick" x1="' + x + '" y1="40" x2="' + x + '" y2="50" />';
+        html += '<text class="sandbox-nl-tick-label" x="' + x + '" y="64" text-anchor="middle">' + s + "</text>";
+      }
+      ticksGroup.innerHTML = html;
+    }
+
+    function currentSEM() {
+      var sd = parseFloat(sdSlider.value);
+      var omega = parseFloat(omegaSlider.value);
+      return sd * Math.sqrt(1 - omega);
+    }
+
+    function render() {
+      var sd = parseFloat(sdSlider.value);
+      var omega = parseFloat(omegaSlider.value);
+      var sem = sd * Math.sqrt(1 - omega);
+
+      sdVal.textContent = sd.toFixed(1);
+      omegaVal.textContent = omega.toFixed(2);
+      sdEcho.textContent = sd.toFixed(1);
+      omegaEcho.textContent = omega.toFixed(2);
+      semResult.textContent = sem.toFixed(2);
+
+      lowRel.hidden = omega >= 0.6;
+
+      var xBoundary = scoreToX(BOUNDARY);
+      var xFloor = scoreToX(BOUNDARY - sem);
+      bufferRect.setAttribute("x", Math.min(xFloor, xBoundary));
+      bufferRect.setAttribute("width", Math.abs(xBoundary - xFloor));
+      boundaryLine.setAttribute("x1", xBoundary);
+      boundaryLine.setAttribute("x2", xBoundary);
+      boundaryLabel.setAttribute("x", xBoundary);
+
+      updateTest();
+    }
+
+    function updateTest() {
+      var raw = testScore.value;
+      if (raw === "") {
+        testResult.textContent = "";
+        marker.style.display = "none";
+        return;
+      }
+      var score = parseFloat(raw);
+      if (isNaN(score)) {
+        testResult.textContent = "";
+        marker.style.display = "none";
+        return;
+      }
+      var sem = currentSEM();
+      var gap = BOUNDARY - score;
+
+      if (score < VIEW_MIN || score > VIEW_MAX) {
+        // Off the visible scale — plotting a clamped dot next to the real
+        // typed value would show a marker in the wrong place relative to
+        // its own label, so skip the marker and let the text speak for itself.
+        marker.style.display = "none";
+      } else {
+        var x = scoreToX(score);
+        marker.style.display = "";
+        marker.setAttribute("cx", x);
+        markerLabel.setAttribute("x", x);
+        markerLabel.textContent = score.toFixed(1);
+      }
+
+      if (gap <= 0) {
+        testResult.innerHTML = '<span class="yes">At or above the boundary already, no rounding needed.</span>';
+      } else if (gap <= sem) {
+        testResult.innerHTML = '<span class="yes">Rounds up: ' + gap.toFixed(2) + " is inside the " + sem.toFixed(2) + '-point buffer.</span>';
+      } else {
+        testResult.innerHTML = '<span class="no">Stays as earned: ' + gap.toFixed(2) + " is outside the " + sem.toFixed(2) + '-point buffer.</span>';
+      }
+    }
+
+    sdSlider.addEventListener("input", render);
+    omegaSlider.addEventListener("input", render);
+    testScore.addEventListener("input", updateTest);
+
+    document.querySelectorAll(".sandbox-preset-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        sdSlider.value = btn.getAttribute("data-sd");
+        omegaSlider.value = btn.getAttribute("data-omega");
+        render();
+      });
+    });
+
+    drawTicks();
+    render();
+  })();
+  </script>
 
   <details class="calc-explainer">
     <summary>Why I choose this method</summary>
