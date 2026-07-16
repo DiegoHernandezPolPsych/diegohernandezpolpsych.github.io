@@ -724,11 +724,17 @@ html.js:not(.cms-ready) [data-email-link] {
 .footer-inner {
   max-width: var(--maxw); margin: 0 auto;
   padding: 26px var(--gutter);
-  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
-  justify-content: space-between;
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center; gap: 12px;
   font-size: var(--text-sm); color: var(--faint);
 }
+.footer-inner .frieze-mark { justify-self: center; }
+.footer-right { display: flex; flex-wrap: wrap; gap: 16px; justify-self: end; }
 .footer-inner .triad { opacity: .8; }
+@media (max-width: 560px) {
+  .footer-inner { grid-template-columns: 1fr 1fr; }
+  .footer-inner .frieze-mark { grid-column: 1 / -1; order: -1; justify-self: center; }
+}
 
 /* =========================================================
    RESPONSIVE
@@ -1064,8 +1070,10 @@ html.vt-on .panel.is-active { animation: none; }
   <div class="footer-inner">
     <span>© <span id="year"></span> Diego Hernandez</span>
     <span class="frieze-mark" id="friezeFooter" aria-hidden="true"><span class="triad"><span></span><span></span><span></span></span></span>
-    <span>Stony Brook University</span>
-    <a href="files/site-template.zip" download>Use this template ↓</a>
+    <div class="footer-right">
+      <span>Stony Brook University</span>
+      <a href="files/site-template.zip" download>Use this template ↓</a>
+    </div>
   </div>
 </footer>
 
