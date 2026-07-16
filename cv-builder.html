@@ -36,16 +36,21 @@ body { background: var(--bg); color: var(--ink); font-family: var(--b); font-siz
 .app { display: flex; flex-direction: column; height: 100vh; }
 
 .topbar {
-  display: flex; align-items: center; gap: 12px;
+  display: flex; flex-direction: column; gap: 10px;
   padding: 10px 20px; border-bottom: 1px solid var(--line);
   background: var(--surface); flex: none;
 }
+.topbar-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .logo {
   font-family: var(--d); font-size: 1.05rem; font-weight: 500;
   color: var(--ink); margin-right: 4px;
 }
 .logo span { color: var(--gold); font-style: italic; }
 .topbar-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.switch-label {
+  font-family: var(--m); font-size: .68rem; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--faint);
+}
 
 .btn {
   font-family: var(--b); font-size: .82rem; font-weight: 500;
@@ -59,6 +64,21 @@ body { background: var(--bg); color: var(--ink); font-family: var(--b); font-siz
 .btn.primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 .btn.danger { border-color: color-mix(in srgb, #c0392b 30%, var(--line)); color: #c0392b; }
 .btn.danger:hover { background: #fff5f5; }
+
+/* preset switches — shared look for both the template and style pickers */
+.preset-switch {
+  display: flex; gap: 2px;
+  background: var(--tint); border: 1px solid var(--line2);
+  border-radius: 100px; padding: 3px;
+}
+.preset-btn {
+  font-family: var(--b); font-size: .78rem; font-weight: 500;
+  padding: 6px 13px; border: 0; background: transparent;
+  border-radius: 100px; color: var(--muted); cursor: pointer;
+  transition: background .2s var(--ease), color .2s var(--ease);
+}
+.preset-btn:hover { color: var(--ink); }
+.preset-btn.active { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.1); }
 
 .panes { display: flex; flex: 1; overflow: hidden; }
 
@@ -195,6 +215,54 @@ textarea { min-height: 72px; }
 .cv-pub { margin-bottom: 7px; font-size: 9pt; line-height: 1.5; }
 .cv-pub .cv-pub-title { font-style: italic; }
 
+/* ================================================================
+   FORMAT PRESETS — same data, different template on #cvSheet.
+   .format-academic is the default look (rules above); .format-resume
+   overrides just the visual language: sans-serif name, bold ruled
+   headings instead of small-caps mono, and tighter vertical rhythm
+   so the same content reads as a one-page general resume.
+================================================================ */
+.format-resume .cv-name { font-family: var(--b); font-weight: 700; }
+.format-resume .cv-role { font-family: var(--b); font-style: normal; font-weight: 500; color: #3a3527; }
+.format-resume .cv-contact-line span + span::before { color: #6a6453; }
+.format-resume .cv-section { margin-bottom: 15px; }
+.format-resume .cv-section-heading {
+  font-family: var(--b); font-size: 9.5pt; font-weight: 700;
+  letter-spacing: .02em; text-transform: uppercase; color: #1a1810;
+  border-bottom: 1.5px solid #1a1810; padding-bottom: 4px; margin-bottom: 8px;
+}
+.format-resume .cv-entry { margin-bottom: 7px; }
+.format-resume .cv-pub { margin-bottom: 5px; }
+
+/* ================================================================
+   STYLE SKINS — a second, independent axis layered on top of
+   whichever format (academic/resume) is active. .style-classic is
+   each format's own default look above, so it needs no rules here.
+   Modern and Minimal only touch color, weight, and rule treatment —
+   never section order or headings, which stay the format's job.
+================================================================ */
+.cv-sheet.style-modern { border-top: 5px solid #2f4b44; }
+.style-modern .cv-role { color: #2f4b44; }
+.style-modern .cv-contact-line { border: 0; padding: 0; }
+.style-modern .cv-contact-line span + span::before { color: #2f4b44; }
+.style-modern .cv-section-heading {
+  font-family: var(--b); font-weight: 700; font-size: 8.5pt;
+  letter-spacing: .03em; text-transform: uppercase; color: #2f4b44;
+  border: 0; border-left: 3px solid #2f4b44; padding: 2px 0 2px 10px; margin-bottom: 9px;
+}
+.style-modern .cv-entry-date { color: #2f4b44; }
+
+.style-minimal .cv-name { font-weight: 400; }
+.style-minimal .cv-contact-line { border: 0; padding: 0; margin-bottom: 26px; color: #938d79; }
+.style-minimal .cv-contact-line span + span::before { color: #d6cdb4; }
+.style-minimal .cv-section { margin-bottom: 26px; }
+.style-minimal .cv-section-heading {
+  font-family: var(--m); font-weight: 500; font-size: 7.5pt;
+  letter-spacing: .22em; color: #938d79;
+  border: 0; padding-bottom: 0; margin-bottom: 12px;
+}
+.style-minimal .cv-entry-date { color: #938d79; }
+
 /* empty state */
 .empty { color: var(--faint); font-style: italic; font-size: 9pt; }
 
@@ -263,15 +331,30 @@ textarea { min-height: 72px; }
 
   <!-- TOP BAR -->
   <header class="topbar">
-    <span class="logo">CV <span>Builder</span></span>
-    <div class="topbar-actions">
-      <label class="btn" id="importLabel" title="Import from existing CV PDF">
-        Import PDF
-        <input type="file" id="pdfUpload" accept=".pdf" style="display:none" />
-      </label>
-      <button class="btn" id="resetBtn">Reset</button>
-      <span style="font-family:var(--m);font-size:.68rem;color:var(--faint);letter-spacing:.04em">Uncheck "Headers &amp; footers" in print dialog</span>
-      <button class="btn primary" id="printBtn">Export PDF</button>
+    <div class="topbar-row">
+      <span class="logo">CV <span>Builder</span></span>
+      <div class="topbar-actions">
+        <label class="btn" id="importLabel" title="Import from existing CV PDF">
+          Import PDF
+          <input type="file" id="pdfUpload" accept=".pdf" style="display:none" />
+        </label>
+        <button class="btn" id="resetBtn">Reset</button>
+        <span style="font-family:var(--m);font-size:.68rem;color:var(--faint);letter-spacing:.04em">Uncheck "Headers &amp; footers" in print dialog</span>
+        <button class="btn primary" id="printBtn">Export PDF</button>
+      </div>
+    </div>
+    <div class="topbar-row">
+      <span class="switch-label">Template</span>
+      <div class="preset-switch" role="group" aria-label="CV template">
+        <button class="preset-btn active" data-format="academic" aria-pressed="true">Academic CV</button>
+        <button class="preset-btn" data-format="resume" aria-pressed="false">General Resume</button>
+      </div>
+      <span class="switch-label">Style</span>
+      <div class="preset-switch" role="group" aria-label="CV visual style">
+        <button class="preset-btn active" data-style="classic" aria-pressed="true">Classic</button>
+        <button class="preset-btn" data-style="modern" aria-pressed="false">Modern</button>
+        <button class="preset-btn" data-style="minimal" aria-pressed="false">Minimal</button>
+      </div>
     </div>
   </header>
 
@@ -435,10 +518,63 @@ var SCHEMAS = {
    STATE + PERSISTENCE
 ================================================================ */
 var KEY = 'cvbuilder:v1';
-var state = { basics: {}, education: [], positions: [], publications: [], presentations: [], teaching: [], awards: [], skills: [] };
+var state = { basics: {}, format: 'academic', style: 'classic', education: [], positions: [], publications: [], presentations: [], teaching: [], awards: [], skills: [] };
 
 function load() { /* public version: always starts blank */ }
 function save() { /* public version: no persistence */ }
+
+/* ================================================================
+   FORMAT PRESETS — same underlying state, different section order
+   and headings (see FORMATS below). STYLE SKINS are a second, or-
+   thogonal axis that only changes color/weight/rules (see the
+   .style-modern / .style-minimal CSS). The two combine freely:
+   #cvSheet always carries one "format-*" class and one "style-*"
+   class at once. Add a preset by adding an entry here plus a
+   matching CSS block — no rendering logic needs to change.
+================================================================ */
+var DEFAULT_HEADINGS = {
+  education: 'Education', positions: 'Academic Positions', publications: 'Publications',
+  presentations: 'Presentations', teaching: 'Teaching', awards: 'Fellowships, Awards & Grants',
+  skills: 'Methods & Skills'
+};
+var FORMATS = {
+  academic: {
+    label: 'Academic CV',
+    order: ['education', 'positions', 'publications', 'presentations', 'teaching', 'awards', 'skills'],
+    headings: {}
+  },
+  resume: {
+    label: 'General Resume',
+    order: ['positions', 'education', 'skills', 'awards', 'publications', 'presentations', 'teaching'],
+    headings: { positions: 'Experience', awards: 'Awards & Honors' }
+  }
+};
+var STYLES = {
+  classic: { label: 'Classic' },
+  modern:  { label: 'Modern' },
+  minimal: { label: 'Minimal' }
+};
+
+function updateSheetClass() {
+  document.getElementById('cvSheet').className = 'cv-sheet format-' + state.format + ' style-' + state.style;
+}
+function setActiveGroup(attr, value) {
+  document.querySelectorAll('.preset-btn[data-' + attr + ']').forEach(function(btn) {
+    var on = btn.dataset[attr] === value;
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+function applyFormat(name) {
+  state.format = FORMATS[name] ? name : 'academic';
+  updateSheetClass();
+  setActiveGroup('format', state.format);
+}
+function applyStyle(name) {
+  state.style = STYLES[name] ? name : 'classic';
+  updateSheetClass();
+  setActiveGroup('style', state.style);
+}
 
 /* ================================================================
    BASICS — bind inputs
@@ -566,8 +702,23 @@ function renderPreview() {
     html += '<div class="cv-section"><div class="cv-entry-body"><p>' + esc(b.summary).replace(/\n/g,'</p><p>') + '</p></div></div>';
   }
 
-  // Education
-  html += renderSection('Education', state.education, function(item) {
+  // Remaining sections — order, headings, and inclusion vary by format preset
+  var fmt = FORMATS[state.format] || FORMATS.academic;
+  fmt.order.forEach(function(key) {
+    var heading = fmt.headings[key] || DEFAULT_HEADINGS[key];
+    if (key === 'skills') {
+      html += renderSkillsBlock(heading);
+    } else {
+      html += renderSection(heading, state[key], SECTION_RENDERERS[key]);
+    }
+  });
+
+  if (!html) html = '<p class="empty">Start filling in Basics to see your CV here.</p>';
+  sheet.innerHTML = html;
+}
+
+var SECTION_RENDERERS = {
+  education: function(item) {
     return '<div class="cv-entry">' +
       '<div class="cv-entry-header">' +
         '<span class="cv-entry-title">' + esc(item.degree || '') + '</span>' +
@@ -576,10 +727,8 @@ function renderPreview() {
       (item.institution ? '<div class="cv-entry-sub">' + esc(item.institution) + (item.note ? ' · ' + esc(item.note) : '') + '</div>' : '') +
       (item.detail ? '<div class="cv-entry-body"><p>' + esc(item.detail) + '</p></div>' : '') +
     '</div>';
-  });
-
-  // Positions
-  html += renderSection('Academic Positions', state.positions, function(item) {
+  },
+  positions: function(item) {
     return '<div class="cv-entry">' +
       '<div class="cv-entry-header">' +
         '<span class="cv-entry-title">' + esc(item.title || '') + '</span>' +
@@ -587,10 +736,8 @@ function renderPreview() {
       '</div>' +
       (item.institution ? '<div class="cv-entry-sub">' + esc(item.institution) + (item.location ? ', ' + esc(item.location) : '') + '</div>' : '') +
     '</div>';
-  });
-
-  // Publications
-  html += renderSection('Publications', state.publications, function(item) {
+  },
+  publications: function(item) {
     return '<div class="cv-pub">' +
       (item.authors ? esc(item.authors) + ' ' : '') +
       (item.year ? '(' + esc(item.year) + '). ' : '') +
@@ -598,10 +745,8 @@ function renderPreview() {
       (item.venue ? esc(item.venue) + '.' : '') +
       (item.status ? ' <em>' + esc(item.status) + '.</em>' : '') +
     '</div>';
-  });
-
-  // Presentations
-  html += renderSection('Presentations', state.presentations, function(item) {
+  },
+  presentations: function(item) {
     return '<div class="cv-entry">' +
       '<div class="cv-entry-header">' +
         '<span class="cv-entry-title">' + esc(item.title || '') + '</span>' +
@@ -609,10 +754,8 @@ function renderPreview() {
       '</div>' +
       (item.venue ? '<div class="cv-entry-sub">' + esc(item.venue) + (item.location ? ', ' + esc(item.location) : '') + '</div>' : '') +
     '</div>';
-  });
-
-  // Teaching
-  html += renderSection('Teaching', state.teaching, function(item) {
+  },
+  teaching: function(item) {
     return '<div class="cv-entry">' +
       '<div class="cv-entry-header">' +
         '<span class="cv-entry-title">' + esc(item.course || '') + '</span>' +
@@ -620,10 +763,8 @@ function renderPreview() {
       '</div>' +
       (item.role || item.institution ? '<div class="cv-entry-sub">' + [item.role, item.institution].filter(Boolean).map(esc).join(', ') + '</div>' : '') +
     '</div>';
-  });
-
-  // Awards
-  html += renderSection('Fellowships, Awards & Grants', state.awards, function(item) {
+  },
+  awards: function(item) {
     return '<div class="cv-entry">' +
       '<div class="cv-entry-header">' +
         '<span class="cv-entry-title">' + esc(item.title || '') + '</span>' +
@@ -632,21 +773,19 @@ function renderPreview() {
       (item.org ? '<div class="cv-entry-sub">' + esc(item.org) + '</div>' : '') +
       (item.detail ? '<div class="cv-entry-body"><p>' + esc(item.detail) + '</p></div>' : '') +
     '</div>';
-  });
-
-  // Skills
-  if (state.skills && state.skills.length) {
-    html += '<div class="cv-section"><div class="cv-section-heading">Methods &amp; Skills</div>';
-    html += '<div class="cv-skills-grid">';
-    state.skills.forEach(function(s) {
-      if (!s.category && !s.items) return;
-      html += '<div class="cv-skill-row"><span class="cv-skill-cat">' + esc(s.category || '') + '</span><span class="cv-skill-val">' + esc(s.items || '') + '</span></div>';
-    });
-    html += '</div></div>';
   }
+};
 
-  if (!html) html = '<p class="empty">Start filling in Basics to see your CV here.</p>';
-  sheet.innerHTML = html;
+function renderSkillsBlock(heading) {
+  if (!state.skills || !state.skills.length) return '';
+  var rows = state.skills.filter(function(s) { return s.category || s.items; });
+  if (!rows.length) return '';
+  var html = '<div class="cv-section"><div class="cv-section-heading">' + esc(heading) + '</div><div class="cv-skills-grid">';
+  rows.forEach(function(s) {
+    html += '<div class="cv-skill-row"><span class="cv-skill-cat">' + esc(s.category || '') + '</span><span class="cv-skill-val">' + esc(s.items || '') + '</span></div>';
+  });
+  html += '</div></div>';
+  return html;
 }
 
 function renderSection(heading, items, renderItem) {
@@ -679,6 +818,17 @@ document.querySelectorAll('.add-item-btn').forEach(function(btn) {
 });
 
 /* ================================================================
+   PRESET BUTTONS — template (format) and style, same click handler
+================================================================ */
+document.querySelectorAll('.preset-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    if (btn.dataset.format) applyFormat(btn.dataset.format);
+    if (btn.dataset.style) applyStyle(btn.dataset.style);
+    save(); renderPreview();
+  });
+});
+
+/* ================================================================
    EXPORT PDF
 ================================================================ */
 document.getElementById('printBtn').addEventListener('click', function() {
@@ -692,8 +842,10 @@ document.getElementById('printBtn').addEventListener('click', function() {
 ================================================================ */
 document.getElementById('resetBtn').addEventListener('click', function() {
   if (!confirm('Clear all CV data? This cannot be undone.')) return;
-  state = { basics: {}, education: [], positions: [], publications: [], presentations: [], teaching: [], awards: [], skills: [] };
+  state = { basics: {}, format: 'academic', style: 'classic', education: [], positions: [], publications: [], presentations: [], teaching: [], awards: [], skills: [] };
   // no localStorage to clear
+  applyFormat('academic');
+  applyStyle('classic');
   bindBasics();
   ['education','positions','publications','presentations','teaching','awards','skills'].forEach(renderList);
   renderPreview();
@@ -703,6 +855,8 @@ document.getElementById('resetBtn').addEventListener('click', function() {
    BOOT
 ================================================================ */
 load();
+applyFormat(state.format);
+applyStyle(state.style);
 bindBasics();
 ['education','positions','publications','presentations','teaching','awards','skills'].forEach(renderList);
 renderPreview();
