@@ -555,6 +555,36 @@ var STYLES = {
   minimal: { label: 'Minimal' }
 };
 
+/* Editor-side labels (section nav tab, panel heading, "+ Add" button)
+   for the sections whose name actually differs by format. Sections
+   not listed here (Education, Publications, …) keep their original
+   HTML text in every format. Each map is complete for the keys it
+   lists, so switching format any direction — including back — always
+   sets an explicit label rather than leaving a stale one behind. */
+var EDITOR_LABELS = {
+  academic: {
+    positions: { nav: 'Positions', title: 'Academic positions', add: '+ Add position' },
+    awards:    { nav: 'Awards', title: 'Fellowships, awards & grants', add: '+ Add award' }
+  },
+  resume: {
+    positions: { nav: 'Experience', title: 'Experience', add: '+ Add experience' },
+    awards:    { nav: 'Awards', title: 'Awards & honors', add: '+ Add award' }
+  }
+};
+
+function applyEditorLabels() {
+  var labels = EDITOR_LABELS[state.format] || EDITOR_LABELS.academic;
+  Object.keys(labels).forEach(function(key) {
+    var l = labels[key];
+    var navBtn = document.querySelector('.snav-btn[data-section="' + key + '"]');
+    if (navBtn) navBtn.textContent = l.nav;
+    var title = document.querySelector('#panel-' + key + ' .section-title-edit');
+    if (title) title.textContent = l.title;
+    var addBtn = document.querySelector('.add-item-btn[data-list="' + key + '"]');
+    if (addBtn) addBtn.textContent = l.add;
+  });
+}
+
 function updateSheetClass() {
   document.getElementById('cvSheet').className = 'cv-sheet format-' + state.format + ' style-' + state.style;
 }
@@ -569,6 +599,7 @@ function applyFormat(name) {
   state.format = FORMATS[name] ? name : 'academic';
   updateSheetClass();
   setActiveGroup('format', state.format);
+  applyEditorLabels();
 }
 function applyStyle(name) {
   state.style = STYLES[name] ? name : 'classic';
