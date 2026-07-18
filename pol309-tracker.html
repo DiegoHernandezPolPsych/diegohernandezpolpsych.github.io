@@ -9,24 +9,28 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
+
+<!-- Apply the theme saved on the main site before paint, so the
+     choice follows the visitor across pages with no flash. -->
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved === "light" || saved === "dark") {
+        document.documentElement.setAttribute("data-theme", saved);
+      }
+    } catch (e) {}
+  })();
+</script>
+
 <style>
-:root {
-  --bg: #faf8f3; --surface: #fffefb; --ink: #211f18; --muted: #6a6453; --faint: #938d79;
-  --line: #e7e0cd; --line-strong: #d6cdb4; --gold: #c39a22; --accent: #876417; --accent-strong: #6c4f12;
-  --rose: #9e5b4b;
-  --font-display: "Fraunces", Georgia, serif;
-  --font-body: "Hanken Grotesk", system-ui, sans-serif;
-  --font-mono: "Spline Sans Mono", ui-monospace, monospace;
-}
-:root[data-theme="dark"] {
-  --bg: #14130e; --surface: #1e1c15; --ink: #ece6d6; --muted: #a7a18c; --faint: #7d7765;
-  --line: #2b2819; --line-strong: #3a3527; --gold: #e0c04a; --accent: #d8b54c; --accent-strong: #e8c869;
-  --rose: #cf9080;
-}
+/* palette + fonts come from the shared tokens.css */
 * { box-sizing: border-box; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
-  font-family: var(--font-body); font-size: 16px; line-height: 1.55;
+  font-family: var(--font-body); font-size: 17px; line-height: 1.55;
+  transition: background .4s var(--ease), color .4s var(--ease);
 }
 .wrap { max-width: 760px; margin: 0 auto; padding: 40px 22px 60px; }
 .topline { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
@@ -83,6 +87,36 @@ h1 { font-family: var(--font-display); font-weight: 500; font-size: 2rem; margin
 .wk .due { color: var(--rose); font-size: .84rem; margin-top: 3px; }
 .note { margin-top: 36px; color: var(--faint); font-size: .82rem; border-top: 1px solid var(--line); padding-top: 14px; }
 .note a { color: var(--accent); text-decoration: none; }
+
+/* texts reveal (transitions.dev): the "this week" card's lines rise
+   in with a 40ms stagger on first paint. Only the first render gets
+   the line classes; the 60s refresh re-renders without them. */
+.t-stagger-line {
+  display: block;
+  opacity: 0;
+  transform: translateY(var(--stagger-distance));
+  filter: blur(var(--stagger-blur));
+  transition:
+    opacity   var(--stagger-dur) var(--stagger-ease),
+    transform var(--stagger-dur) var(--stagger-ease),
+    filter    var(--stagger-dur) var(--stagger-ease);
+  will-change: transform, opacity, filter;
+}
+.t-stagger-line--2 { transition-delay: var(--stagger-stagger); }
+.t-stagger-line--3 { transition-delay: calc(var(--stagger-stagger) * 2); }
+.t-stagger-line--4 { transition-delay: calc(var(--stagger-stagger) * 3); }
+.t-stagger-line--5 { transition-delay: calc(var(--stagger-stagger) * 4); }
+.t-stagger-line--6 { transition-delay: calc(var(--stagger-stagger) * 5); }
+.t-stagger.is-shown .t-stagger-line {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-stagger-line { transition: none !important; }
+  body { transition: none !important; }
+}
 </style>
 </head>
 <body>
@@ -96,7 +130,7 @@ h1 { font-family: var(--font-display); font-weight: 500; font-size: 2rem; margin
   <h1>This week in POL309</h1>
   <p class="sub">Politics of the European Union · online, asynchronous · July 6 to August 15</p>
 
-  <div class="now" id="now"></div>
+  <div class="now t-stagger" id="now"></div>
 
   <div class="all">
     <h3>Full schedule</h3>
@@ -257,6 +291,21 @@ var SCHEDULE = [
     }
     box.innerHTML = html;
 
+    /* staggered reveal on first paint only — later 60s refreshes
+       render plain children, which show instantly */
+    if (!box.dataset.revealed) {
+      box.dataset.revealed = "1";
+      Array.prototype.forEach.call(box.children, function (el, i) {
+        el.classList.add("t-stagger-line", "t-stagger-line--" + Math.min(i + 1, 6));
+      });
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { box.classList.add("is-shown"); });
+      });
+      /* rAF never fires in a hidden/background tab — make sure the
+         card can't stay invisible if the page loads unfocused */
+      setTimeout(function () { box.classList.add("is-shown"); }, 800);
+    }
+
     document.getElementById("weeks").innerHTML = WEEKS.map(function (w) {
       var state = now > new Date(w.end) ? "past" : (now >= new Date(w.start) ? "current" : "");
       return '<div class="wk ' + state + '"><div class="no">Week ' + w.n + "<br>" + fmtRange(w) + "</div>" +
@@ -285,7 +334,9 @@ var SCHEDULE = [
 
   document.getElementById("themeBtn").onclick = function () {
     var r = document.documentElement;
-    r.setAttribute("data-theme", r.getAttribute("data-theme") === "dark" ? "light" : "dark");
+    var next = r.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    r.setAttribute("data-theme", next);
+    try { localStorage.setItem("theme", next); } catch (e) {}
   };
 })();
 </script>

@@ -12,19 +12,20 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
 <style>
 /* ================================================================
-   TOKENS — match the public site exactly
+   TOKENS — palette, fonts, ease, and motion scale come from the
+   shared tokens.css (this page has no data-theme attribute, so it
+   resolves to the light palette). Local names alias the shared
+   ones so the rules below stay short.
 ================================================================ */
 :root {
-  --bg: #faf8f3; --surface: #fffefb; --tint: #f3efe3;
-  --ink: #211f18; --muted: #6a6453; --faint: #938d79;
-  --line: #e6dfcd; --line2: #d6cdb4;
-  --accent: #876417; --gold: #c39a22; --teal: #2f4b44;
-  --d: "Fraunces", Georgia, serif;
-  --b: "Hanken Grotesk", system-ui, sans-serif;
-  --m: "Spline Sans Mono", monospace;
-  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --tint: var(--bg-tint);
+  --line2: var(--line-strong);
+  --d: var(--font-display);
+  --b: var(--font-body);
+  --m: var(--font-mono);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
@@ -90,6 +91,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--b); font-siz
   border-right: 1px solid var(--line); overflow: hidden;
 }
 .section-nav {
+  position: relative;
   display: flex; gap: 0; overflow-x: auto; scrollbar-width: none;
   border-bottom: 1px solid var(--line); flex: none;
 }
@@ -97,17 +99,36 @@ body { background: var(--bg); color: var(--ink); font-family: var(--b); font-siz
 .snav-btn {
   font-family: var(--m); font-size: .68rem; letter-spacing: .06em; text-transform: uppercase;
   padding: 10px 14px; border: 0; background: transparent; color: var(--faint);
-  cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent;
-  transition: color .15s, border-color .15s;
+  cursor: pointer; white-space: nowrap;
+  transition: color .15s var(--ease);
 }
 .snav-btn:hover { color: var(--ink); }
-.snav-btn.active { color: var(--ink); border-bottom-color: var(--gold); }
+.snav-btn.active { color: var(--ink); }
+
+/* sliding active-section underline (transitions.dev tabs-sliding):
+   JS writes the active button's offsetLeft/offsetWidth, CSS tweens */
+.snav-indicator {
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 2px; width: 0;
+  background: var(--gold);
+  transform: translateX(0);
+  transition:
+    transform var(--tabs-dur) var(--tabs-ease),
+    width     var(--tabs-dur) var(--tabs-ease);
+  will-change: transform, width;
+  pointer-events: none;
+}
 
 .editor-body { flex: 1; overflow-y: auto; padding: 20px; }
 
-/* section panels */
+/* section panels — light cross-fade on switch */
 .section-panel { display: none; }
-.section-panel.active { display: block; }
+.section-panel.active { display: block; animation: panel-in var(--duration-quick) var(--ease) both; }
+@keyframes panel-in {
+  from { opacity: 0; filter: blur(var(--blur-small)); }
+  to   { opacity: 1; filter: blur(0); }
+}
 
 .field-group { margin-bottom: 18px; }
 .field-label {
@@ -131,6 +152,12 @@ textarea { min-height: 72px; }
 .item-card {
   background: var(--tint); border: 1px solid var(--line);
   border-radius: 3px; padding: 12px 14px;
+}
+/* only the freshly added card animates — re-renders stay quiet */
+.item-card.is-new { animation: item-card-in var(--duration-slow) var(--ease) both; }
+@keyframes item-card-in {
+  from { opacity: 0; transform: translateY(var(--distance-base)); }
+  to   { opacity: 1; transform: none; }
 }
 .item-card-header {
   display: flex; justify-content: space-between; align-items: center;
@@ -298,14 +325,45 @@ textarea { min-height: 72px; }
 }
 
 /* ================================================================
-   IMPORT MODAL
+   MODALS — transitions.dev modal open/close: the dialog scales up
+   from --modal-scale over the open duration and dips back out over
+   the quicker close; the overlay fades in step.
 ================================================================ */
 .modal-overlay {
   display: none; position: fixed; inset: 0; z-index: 200;
   background: rgba(20,19,14,.6); backdrop-filter: blur(4px);
   align-items: center; justify-content: center;
+  opacity: 0;
+  transition: opacity var(--modal-open-dur) var(--modal-ease);
 }
 .modal-overlay.open { display: flex; }
+.modal-overlay.is-open { opacity: 1; }
+.modal-overlay.is-closing { opacity: 0; transition-duration: var(--modal-close-dur); }
+
+.t-modal {
+  transform-origin: center;
+  transform: scale(var(--modal-scale));
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform var(--modal-open-dur) var(--modal-ease),
+    opacity   var(--modal-open-dur) var(--modal-ease);
+  will-change: transform, opacity;
+}
+.t-modal.is-open {
+  transform: scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+.t-modal.is-closing {
+  transform: scale(var(--modal-scale-close));
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform var(--modal-close-dur) var(--modal-ease),
+    opacity   var(--modal-close-dur) var(--modal-ease);
+}
+
 .modal {
   background: var(--surface); border: 1px solid var(--line2);
   border-radius: 6px; padding: 28px 32px; max-width: 600px; width: 92%;
@@ -324,6 +382,66 @@ textarea { min-height: 72px; }
 }
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
 #importLabel { cursor: pointer; }
+
+/* ================================================================
+   IMPORT SUCCESS — transitions.dev success check: fades in, rotates
+   upright, bobs, and stroke-draws the checkmark path
+================================================================ */
+.import-done {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--m); font-size: .72rem; letter-spacing: .04em;
+  color: var(--teal);
+}
+.import-done[hidden] { display: none; }
+.t-success-check {
+  display: inline-block;
+  transform-origin: center;
+  opacity: 0;
+  will-change: transform, opacity, filter;
+  /* the 40px default bob is sized for hero moments — this is a
+     16px inline glyph, so travel and blur scale down with it */
+  --check-y-amount: 10px;
+  --check-blur-from: 4px;
+}
+.t-success-check svg { display: block; overflow: visible; width: 16px; height: 16px; }
+/* dasharray = path length (M5 12.5 → 10 17.5 → 19 7.5 ≈ 20.5), rounded up */
+.t-success-check svg path {
+  stroke: var(--teal); stroke-width: 2.2; fill: none;
+  stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 22;
+  stroke-dashoffset: 22;
+}
+.t-success-check[data-state="in"] {
+  animation:
+    t-check-fade   var(--check-opacity-dur) var(--check-ease-opacity) forwards,
+    t-check-rotate var(--check-rotate-dur)  var(--check-ease-rotate)  forwards,
+    t-check-blur   var(--check-blur-dur)    var(--check-ease-out)     forwards,
+    t-check-bob    var(--check-bob-dur)     var(--check-ease-bob)     forwards;
+}
+.t-success-check[data-state="in"] svg path {
+  animation: t-check-draw var(--check-path-dur) var(--check-ease-path) var(--check-path-delay, 0ms) forwards;
+}
+@keyframes t-check-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes t-check-rotate {
+  from { transform: rotate(var(--check-rotate-from)); }
+  to   { transform: rotate(0deg); }
+}
+@keyframes t-check-blur {
+  from { filter: blur(var(--check-blur-from)); }
+  to   { filter: blur(0); }
+}
+@keyframes t-check-bob {
+  from { translate: 0 var(--check-y-amount); }
+  to   { translate: 0 0; }
+}
+@keyframes t-check-draw { to { stroke-dashoffset: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .snav-btn, .snav-indicator, .modal-overlay, .t-modal { transition: none !important; }
+  .section-panel.active, .item-card.is-new { animation: none !important; }
+  .t-success-check { animation: none !important; opacity: 1; }
+  .t-success-check svg path { animation: none !important; stroke-dashoffset: 0 !important; }
+}
 </style>
 </head>
 <body>
@@ -338,6 +456,12 @@ textarea { min-height: 72px; }
           Import PDF
           <input type="file" id="pdfUpload" accept=".pdf" style="display:none" />
         </label>
+        <span class="import-done" id="importDone" hidden>
+          <span class="t-success-check" data-state="out" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 12.5L10 17.5L19 7.5"/></svg>
+          </span>
+          Imported
+        </span>
         <button class="btn" id="resetBtn">Reset</button>
         <span style="font-family:var(--m);font-size:.68rem;color:var(--faint);letter-spacing:.04em">Uncheck "Headers &amp; footers" in print dialog</span>
         <button class="btn primary" id="printBtn">Export PDF</button>
@@ -363,6 +487,7 @@ textarea { min-height: 72px; }
     <!-- EDITOR PANE -->
     <aside class="editor-pane">
       <nav class="section-nav" role="tablist">
+        <span class="snav-indicator" aria-hidden="true"></span>
         <button class="snav-btn active" data-section="basics">Basics</button>
         <button class="snav-btn" data-section="education">Education</button>
         <button class="snav-btn" data-section="positions">Positions</button>
@@ -466,6 +591,36 @@ textarea { min-height: 72px; }
 </div>
 
 <script>
+/* ================================================================
+   MODAL OPEN / CLOSE — transitions.dev: scale up over the open
+   duration, quicker dip out on close; shared by import + reset.
+   The timing read keeps JS in sync with the CSS tokens.
+================================================================ */
+var MODAL_CLOSE_MS = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--modal-close-dur')) || 150;
+window.cvModal = {
+  open: function (overlay) {
+    var modal = overlay.querySelector('.t-modal');
+    overlay.classList.remove('is-closing');
+    if (modal) modal.classList.remove('is-closing');
+    overlay.classList.add('open');
+    void overlay.offsetWidth; // paint at display:flex before transitioning
+    overlay.classList.add('is-open');
+    if (modal) modal.classList.add('is-open');
+  },
+  close: function (overlay) {
+    var modal = overlay.querySelector('.t-modal');
+    overlay.classList.remove('is-open');
+    if (modal) modal.classList.remove('is-open');
+    overlay.classList.add('is-closing');
+    if (modal) modal.classList.add('is-closing');
+    setTimeout(function () {
+      overlay.classList.remove('open');
+      overlay.classList.remove('is-closing');
+      if (modal) modal.classList.remove('is-closing');
+    }, MODAL_CLOSE_MS);
+  }
+};
+
 /* ================================================================
    DATA SCHEMA
 ================================================================ */
@@ -583,6 +738,7 @@ function applyEditorLabels() {
     var addBtn = document.querySelector('.add-item-btn[data-list="' + key + '"]');
     if (addBtn) addBtn.textContent = l.add;
   });
+  moveSnav(false); // label widths changed — reposition without a slide
 }
 
 function updateSheetClass() {
@@ -703,9 +859,12 @@ function addItem(listName) {
   state[listName].push({});
   renderList(listName);
   save(); renderPreview();
-  // scroll to new card
+  // animate only the new card in, and scroll to it
   var container = document.getElementById('list-' + listName);
-  if (container && container.lastChild) container.lastChild.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  if (container && container.lastChild) {
+    container.lastChild.classList.add('is-new');
+    container.lastChild.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
 }
 
 /* ================================================================
@@ -829,8 +988,33 @@ function renderSection(heading, items, renderItem) {
 }
 
 /* ================================================================
-   NAV TABS
+   NAV TABS — with sliding underline (transitions.dev tabs-sliding):
+   JS writes the active button's offsetLeft/offsetWidth onto the
+   indicator; first paint and resize reposition without a transition
+   so the underline never slides in from x=0.
 ================================================================ */
+var snavIndicator = document.querySelector('.snav-indicator');
+function moveSnav(animate) {
+  if (!snavIndicator) return;
+  var sel = document.querySelector('.snav-btn.active');
+  if (!sel) return;
+  if (!animate) {
+    var prev = snavIndicator.style.transition;
+    snavIndicator.style.transition = 'none';
+    snavIndicator.style.transform = 'translateX(' + sel.offsetLeft + 'px)';
+    snavIndicator.style.width = sel.offsetWidth + 'px';
+    void snavIndicator.offsetWidth;
+    snavIndicator.style.transition = prev;
+  } else {
+    snavIndicator.style.transform = 'translateX(' + sel.offsetLeft + 'px)';
+    snavIndicator.style.width = sel.offsetWidth + 'px';
+  }
+}
+window.addEventListener('resize', function () { moveSnav(false); });
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(function () { moveSnav(false); });
+}
+
 document.querySelectorAll('.snav-btn').forEach(function(btn) {
   btn.addEventListener('click', function() {
     document.querySelectorAll('.snav-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -838,6 +1022,7 @@ document.querySelectorAll('.snav-btn').forEach(function(btn) {
     btn.classList.add('active');
     var panel = document.getElementById('panel-' + btn.dataset.section);
     if (panel) panel.classList.add('active');
+    moveSnav(true);
   });
 });
 
@@ -869,17 +1054,28 @@ document.getElementById('printBtn').addEventListener('click', function() {
 });
 
 /* ================================================================
-   RESET
+   RESET — styled confirm modal instead of the native confirm().
+   The modal markup lives after this script, so its buttons are
+   wired lazily on first open.
 ================================================================ */
 document.getElementById('resetBtn').addEventListener('click', function() {
-  if (!confirm('Clear all CV data? This cannot be undone.')) return;
-  state = { basics: {}, format: 'academic', style: 'classic', education: [], positions: [], publications: [], presentations: [], teaching: [], awards: [], skills: [] };
-  // no localStorage to clear
-  applyFormat('academic');
-  applyStyle('classic');
-  bindBasics();
-  ['education','positions','publications','presentations','teaching','awards','skills'].forEach(renderList);
-  renderPreview();
+  var overlay = document.getElementById('resetOverlay');
+  if (!overlay._wired) {
+    overlay._wired = true;
+    document.getElementById('resetCancelBtn').addEventListener('click', function () { window.cvModal.close(overlay); });
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) window.cvModal.close(overlay); });
+    document.getElementById('resetConfirmBtn').addEventListener('click', function () {
+      state = { basics: {}, format: 'academic', style: 'classic', education: [], positions: [], publications: [], presentations: [], teaching: [], awards: [], skills: [] };
+      // no localStorage to clear
+      applyFormat('academic');
+      applyStyle('classic');
+      bindBasics();
+      ['education','positions','publications','presentations','teaching','awards','skills'].forEach(renderList);
+      renderPreview();
+      window.cvModal.close(overlay);
+    });
+  }
+  window.cvModal.open(overlay);
 });
 
 /* ================================================================
@@ -893,10 +1089,22 @@ bindBasics();
 renderPreview();
 </script>
 
+<!-- RESET CONFIRM MODAL -->
+<div class="modal-overlay" id="resetOverlay">
+  <div class="modal t-modal" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+    <h2 id="resetTitle">Clear all CV data?</h2>
+    <p class="sub">Every section resets to blank. Nothing is stored outside this page, so there is no way to undo this.</p>
+    <div class="modal-actions">
+      <button class="btn" id="resetCancelBtn">Cancel</button>
+      <button class="btn danger" id="resetConfirmBtn">Clear everything</button>
+    </div>
+  </div>
+</div>
+
 <!-- IMPORT MODAL -->
 <div class="modal-overlay" id="importOverlay">
-  <div class="modal">
-    <h2>Import from existing CV</h2>
+  <div class="modal t-modal" role="dialog" aria-modal="true" aria-labelledby="importTitle">
+    <h2 id="importTitle">Import from existing CV</h2>
     <p class="sub">Upload a PDF of your CV. The tool will extract text and attempt to pre-fill your sections. Review everything after importing — auto-detection is imperfect and you'll want to check each section.</p>
     <p class="import-status" id="importStatus"></p>
     <div class="parsed-preview" id="parsedPreview"></div>
@@ -932,7 +1140,7 @@ renderPreview();
   // open modal when file selected
   fileInput.addEventListener('change', function () {
     if (!fileInput.files || !fileInput.files[0]) return;
-    overlay.classList.add('open');
+    window.cvModal.open(overlay);
     status.className = 'import-status';
     status.textContent = 'Reading PDF…';
     preview.style.display = 'none';
@@ -942,8 +1150,8 @@ renderPreview();
     fileInput.value = ''; // reset so same file can be re-selected
   });
 
-  cancelBtn.addEventListener('click', function () { overlay.classList.remove('open'); });
-  overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.classList.remove('open'); });
+  cancelBtn.addEventListener('click', function () { window.cvModal.close(overlay); });
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) window.cvModal.close(overlay); });
 
   applyBtn.addEventListener('click', function () {
     if (!parsed) return;
@@ -957,7 +1165,18 @@ renderPreview();
     bindBasics();
     ['education','positions','publications','presentations','teaching','awards','skills'].forEach(renderList);
     renderPreview();
-    overlay.classList.remove('open');
+    window.cvModal.close(overlay);
+
+    /* success check (transitions.dev): fade + rotate + bob + stroke
+       draw next to the Import button, replayable per import */
+    var done = document.getElementById('importDone');
+    var check = done.querySelector('.t-success-check');
+    done.hidden = false;
+    check.setAttribute('data-state', 'out');
+    void check.offsetWidth; // force reflow so keyframes restart
+    check.setAttribute('data-state', 'in');
+    clearTimeout(done._hideTimer);
+    done._hideTimer = setTimeout(function () { done.hidden = true; }, 4000);
   });
 
   /* ------------------------------------------------------------------

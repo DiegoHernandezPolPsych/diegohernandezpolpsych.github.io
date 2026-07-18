@@ -12,16 +12,11 @@
   "dataTag": "survey experiments, quantitative and qualitative methods",
   "publications": [
     {
-      "title": "[Dissertation paper title]",
+      "title": "Dissertation",
       "status": "Job market paper",
-      "meta": "Working paper",
+      "meta": "Working paper · title forthcoming",
       "desc": "",
-      "links": [
-        {
-          "label": "Draft on request",
-          "href": "#"
-        }
-      ]
+      "links": []
     },
     {
       "title": "Democratic Governance, Interpersonal Trust, and Interpersonal Responsibility: Do Values Predict Vote Choice in Hypothetical EU Membership Referenda?",
