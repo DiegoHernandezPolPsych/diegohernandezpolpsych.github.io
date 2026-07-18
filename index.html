@@ -43,13 +43,9 @@
 }
 </script>
 
-<!-- Highwire Press tags: lets Google Scholar index the job market paper.
-     EDIT these to match your real paper once the PDF and title are final. -->
-<meta name="citation_title" content="[Dissertation paper title]" />
-<meta name="citation_author" content="Hernandez, Diego" />
-<meta name="citation_publication_date" content="2026" />
-<meta name="citation_pdf_url" content="https://diegohernandezpolpsych.github.io/files/cv.pdf" />
-<meta name="citation_abstract_html_url" content="https://diegohernandezpolpsych.github.io/#research" />
+<!-- Highwire Press (citation_*) tags intentionally omitted until the
+     dissertation paper has a final title and PDF — Google Scholar
+     indexes placeholder titles otherwise. -->
 
 <!-- ============================================================
      Set theme before paint to avoid a light/dark flash on load.
@@ -96,20 +92,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
 
 <style>
 /* =========================================================
-   TOKENS
+   TOKENS — fonts, palette (both themes), ease, and the motion
+   scale live in the shared tokens.css; only page-specific
+   layout tokens stay here.
 ========================================================= */
 :root {
-  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
-  --font-body: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
-  --font-mono: "Spline Sans Mono", ui-monospace, "SFMono-Regular", monospace;
-
   --maxw: 1080px;
   --gutter: clamp(20px, 5vw, 64px);
   --radius: 3px;
-  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
   /* type scale — named steps, relative to the 16px root */
   --text-3xs: .68rem;
@@ -122,44 +116,6 @@
   --text-xl:  1.4rem;
 }
 
-:root[data-theme="light"] {
-  --bg: oklch(0.979 0.007 88.642);
-  --bg-tint: oklch(0.952 0.016 91.553);
-  --surface: oklch(0.997 0.004 91.445);
-  --ink: oklch(0.239 0.013 93.936);
-  --muted: oklch(0.504 0.027 90.887);
-  --faint: oklch(0.552 0.029 92.555);
-  --line: oklch(0.904 0.025 89.221);
-  --line-strong: oklch(0.849 0.035 90.532);
-  --accent: oklch(0.526 0.1 82.023);          /* links + interactive */
-  --accent-strong: oklch(0.447 0.084 81.238);
-  --gold: oklch(0.705 0.135 87.98);            /* signature mark */
-  --teal: oklch(0.388 0.036 176.839);         /* secondary accent */
-  --rose: oklch(0.544 0.092 34.321);          /* teaching */
-  --lapis: oklch(0.46 0.062 253.248);         /* cv */
-  --plum: oklch(0.493 0.069 336.066);         /* contact */
-  --shadow: 0 1px 2px oklch(0.253 0.033 92.369 / .04), 0 12px 32px oklch(0.253 0.033 92.369 / .05);
-}
-
-:root[data-theme="dark"] {
-  --bg: oklch(0.186 0.01 97.891);
-  --bg-tint: oklch(0.214 0.012 91.771);
-  --surface: oklch(0.226 0.013 93.957);
-  --ink: oklch(0.925 0.022 89.798);
-  --muted: oklch(0.708 0.03 93.856);
-  --faint: oklch(0.59 0.027 91.736);
-  --line: oklch(0.285 0.018 93.32);
-  --line-strong: oklch(0.33 0.024 90.724);
-  --accent: oklch(0.785 0.129 82.023);
-  --accent-strong: oklch(0.842 0.12 81.238);
-  --gold: oklch(0.814 0.139 93.786);
-  --teal: oklch(0.735 0.06 173.532);
-  --rose: oklch(0.711 0.081 34.819);
-  --lapis: oklch(0.716 0.06 254.207);
-  --plum: oklch(0.736 0.063 334.227);
-  --shadow: 0 1px 2px oklch(0 0 0 / .3), 0 18px 40px oklch(0 0 0 / .45);
-}
-
 /* per-section accent, switched by the active tab (set in JS) */
 :root { --section: var(--gold); }
 :root[data-section="research"] { --section: var(--teal); }
@@ -170,6 +126,9 @@
 * { box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
+/* clip, not hidden: no horizontal scroll can ever leak, but
+   position: sticky and programmatic scrolling keep working */
+html, body { overflow-x: clip; }
 
 body {
   margin: 0;
@@ -239,10 +198,14 @@ a { color: var(--accent); text-decoration: none; }
 :root[data-section="about"] .brand-name { opacity: 0; pointer-events: none; }
 
 .tabs {
+  position: relative;
   display: flex; gap: 2px; margin-left: auto;
   overflow-x: auto; scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-  /* fade hint on the right edge so it's obvious there's more */
+}
+/* fade hint on the right edge, only when there actually is more —
+   .is-scrollable is toggled by JS from scrollWidth vs clientWidth */
+.tabs.is-scrollable {
   -webkit-mask-image: linear-gradient(to right, black calc(100% - 32px), transparent 100%);
   mask-image: linear-gradient(to right, black calc(100% - 32px), transparent 100%);
 }
@@ -264,9 +227,26 @@ a { color: var(--accent); text-decoration: none; }
   color: var(--ink);
   background: var(--bg-tint);
 }
-.tab[aria-selected="true"] {
-  box-shadow: inset 0 -2px 0 var(--section);
+
+/* sliding active-tab underline (transitions.dev tabs-sliding):
+   JS writes the selected tab's offsetLeft/offsetWidth onto it,
+   CSS owns the tween. Replaces the old inset box-shadow. */
+.tab-indicator {
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 2px; width: 0;
+  background: var(--section);
+  transform: translateX(0);
+  transition:
+    transform var(--tabs-dur) var(--tabs-ease),
+    width     var(--tabs-dur) var(--tabs-ease),
+    background .2s var(--ease);
+  will-change: transform, width;
+  pointer-events: none;
 }
+/* during a tab view transition the root cross-fade would hide the
+   slide; naming the indicator lets the browser morph it instead */
+html.tab-vt .tab-indicator { view-transition-name: tab-indicator; }
 
 .theme-toggle {
   position: relative;
@@ -284,47 +264,44 @@ a { color: var(--accent); text-decoration: none; }
 .theme-toggle svg {
   position: absolute; top: 50%; left: 50%;
   width: 18px; height: 18px;
-  opacity: 0; filter: blur(4px);
+  opacity: 0; filter: blur(var(--blur-small));
   transform: translate(-50%, -50%) scale(0.25);
-  transition: opacity .3s cubic-bezier(0.2,0,0,1), transform .3s cubic-bezier(0.2,0,0,1), filter .3s cubic-bezier(0.2,0,0,1);
+  transition: opacity var(--duration-fast) var(--ease-in-out), transform var(--duration-fast) var(--ease-in-out), filter var(--duration-fast) var(--ease-in-out);
 }
 .theme-toggle .icon-moon { opacity: 1; filter: blur(0); transform: translate(-50%, -50%) scale(1); }
 :root[data-theme="dark"] .theme-toggle .icon-sun { opacity: 1; filter: blur(0); transform: translate(-50%, -50%) scale(1); }
-:root[data-theme="dark"] .theme-toggle .icon-moon { opacity: 0; filter: blur(4px); transform: translate(-50%, -50%) scale(0.25); }
+:root[data-theme="dark"] .theme-toggle .icon-moon { opacity: 0; filter: blur(var(--blur-small)); transform: translate(-50%, -50%) scale(0.25); }
 
 /* =========================================================
    LAYOUT / PANELS
 ========================================================= */
 main { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
 
-/* Inactive panels are hidden visually but stay genuinely "visible" by
-   CSS's own definition (display and visibility both remain normal) —
-   only position and size are collapsed. display:none or the hidden
-   attribute get treated as "not content" by a lot of text-extraction
-   tools, even ones that otherwise render the page fully; this keeps
-   the content available to those tools while still being invisible
-   to a sighted visitor looking at the page normally. */
+/* Inactive panels are fully hidden: display:none here plus the
+   `hidden` attribute toggled by the tab script. The active panel
+   gets .is-active (display:block + entrance fade). */
 .panel { display: none; padding: clamp(40px, 7vw, 88px) 0 64px; }
-.panel.is-active { display: block; animation: fade .45s var(--ease) both; }
+.panel.is-active { display: block; animation: fade var(--duration-slow) var(--ease) both; }
 @keyframes fade {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(var(--distance-base)); }
   to   { opacity: 1; transform: none; }
 }
 
-/* repeated list items stagger in rather than fading as one block with the panel */
+/* repeated list items stagger in rather than fading as one block with
+   the panel — 40ms steps keep the six-item total under 300ms */
 .cards .card, .cv-list li, .contact-list li {
-  animation: item-in .5s var(--ease) both;
+  animation: item-in var(--duration-very-slow) var(--ease) both;
 }
 @keyframes item-in {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(var(--distance-base)); }
   to   { opacity: 1; transform: none; }
 }
-.cards .card:nth-child(1), .cv-list li:nth-child(1), .contact-list li:nth-child(1) { animation-delay: .05s; }
-.cards .card:nth-child(2), .cv-list li:nth-child(2), .contact-list li:nth-child(2) { animation-delay: .12s; }
-.cards .card:nth-child(3), .cv-list li:nth-child(3), .contact-list li:nth-child(3) { animation-delay: .19s; }
-.cards .card:nth-child(4), .cv-list li:nth-child(4), .contact-list li:nth-child(4) { animation-delay: .26s; }
-.cards .card:nth-child(5), .cv-list li:nth-child(5), .contact-list li:nth-child(5) { animation-delay: .33s; }
-.cards .card:nth-child(n+6), .cv-list li:nth-child(n+6), .contact-list li:nth-child(n+6) { animation-delay: .4s; }
+.cards .card:nth-child(1), .cv-list li:nth-child(1), .contact-list li:nth-child(1) { animation-delay: calc(var(--duration-stagger) * 1); }
+.cards .card:nth-child(2), .cv-list li:nth-child(2), .contact-list li:nth-child(2) { animation-delay: calc(var(--duration-stagger) * 2); }
+.cards .card:nth-child(3), .cv-list li:nth-child(3), .contact-list li:nth-child(3) { animation-delay: calc(var(--duration-stagger) * 3); }
+.cards .card:nth-child(4), .cv-list li:nth-child(4), .contact-list li:nth-child(4) { animation-delay: calc(var(--duration-stagger) * 4); }
+.cards .card:nth-child(5), .cv-list li:nth-child(5), .contact-list li:nth-child(5) { animation-delay: calc(var(--duration-stagger) * 5); }
+.cards .card:nth-child(n+6), .cv-list li:nth-child(n+6), .contact-list li:nth-child(n+6) { animation-delay: calc(var(--duration-stagger) * 6); }
 /* view-transition-driven tab changes already cross-fade the whole document; drop the per-item animation so it doesn't double up */
 html.vt-on .cards .card, html.vt-on .cv-list li, html.vt-on .contact-list li { animation: none; }
 
@@ -403,10 +380,6 @@ html.vt-on .cards .card, html.vt-on .cv-list li, html.vt-on .contact-list li { a
   overflow: hidden;
 }
 .portrait img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
-.portrait .placeholder {
-  font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: .1em;
-  color: var(--faint); text-align: center; padding: 16px;
-}
 .portrait-wrap::before,
 .portrait-wrap::after {
   content: ""; position: absolute; width: 22px; height: 22px;
@@ -515,6 +488,32 @@ html.vt-on .cards .card, html.vt-on .cv-list li, html.vt-on .contact-list li { a
 }
 .cite-btn:hover { color: var(--section); border-color: var(--section); }
 .cite-btn:active { transform: scale(0.96); }
+
+/* text states swap (transitions.dev) — "Copy citation" ↔ "Copied"
+   swaps in place: old label exits up with blur, new one enters
+   from below. The span inside .cite-btn carries the classes. */
+.t-text-swap {
+  display: inline-block;
+  transform: translateY(0);
+  filter: blur(0);
+  opacity: 1;
+  transition:
+    transform var(--text-swap-dur) var(--text-swap-ease),
+    filter    var(--text-swap-dur) var(--text-swap-ease),
+    opacity   var(--text-swap-dur) var(--text-swap-ease);
+  will-change: transform, filter, opacity;
+}
+.t-text-swap.is-exit {
+  transform: translateY(calc(var(--text-swap-translate-y) * -1));
+  filter: blur(var(--text-swap-blur));
+  opacity: 0;
+}
+.t-text-swap.is-enter-start {
+  transform: translateY(var(--text-swap-translate-y));
+  filter: blur(var(--text-swap-blur));
+  opacity: 0;
+  transition: none;
+}
 
 .colophon { border-top: 1px solid var(--line); }
 .colophon-inner {
@@ -666,43 +665,6 @@ html.vt-on .cards .card, html.vt-on .cv-list li, html.vt-on .contact-list li { a
     0 1px 3px rgba(0,0,0,1);
 }
 
-/* =========================================================
-   GILT — the Beethoven Frieze easter egg. Triple-click the
-   name on About: gold floods from the click point, shimmers,
-   and recedes. Layer sits above everything, blocks nothing.
-========================================================= */
-.gilt {
-  position: fixed; inset: 0; z-index: 200;
-  pointer-events: none;
-  background: url('images/gold-flood.jpg') repeat;
-  background-size: 420px auto;
-  display: none;
-}
-.gilt::after {
-  /* travelling sheen so the gold reads as metal, not wallpaper */
-  content: ""; position: absolute; inset: 0;
-  background: radial-gradient(ellipse 60% 45% at var(--gx, 50%) var(--gy, 50%),
-              rgba(255, 244, 200, .5), transparent 70%);
-  mix-blend-mode: overlay;
-  animation: gilt-sheen 4.2s var(--ease) both;
-}
-.gilt.on { display: block; animation: gilt-run 4.2s var(--ease) both; }
-@keyframes gilt-run {
-  0%   { clip-path: circle(0% at var(--gx, 50%) var(--gy, 50%)); opacity: 1; }
-  24%  { clip-path: circle(140% at var(--gx, 50%) var(--gy, 50%)); opacity: 1; }
-  74%  { clip-path: circle(140% at var(--gx, 50%) var(--gy, 50%)); opacity: 1; }
-  100% { clip-path: circle(140% at var(--gx, 50%) var(--gy, 50%)); opacity: 0; }
-}
-@keyframes gilt-sheen {
-  0%   { transform: translateY(6%) scale(.9); opacity: 0; }
-  30%  { opacity: 1; }
-  70%  { transform: translateY(-4%) scale(1.15); opacity: .7; }
-  100% { transform: translateY(-8%) scale(1.2); opacity: 0; }
-}
-/* under prefers-reduced-motion the easter egg is skipped in JS,
-   because the global reduced-motion rule cancels all animations
-   and would otherwise leave this layer stuck on screen */
-
 /* hide CMS-driven elements until content.json resolves — eliminates flash.
    Gated on html.js (added by the tiny inline script in <head>) so that if
    JavaScript never runs at all, this rule never applies and the static
@@ -752,12 +714,11 @@ html.js:not(.cms-ready) [data-email-link] {
   /* hide brand name — h1 has it */
   .brand span.brand-name { display: none; }
 
-  /* fit all six tabs without scrolling: tighter padding, smaller text */
-  .tabs {
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
+  /* tighter tabs: smaller text and padding; the .is-scrollable mask
+     handles the scroll hint whenever all six no longer fit */
   .tab { font-size: var(--text-2xs); padding: 8px 9px; letter-spacing: .02em; min-height: 44px; }
+}
+@media (max-width: 560px) {
 
   /* truncate labels */
   .hide-mobile { display: none; }
@@ -783,7 +744,12 @@ html.js:not(.cms-ready) [data-email-link] {
 .show-mobile { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  /* spatial motion collapses to a short opacity-only fade so a tab
+     change still gives feedback without any movement */
+  @keyframes fade-reduced { from { opacity: 0; } to { opacity: 1; } }
+  .panel.is-active { animation: fade-reduced .15s ease both !important; }
 }
 
 /* =========================================================
@@ -801,7 +767,7 @@ html.js:not(.cms-ready) [data-email-link] {
     z-index: 1;
   }
   html.theme-vt::view-transition-new(root) {
-    animation: vt-reveal .55s var(--ease);
+    animation: vt-reveal var(--duration-very-slow) var(--ease);
     z-index: 2;
     mix-blend-mode: normal;
   }
@@ -811,8 +777,8 @@ html.js:not(.cms-ready) [data-email-link] {
   }
 
   /* TAB CHANGE: simple, fast cross-fade, no circle */
-  html.tab-vt::view-transition-old(root) { animation: vt-fade-out .28s var(--ease) both; }
-  html.tab-vt::view-transition-new(root) { animation: vt-fade-in .28s var(--ease) both; }
+  html.tab-vt::view-transition-old(root) { animation: vt-fade-out var(--duration-fast) var(--ease) both; }
+  html.tab-vt::view-transition-new(root) { animation: vt-fade-in var(--duration-fast) var(--ease) both; }
   @keyframes vt-fade-out { to   { opacity: 0; } }
   @keyframes vt-fade-in  { from { opacity: 0; } }
 }
@@ -853,6 +819,7 @@ html.vt-on .panel.is-active { animation: none; }
     </a>
 
     <nav class="tabs" role="tablist" aria-label="Sections">
+      <span class="tab-indicator" aria-hidden="true"></span>
       <button class="tab" role="tab" id="tab-about"    aria-controls="about"    aria-selected="true">About</button>
       <button class="tab" role="tab" id="tab-research" aria-controls="research" aria-selected="false" tabindex="-1">Research</button>
       <button class="tab" role="tab" id="tab-teaching" aria-controls="teaching" aria-selected="false" tabindex="-1">Teaching</button>
@@ -896,9 +863,7 @@ html.vt-on .panel.is-active { animation: none; }
 
       <div class="portrait-wrap">
         <figure class="portrait">
-          <!-- EDIT: drop a headshot at images/profile.jpg and uncomment the line below -->
           <img src="images/profile.jpg" alt="Diego Hernandez" />
-          <span class="placeholder">images/profile.jpg<br>4 : 5 portrait</span>
         </figure>
         <p class="portrait-caption">Stony Brook, New York</p>
       </div>
@@ -917,7 +882,7 @@ html.vt-on .panel.is-active { animation: none; }
       <article class="card">
         <div class="card-index">01</div>
         <div>
-          <h3>[Dissertation paper title]<span class="status">Job market paper</span></h3><p class="meta">Working paper</p><div class="card-links"><a href="#">Draft on request</a></div>
+          <h3>Dissertation<span class="status">Job market paper</span></h3><p class="meta">Working paper · title forthcoming</p>
         </div>
       </article>
 
@@ -1077,9 +1042,6 @@ html.vt-on .panel.is-active { animation: none; }
   </div>
 </footer>
 
-<!-- gilt flood layer, activated by the easter egg below -->
-<div class="gilt" id="gilt" aria-hidden="true"></div>
-
 <script>
 /* =========================================================
    THEME TOGGLE
@@ -1116,6 +1078,41 @@ html.vt-on .panel.is-active { animation: none; }
   var supportsVT = !!document.startViewTransition;
   function reducedMotion() { return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
 
+  /* sliding underline (transitions.dev tabs-sliding): JS writes the
+     selected tab's offsetLeft/offsetWidth onto the indicator, CSS
+     tweens. First paint and resize reposition without a transition
+     so the underline never slides in from x=0. */
+  var indicator = document.querySelector(".tab-indicator");
+  var indicatorBooted = false;
+  function moveIndicator(animate) {
+    if (!indicator) return;
+    var sel = tabs.filter(function (t) { return t.getAttribute("aria-selected") === "true"; })[0];
+    if (!sel) return;
+    if (!animate) {
+      var prev = indicator.style.transition;
+      indicator.style.transition = "none";
+      indicator.style.transform = "translateX(" + sel.offsetLeft + "px)";
+      indicator.style.width = sel.offsetWidth + "px";
+      void indicator.offsetWidth;
+      indicator.style.transition = prev;
+    } else {
+      indicator.style.transform = "translateX(" + sel.offsetLeft + "px)";
+      indicator.style.width = sel.offsetWidth + "px";
+    }
+  }
+  /* show the tab strip's right-edge fade only when it can scroll */
+  var tabsEl = document.querySelector(".tabs");
+  function updateTabsMask() {
+    if (!tabsEl) return;
+    tabsEl.classList.toggle("is-scrollable", tabsEl.scrollWidth > tabsEl.clientWidth + 1);
+  }
+  updateTabsMask();
+
+  window.addEventListener("resize", function () { moveIndicator(false); updateTabsMask(); });
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () { moveIndicator(false); updateTabsMask(); });
+  }
+
   function apply(id, setFocus) {
     document.documentElement.setAttribute("data-section", id);
     tabs.forEach(function (t) {
@@ -1129,6 +1126,8 @@ html.vt-on .panel.is-active { animation: none; }
       p.classList.toggle("is-active", on);
       p.hidden = !on;
     });
+    moveIndicator(indicatorBooted);
+    indicatorBooted = true;
     if (history.replaceState) history.replaceState(null, "", "#" + id);
     else location.hash = id;
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1258,17 +1257,31 @@ document.addEventListener("section:active", function (e) {
       var status = (!isTeaching && it.status) ? '<span class="status">' + esc(it.status) + "</span>" : "";
       var meta = it.meta ? '<p class="meta">' + esc(it.meta) + "</p>" : "";
       var desc = it.desc ? "<p>" + esc(it.desc) + "</p>" : "";
-      var cite = (!isTeaching) ? '<button class="cite-btn" type="button" data-cite="' + esc(citeText(authorName, it)) + '">Copy citation</button>' : "";
+      var cite = (!isTeaching) ? '<button class="cite-btn" type="button" data-cite="' + esc(citeText(authorName, it)) + '"><span class="t-text-swap">Copy citation</span></button>' : "";
       return '<article class="card"><div class="card-index">' + index + "</div><div>" +
              "<h3>" + esc(it.title) + status + "</h3>" + meta + desc + linksHtml(it.links) + cite + "</div></article>";
     }).join("");
     if (!isTeaching) {
+      /* three-phase text swap (transitions.dev): old label exits up,
+         textContent changes, new label enters from below */
+      var swapMs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--text-swap-dur")) || 150;
+      var swapLabel = function (el, next) {
+        el.classList.add("is-exit");
+        setTimeout(function () {
+          el.textContent = next;
+          el.classList.remove("is-exit");
+          el.classList.add("is-enter-start");
+          void el.offsetHeight; // force reflow so the next change transitions
+          el.classList.remove("is-enter-start");
+        }, swapMs);
+      };
       box.querySelectorAll(".cite-btn").forEach(function (btn) {
+        var label = btn.querySelector(".t-text-swap");
         btn.addEventListener("click", function () {
           var text = btn.getAttribute("data-cite");
-          var done = function () { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy citation"; }, 1600); };
+          var done = function () { swapLabel(label, "Copied"); setTimeout(function () { swapLabel(label, "Copy citation"); }, 1600); };
           if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(done).catch(function () { btn.textContent = "Copy failed"; });
+            navigator.clipboard.writeText(text).then(done).catch(function () { swapLabel(label, "Copy failed"); });
           } else { done(); }
         });
       });
@@ -1355,13 +1368,6 @@ document.addEventListener("section:active", function (e) {
   }, { passive: true });
   update();
 })();
-
-/* =========================================================
-   GILT — the triple-click easter egg is currently disabled.
-   The .gilt element and its CSS stay in place so it can be
-   re-enabled later by restoring the trigger script that used
-   to live here (triple-click on .hero-name, gilt.classList.add("on")).
-========================================================= */
 
 /* =========================================================
    DAILY FRIEZE — date-seeded generative Secession ornament.

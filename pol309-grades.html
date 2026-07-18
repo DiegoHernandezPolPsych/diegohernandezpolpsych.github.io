@@ -9,22 +9,29 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
+
+<!-- Apply the theme saved on the main site before paint, so the
+     choice follows the visitor across pages with no flash. -->
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved === "light" || saved === "dark") {
+        document.documentElement.setAttribute("data-theme", saved);
+      }
+    } catch (e) {}
+  })();
+</script>
+
 <style>
-:root {
-  --bg: #faf8f3; --surface: #fffefb; --ink: #211f18; --muted: #6a6453; --faint: #938d79;
-  --line: #e7e0cd; --line-strong: #d6cdb4; --gold: #c39a22; --accent: #876417; --accent-strong: #6c4f12;
-  --rose: #9e5b4b; --teal: #2f4b44;
-  --font-display: "Fraunces", Georgia, serif;
-  --font-body: "Hanken Grotesk", system-ui, sans-serif;
-  --font-mono: "Spline Sans Mono", ui-monospace, monospace;
-}
-:root[data-theme="dark"] {
-  --bg: #14130e; --surface: #1e1c15; --ink: #ece6d6; --muted: #a7a18c; --faint: #7d7765;
-  --line: #2b2819; --line-strong: #3a3527; --gold: #e0c04a; --accent: #d8b54c; --accent-strong: #e8c869;
-  --rose: #cf9080; --teal: #82b6a6;
-}
+/* palette + fonts come from the shared tokens.css */
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.5;
+  transition: background .4s var(--ease), color .4s var(--ease);
+}
 .wrap { max-width: 760px; margin: 0 auto; padding: 40px 22px 60px; }
 .topline { display: flex; justify-content: space-between; align-items: center; }
 .back { color: var(--faint); text-decoration: none; font-size: .85rem; }
@@ -73,16 +80,117 @@ table.targets th { font-family: var(--font-mono); font-weight: 500; font-size: .
 .note { margin-top: 36px; color: var(--faint); font-size: .82rem; border-top: 1px solid var(--line); padding-top: 14px; }
 .note a { color: var(--accent); text-decoration: none; }
 .calc-explainer { margin: 10px 0 18px; border: 1px solid var(--line-strong); background: var(--surface); }
-.calc-explainer summary {
-  cursor: pointer; list-style: none; padding: 10px 16px; font-size: .85rem; color: var(--accent);
+.t-acc-head {
+  width: 100%; text-align: left; cursor: pointer; border: 0; background: transparent;
+  padding: 10px 16px; font-size: .85rem; color: var(--accent);
   display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); letter-spacing: .02em;
 }
-.calc-explainer summary::-webkit-details-marker { display: none; }
-.calc-explainer summary::before { content: "+"; font-family: var(--font-body); font-size: 1rem; color: var(--gold); width: 1em; }
-.calc-explainer[open] summary::before { content: "\2212"; }
-.calc-explainer summary:hover { color: var(--accent-strong); }
-.calc-explainer-body { padding: 4px 16px 18px; border-top: 1px solid var(--line); }
+.t-acc-head:hover { color: var(--accent-strong); }
+
+/* accordion expand (transitions.dev): grid-template-rows 0fr ↔ 1fr
+   animates height with no JS measuring; chevron flips via scaleY,
+   which animates in every browser (CSS `d:` morph is Chromium-only) */
+.t-acc-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--acc-collapse) var(--acc-ease);
+}
+.t-acc[data-open="true"] .t-acc-panel {
+  grid-template-rows: 1fr;
+  transition: grid-template-rows var(--acc-expand) var(--acc-ease);
+}
+.t-acc-panel-inner {
+  overflow: hidden;
+  opacity: 0;
+  filter: blur(2px);
+  transition:
+    opacity var(--acc-collapse) var(--acc-ease),
+    filter var(--acc-collapse) var(--acc-ease);
+}
+.t-acc[data-open="true"] .t-acc-panel-inner {
+  opacity: 1;
+  filter: blur(0);
+  transition:
+    opacity var(--acc-expand) var(--acc-ease),
+    filter var(--acc-expand) var(--acc-ease);
+}
+.t-acc-chevron {
+  display: inline-flex; margin-left: auto;
+  transform: scaleY(1); transform-origin: center;
+  transition: transform var(--acc-chevron) var(--acc-ease);
+}
+.t-acc-chevron svg { width: 14px; height: 14px; display: block; }
+.t-acc-chevron path { vector-effect: non-scaling-stroke; fill: none; stroke: var(--gold); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.t-acc[data-open="true"] .t-acc-chevron { transform: scaleY(-1); }
+/* vertical spacing lives on the CHILDREN, not the inner element —
+   vertical padding on the inner survives the 0fr collapse and
+   leaves a visible strip when closed */
+.calc-explainer-body { padding: 0 16px; }
+.calc-explainer-body > :first-child { margin-top: 4px; }
+.calc-explainer-body > :last-child { margin-bottom: 18px; }
 .calc-explainer-body p { color: var(--muted); font-size: .88rem; }
+
+/* number pop-in (transitions.dev): each digit of the standing
+   re-enters from below with blur; last two digits ride 1×/2×
+   the stagger behind the rest */
+@keyframes t-digit-pop-in {
+  0%   {
+    transform: translate(
+      calc(var(--digit-distance) * var(--digit-dir-x)),
+      calc(var(--digit-distance) * var(--digit-dir-y))
+    );
+    opacity: 0;
+    filter: blur(var(--digit-blur));
+  }
+  100% { transform: translate(0, 0); opacity: 1; filter: blur(0); }
+}
+.t-digit-group { display: inline-flex; align-items: baseline; }
+.t-digit { display: inline-block; will-change: transform, opacity, filter; }
+.t-digit-group.is-animating .t-digit {
+  animation: t-digit-pop-in var(--digit-dur) var(--digit-ease) both;
+}
+.t-digit-group.is-animating .t-digit[data-stagger="1"] { animation-delay: var(--digit-stagger); }
+.t-digit-group.is-animating .t-digit[data-stagger="2"] { animation-delay: calc(var(--digit-stagger) * 2); }
+
+/* error state shake (transitions.dev): out-of-range score inputs
+   shake, border goes rose, and a message reveals under the table,
+   auto-reverting after the hold */
+input[type="number"] { transition: border-color 150ms ease-out; will-change: transform; }
+input[type="number"].is-error { border-color: var(--rose); transition: border-color var(--revert-dur, 280ms) ease-out; }
+.t-error-msg {
+  color: var(--rose); font-size: .82rem; margin: 8px 0 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity    var(--revert-dur, 280ms) ease-out,
+    visibility 0s linear var(--revert-dur, 280ms);
+}
+.t-input-wrap.is-error .t-error-msg {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity    var(--revert-dur, 280ms) ease-out,
+    visibility 0s linear 0s;
+}
+input[type="number"].is-shaking {
+  animation: t-input-shake calc(
+      var(--shake-dur-a) * 2 + var(--shake-dur-b) * 2
+    ) linear;
+}
+@keyframes t-input-shake {
+  0%      { transform: translateX(0);                                 animation-timing-function: var(--shake-ease); }
+  28.57%  { transform: translateX(var(--shake-distance));             animation-timing-function: var(--shake-ease); }
+  57.14%  { transform: translateX(calc(var(--shake-distance) * -1));  animation-timing-function: var(--shake-ease); }
+  78.57%  { transform: translateX(var(--shake-overshoot));            animation-timing-function: var(--shake-ease); }
+  100%    { transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body { transition: none !important; }
+  .t-acc-panel, .t-acc-panel-inner, .t-acc-chevron { transition: none !important; }
+  .t-digit-group .t-digit { animation: none !important; }
+  input[type="number"] { animation: none !important; transform: none !important; }
+}
 table.calc-example { width: 100%; border-collapse: collapse; font-size: .82rem; margin: 12px 0; }
 table.calc-example th, table.calc-example td { padding: 6px 8px 6px 0; border-bottom: 1px solid var(--line); text-align: left; }
 table.calc-example th { font-family: var(--font-mono); font-weight: 500; font-size: .65rem; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); border-bottom: 1px solid var(--line-strong); }
@@ -149,10 +257,13 @@ table.calc-example .no { color: var(--faint); }
   <h1>Grade calculator</h1>
   <p class="sub">Uses the exact weights, letter scale, and late policy from the syllabus. Leave anything you have not received blank.</p>
 
-  <table class="inputs">
-    <thead><tr><th>Assignment</th><th>Weight</th><th>Score /100</th><th>Days late</th></tr></thead>
-    <tbody id="rows"></tbody>
-  </table>
+  <div class="t-input-wrap" id="inputsWrap">
+    <table class="inputs">
+      <thead><tr><th>Assignment</th><th>Weight</th><th>Score /100</th><th>Days late</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="t-error-msg" id="rangeMsg" aria-live="polite">Scores run 0–100 and days late 0–14 — the calculation clamps anything outside that range.</p>
+  </div>
   <p class="late-note">Late work: 5 points per day off that assignment, weekends included. More than a week late may not be accepted.</p>
 
   <div class="result" id="result"></div>
@@ -166,9 +277,9 @@ table.calc-example .no { color: var(--faint); }
   </table>
   <p class="late-note">Course totals that fall short of the next letter grade boundary may round up, depending on how reliably the term's grades measured student performance. I use statistical procedure to determine the Standard Error of Measurement, or SEM: a data-based estimate of how far a reported total might reasonably drift from your actual performance across the term, using McDonald's omega to account for differing weights of assignments. A course total within one SEM of the next grade boundary rounds up to that grade; anything further away stands as earned. This buffer is calculated once, after all grades are finalized, and applied identically to every student, so it is not something that can be requested or negotiated individually, and it limits grade inflation.</p>
 
-  <details class="calc-explainer">
-    <summary>See how this calculation works</summary>
-    <div class="calc-explainer-body">
+  <div class="calc-explainer t-acc" data-open="false">
+    <button class="t-acc-head" type="button" aria-expanded="false">See how this calculation works <span class="t-acc-chevron"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6.5L8 10.5L12 6.5"/></svg></span></button>
+    <div class="t-acc-panel"><div class="calc-explainer-body t-acc-panel-inner">
       <p>SEM = SD &times; &radic;(1 &minus; omega). SD is how spread out course totals are across the class. Omega measures how consistently your performance on one graded component (quizzes, the writing assignment, the meeting, the final paper) predicts your performance on the others, weighted for how much each one counts. A course total within one SEM of the next boundary rounds up. Both SD and omega can only be calculated once every student's final grade is in, so the number below is illustrative, not this term's actual figure.</p>
       <p>Say SD works out to 5.4 and omega to 0.82: SEM = 5.4 &times; &radic;(1 &minus; 0.82) &asymp; 2.3 points. Here is how that plays out for two made-up students, both graded on the syllabus weights above, against the 90-point A&minus;/A boundary:</p>
       <table class="calc-example">
@@ -179,41 +290,41 @@ table.calc-example .no { color: var(--faint); }
         </tbody>
       </table>
       <p>Maya's total sits close enough to 90 that measurement noise alone could plausibly explain the gap, so her A&minus; becomes an A. Jordan's total, mostly pulled down by a low quiz average, sits too far from the boundary for that explanation, so it stands as earned. Neither student negotiates anything: the same line applies to both once the term's actual SD and omega are known.</p>
-    </div>
-  </details>
+    </div></div>
+  </div>
 
-  <details class="calc-explainer">
-    <summary>Why this instead of a simpler method?</summary>
-    <div class="calc-explainer-body">
+  <div class="calc-explainer t-acc" data-open="false">
+    <button class="t-acc-head" type="button" aria-expanded="false">Why this instead of a simpler method? <span class="t-acc-chevron"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6.5L8 10.5L12 6.5"/></svg></span></button>
+    <div class="t-acc-panel"><div class="calc-explainer-body t-acc-panel-inner">
       <p>Most instructors handle borderline grades one of a few common ways, and each has a real cost to students:</p>
       <p><b>A blanket curve, adding points to every total.</b> Mechanically, this is the same as applying a flat margin at every letter boundary at once, so it inherits the same problem a fixed margin has: the size of the boost has nothing to do with how reliable that term's grades actually were. It is also worse in one specific way. A boundary-based margin only changes anything for students near a cutoff. A blanket curve changes the reported number for everyone, including students who were never at risk of anything, so a 96 becomes a fabricated 99 for no reason. That said, blanket adjustments will be used if an assignment turns out to have been miscalibrated for the whole class, which is a different problem than any one student's measurement uncertainty, and would be handled according to the below.</p>
       <p><b>Emailing to ask for a bump.</b> This rewards whoever thinks to ask, knows the option exists, or feels comfortable requesting an exception, not whoever actually has the strongest case. Two students with the same total can end up with different grades depending on who reaches out.</p>
       <p><b>A fixed margin decided in advance, such as always rounding within a point.</b> This is simple to state but arbitrary in size. It hands out the same benefit whether that term's grades were highly consistent, meaning there was little real uncertainty to correct for, or genuinely noisy, meaning a bigger margin was warranted.</p>
       <p><b>Curving to fit a target class average.</b> This ties your grade partly to how your classmates did rather than to an absolute standard, so the same performance can land you a different grade in a strong cohort than in a weak one.</p>
       <p>The SEM method sidesteps all four problems the same way: the margin comes from this term's actual measurement precision, not a guess, a favor, or the rest of the class. It applies identically to everyone the moment final grades are set, so nothing about it depends on asking, timing, or who else is in the room. The tradeoff is that it takes more explaining than "I round to the nearest point," and the exact number can't exist until the term is over.</p>
-    </div>
-  </details>
+    </div></div>
+  </div>
 
-  <details class="calc-explainer">
-    <summary>What if the assignment itself was the problem?</summary>
-    <div class="calc-explainer-body">
+  <div class="calc-explainer t-acc" data-open="false">
+    <button class="t-acc-head" type="button" aria-expanded="false">What if the assignment itself was the problem? <span class="t-acc-chevron"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6.5L8 10.5L12 6.5"/></svg></span></button>
+    <div class="t-acc-panel"><div class="calc-explainer-body t-acc-panel-inner">
       <p>The same data used to calculate omega can also flag when a low score reflects a flawed assessment rather than weak performance, not just individual rounding. Omega is built from how each graded component relates to the others: how much of a component's variation tracks the same underlying performance as everything else, and how much doesn't. A component with a low class-wide average and a weak relationship to the rest of the term's grades, meaning it doesn't predict how students did elsewhere the way a typical component does, is a signal that the item measured something other than course mastery: maybe a confusing prompt, an ambiguous question, essentially something I did poorly. A component with a low average but a strong relationship to the rest of the term's grades tells a different story: students who understood the material did better than those who didn't, the usual pattern, which points to difficult material rather than a flawed assessment.</p>
       <p>When the data does point to a flawed component, it's handled the same way the rounding buffer is: applied to the whole class at once, decided from the evidence rather than case by case. Depending on what the diagnostic shows, that might mean dropping the component from everyone's total and reweighting the rest or giving uniform credit for a specific question while leaving the rest of the assignment as scored. What it doesn't mean is negotiating adjustments student by student, or assuming a low average by itself proves the assessment was at fault.</p>
-    </div>
-  </details>
+    </div></div>
+  </div>
 
-  <details class="calc-explainer">
-    <summary>A note on statistics, for the nerds</summary>
-    <div class="calc-explainer-body">
+  <div class="calc-explainer t-acc" data-open="false">
+    <button class="t-acc-head" type="button" aria-expanded="false">A note on statistics, for the nerds <span class="t-acc-chevron"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6.5L8 10.5L12 6.5"/></svg></span></button>
+    <div class="t-acc-panel"><div class="calc-explainer-body t-acc-panel-inner">
       <p>With something like 30 students, one erratic data point carries outsized influence on the calculation of omega. A single student who has a rough week or misses a deadline can drag down the whole class's internal consistency score, even though nothing about the course itself changed. Calculated once from a small sample, omega is an unstable statistic, swinging based on the specific handful of people enrolled rather than the actual quality of the assessments.</p>
       <p>Instead of computing omega only once from the class's scores, I resample the data thousands of times, drawing simulated classes from the same score distribution, and calculate omega on each resample. Averaging across that many resamples dampens the effect any single student's data point can have, since an outlier only shows up in some of the resampled draws instead of deciding the one and only calculation. The result is a steadier SEM, one that reflects the term's assessments rather than the luck of exactly who happened to enroll that term.</p>
       <p>This matters for you. Without it, a small seminar's rounding buffer could shrink or swell based on one classmate's unrelated bad week, which has nothing to do with your own performance. This bootstrapping method keeps that from happening, so a small class gets a buffer that's considerably steadier than a single raw calculation would produce.</p>
-    </div>
-  </details>
+    </div></div>
+  </div>
 
-  <details class="calc-explainer">
-    <summary>Try it yourself: a SEM sandbox</summary>
-    <div class="calc-explainer-body">
+  <div class="calc-explainer t-acc" data-open="false">
+    <button class="t-acc-head" type="button" aria-expanded="false">Try it yourself: a SEM sandbox <span class="t-acc-chevron"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6.5L8 10.5L12 6.5"/></svg></span></button>
+    <div class="t-acc-panel"><div class="calc-explainer-body t-acc-panel-inner">
       <p>Drag the sliders to see how SD and omega change the buffer, or use a preset. This is a teaching tool with made-up numbers, not this term's actual figures.</p>
 
       <div class="sandbox-presets">
@@ -252,8 +363,8 @@ table.calc-example .no { color: var(--faint); }
         <label>Test a score: <input type="number" id="sbTestScore" step="0.1" placeholder="e.g. 88.2" /></label>
         <p id="sbTestResult"></p>
       </div>
-    </div>
-  </details>
+    </div></div>
+  </div>
 
   <script>
   (function () {
@@ -297,7 +408,24 @@ table.calc-example .no { color: var(--faint); }
       return sd * Math.sqrt(1 - omega);
     }
 
-    function render() {
+    /* number pop-in (transitions.dev) for the SEM figure — only on
+       preset clicks and slider release, never during a drag, where
+       re-animating at input-event rate would flicker */
+    function setSem(str, animate) {
+      var chars = str.split("");
+      semResult.classList.add("t-digit-group");
+      semResult.classList.remove("is-animating");
+      semResult.innerHTML = chars.map(function (ch, i) {
+        var stag = i === chars.length - 2 ? ' data-stagger="1"' : (i === chars.length - 1 ? ' data-stagger="2"' : "");
+        return '<span class="t-digit"' + stag + ">" + ch + "</span>";
+      }).join("");
+      if (animate) {
+        void semResult.offsetHeight; // force reflow so the keyframes replay
+        semResult.classList.add("is-animating");
+      }
+    }
+
+    function render(animate) {
       var sd = parseFloat(sdSlider.value);
       var omega = parseFloat(omegaSlider.value);
       var sem = sd * Math.sqrt(1 - omega);
@@ -306,7 +434,7 @@ table.calc-example .no { color: var(--faint); }
       omegaVal.textContent = omega.toFixed(2);
       sdEcho.textContent = sd.toFixed(1);
       omegaEcho.textContent = omega.toFixed(2);
-      semResult.textContent = sem.toFixed(2);
+      setSem(sem.toFixed(2), animate === true);
 
       lowRel.hidden = omega >= 0.6;
 
@@ -359,15 +487,18 @@ table.calc-example .no { color: var(--faint); }
       }
     }
 
-    sdSlider.addEventListener("input", render);
-    omegaSlider.addEventListener("input", render);
+    sdSlider.addEventListener("input", function () { render(); });
+    omegaSlider.addEventListener("input", function () { render(); });
+    /* "change" fires on slider release — that's the animated beat */
+    sdSlider.addEventListener("change", function () { render(true); });
+    omegaSlider.addEventListener("change", function () { render(true); });
     testScore.addEventListener("input", updateTest);
 
     document.querySelectorAll(".sandbox-preset-btn").forEach(function (btn) {
       btn.addEventListener("click", function () {
         sdSlider.value = btn.getAttribute("data-sd");
         omegaSlider.value = btn.getAttribute("data-omega");
-        render();
+        render(true);
       });
     });
 
@@ -376,14 +507,14 @@ table.calc-example .no { color: var(--faint); }
   })();
   </script>
 
-  <details class="calc-explainer">
-    <summary>Why I choose this method</summary>
-    <div class="calc-explainer-body">
+  <div class="calc-explainer t-acc" data-open="false">
+    <button class="t-acc-head" type="button" aria-expanded="false">Why I choose this method <span class="t-acc-chevron"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6.5L8 10.5L12 6.5"/></svg></span></button>
+    <div class="t-acc-panel"><div class="calc-explainer-body t-acc-panel-inner">
       <p>Most grading treats a final percentage as an exact, unquestionable outcome. A 92.9 and a 93.0 get sorted into different tiers as if the difference between them means something real, as if every rubric, every essay prompt, and every quiz question measures performance with perfect precision. I don't assume that they do. Any form of academic assessment carries some amount of noise: an ambiguous prompt, a rubric that reads two different ways, a rough night's sleep before a quiz. None of that is a flaw unique to this course. It's just what measurement looks like.</p>
       <p>Using omega to calculate a real, term-specific SEM means the grading scale can check itself and I can know where to improve my teaching and assessment for future semesters without disadvantaging yours now. If a particular assignment turns out to have been inconsistent or poorly calibrated across this class, the buffer widens to reflect that, automatically, without me having to notice and adjust it by hand.</p>
       <p>The point of building the buffer this way is to take the guesswork and any bias I may have out of it. Nobody has to email me and make a case for a decimal point at the end of the term. If a student's actual performance can't be reliably distinguished from the next letter grade, the same rule applies to them as to everyone else, without exception and without anyone having to ask.</p>
-    </div>
-  </details>
+    </div></div>
+  </div>
 
   <p class="note">
     This calculator is an aid, not the official record. Grades on Brightspace are authoritative,
@@ -422,6 +553,15 @@ table.calc-example .no { color: var(--faint); }
   var saved = {};
   try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
 
+  var lastStanding = null;
+  function digitsHtml(str) {
+    var chars = str.split("");
+    return '<span class="t-digit-group" id="standingDigits">' + chars.map(function (ch, i) {
+      var stag = i === chars.length - 2 ? ' data-stagger="1"' : (i === chars.length - 1 ? ' data-stagger="2"' : "");
+      return '<span class="t-digit"' + stag + ">" + ch + "</span>";
+    }).join("") + "</span>";
+  }
+
   var rows = document.getElementById("rows");
   rows.innerHTML = ITEMS.map(function (it) {
     return "<tr><td class='aname'><b>" + it.name + "</b><span>" + it.sub + "</span></td>" +
@@ -459,10 +599,12 @@ table.calc-example .no { color: var(--faint); }
     var box = document.getElementById("result");
     if (earnedW === 0) {
       box.innerHTML = '<span class="rl">Standing</span><p style="margin-top:6px">Enter a score to see where you stand.</p>';
+      lastStanding = null;
     } else {
       var standing = earnedPts / earnedW * 100;
+      var standingStr = standing.toFixed(1);
       var html = '<span class="rl">' + (earnedW === 100 ? "Course grade" : "Current standing, " + earnedW + "% of the grade in") + "</span>" +
-        '<div class="big">' + standing.toFixed(1) + " &middot; <b>" + letter(standing) + "</b></div>";
+        '<div class="big">' + digitsHtml(standingStr) + " &middot; <b>" + letter(standing) + "</b></div>";
       if (earnedW < 100) {
         var floor = earnedPts;   // everything remaining scores 0
         var ceil = earnedPts + (100 - earnedW); // everything remaining scores 100
@@ -472,6 +614,11 @@ table.calc-example .no { color: var(--faint); }
       if (anyLate) html += "<p>Late penalties are included: 5 points per day off the affected assignment.</p>";
       html += '<p style="margin-top:6px">This is your raw, unrounded standing. If your final total lands close to a grade boundary, see the note below on how rounding is determined.</p>';
       box.innerHTML = html;
+      /* number pop-in (transitions.dev): animate only when the value
+         actually changed, so edits to unrelated fields stay quiet */
+      var dg = document.getElementById("standingDigits");
+      if (dg && standingStr !== lastStanding) dg.classList.add("is-animating");
+      lastStanding = standingStr;
     }
 
     /* what do I need on the final: use adjusted non-final scores; blanks count as unknown,
@@ -504,10 +651,58 @@ table.calc-example .no { color: var(--faint); }
     }).join("");
   }
 
-  document.querySelectorAll("input").forEach(function (i) { i.addEventListener("input", recalc); });
+  /* error state shake (transitions.dev): an out-of-range entry shakes
+     the field, turns its border rose, and reveals the range note under
+     the table; the error auto-reverts after the hold, and typing a
+     valid value clears it immediately */
+  var wrapEl = document.getElementById("inputsWrap");
+  var rootCss = getComputedStyle(document.documentElement);
+  function msTok(name, fb) { var v = parseFloat(rootCss.getPropertyValue(name)); return isFinite(v) ? v : fb; }
+  var shakeTotal = msTok("--shake-dur-a", 80) * 2 + msTok("--shake-dur-b", 60) * 2;
+  function rangeCheck(el) {
+    var v = el.value.trim();
+    var n = parseFloat(v);
+    var bad = v !== "" && isFinite(n) && (n < parseFloat(el.min) || n > parseFloat(el.max));
+    if (bad) {
+      wrapEl.classList.add("is-error");
+      el.classList.add("is-error");
+      el.classList.remove("is-shaking");
+      void el.offsetWidth; // force reflow so the shake replays
+      el.classList.add("is-shaking");
+      setTimeout(function () { el.classList.remove("is-shaking"); }, shakeTotal + 20);
+      if (wrapEl._revertTimer) clearTimeout(wrapEl._revertTimer);
+      wrapEl._revertTimer = setTimeout(function () {
+        wrapEl._revertTimer = null;
+        wrapEl.classList.remove("is-error");
+        rows.querySelectorAll("input.is-error").forEach(function (i) { i.classList.remove("is-error"); });
+      }, shakeTotal + msTok("--revert-hold", 3000));
+    } else {
+      el.classList.remove("is-error");
+      if (!rows.querySelector("input.is-error")) {
+        wrapEl.classList.remove("is-error");
+        if (wrapEl._revertTimer) { clearTimeout(wrapEl._revertTimer); wrapEl._revertTimer = null; }
+      }
+    }
+  }
+  rows.querySelectorAll("input").forEach(function (i) {
+    i.addEventListener("input", function () { rangeCheck(i); recalc(); });
+  });
+
+  /* accordion toggles (transitions.dev): data-open drives the CSS */
+  document.querySelectorAll(".t-acc").forEach(function (acc) {
+    var head = acc.querySelector(".t-acc-head");
+    head.addEventListener("click", function () {
+      var open = acc.getAttribute("data-open") === "true";
+      acc.setAttribute("data-open", String(!open));
+      head.setAttribute("aria-expanded", String(!open));
+    });
+  });
+
   document.getElementById("themeBtn").onclick = function () {
     var r = document.documentElement;
-    r.setAttribute("data-theme", r.getAttribute("data-theme") === "dark" ? "light" : "dark");
+    var next = r.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    r.setAttribute("data-theme", next);
+    try { localStorage.setItem("theme", next); } catch (e) {}
   };
   recalc();
 })();
