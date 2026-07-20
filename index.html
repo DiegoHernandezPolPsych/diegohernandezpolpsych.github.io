@@ -465,6 +465,12 @@ html.vt-on .cards .card, html.vt-on .cv-list li, html.vt-on .contact-list li { a
   font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: .04em;
   text-transform: uppercase; color: var(--faint); margin: 0 0 10px;
 }
+.card .meta a {
+  color: inherit;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  padding-bottom: 1px;
+}
+.card .meta a:hover { color: var(--accent); border-bottom-color: var(--accent); }
 .card p { margin: 0 0 12px; color: var(--muted); font-size: var(--text-base); line-height: 1.55; text-wrap: pretty; }
 .card .card-links { display: flex; flex-wrap: wrap; gap: 8px 18px; }
 .card .card-links a {
@@ -913,7 +919,7 @@ html.vt-on .panel.is-active { animation: none; }
       <article class="card">
         <div class="card-index">→</div>
         <div>
-          <h3>POL309: Politics of the European Union</h3><p class="meta">Instructor of Record · Summer 2025; Summer 2026; Fall 2026; Spring 2027</p><div class="card-links"><a href="files/POL309_Summer2026.pdf">Syllabus</a><a href="pol309-tracker.html">This Week at a Glance</a><a href="pol309-grades.html">Grade Calculator</a></div>
+          <h3>POL309: Politics of the European Union</h3><p class="meta">Instructor of Record · Summer 2025; Summer 2026; <a href="files/POL309_Fall2026.pdf">Fall 2026</a>; Spring 2027</p><div class="card-links"><a href="files/POL309_Summer2026.pdf">Syllabus</a><a href="pol309-tracker.html">This Week at a Glance</a><a href="pol309-grades.html">Grade Calculator</a></div>
         </div>
       </article>
     </div>
@@ -1255,7 +1261,8 @@ document.addEventListener("section:active", function (e) {
     box.innerHTML = items.map(function (it, i) {
       var index = isTeaching ? "\u2192" : ("0" + (i + 1)).slice(-2);
       var status = (!isTeaching && it.status) ? '<span class="status">' + esc(it.status) + "</span>" : "";
-      var meta = it.meta ? '<p class="meta">' + esc(it.meta) + "</p>" : "";
+      /* meta is escaped first, then [label](href) becomes an inline link */
+      var meta = it.meta ? '<p class="meta">' + esc(it.meta).replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>') + "</p>" : "";
       var desc = it.desc ? "<p>" + esc(it.desc) + "</p>" : "";
       var cite = (!isTeaching) ? '<button class="cite-btn" type="button" data-cite="' + esc(citeText(authorName, it)) + '"><span class="t-text-swap">Copy citation</span></button>' : "";
       return '<article class="card"><div class="card-index">' + index + "</div><div>" +
