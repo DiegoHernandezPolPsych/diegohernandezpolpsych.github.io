@@ -1550,9 +1550,14 @@ document.addEventListener("section:active", function (e) {
           openPanel(false);
         });
       });
+      /* the open panel is position:fixed, positioned from the trigger's
+         viewport rect at open time — closing on scroll/resize is simpler
+         and more robust than trying to keep it re-anchored live */
       window.addEventListener("resize", function () {
+        openPanel(false);
         movePill(root.querySelector('.term-select-option[aria-selected="true"]'), false);
       });
+      window.addEventListener("scroll", function () { openPanel(false); }, { passive: true, capture: true });
 
       selectTerm(POL309.pickTerm(terms, { queryTerm: POL309.queryTerm() }), { animate: false });
     });
