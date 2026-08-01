@@ -57,6 +57,22 @@ input[type="number"] {
 }
 input[type="number"]:focus { outline: 2px solid var(--gold); border-color: transparent; }
 .late-note { color: var(--faint); font-size: .78rem; }
+.term-switch { display: flex; align-items: center; gap: 8px; margin: 0 0 28px; }
+.term-switch label { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.term-switch select {
+  font: inherit; font-size: .85rem; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line-strong); border-radius: 100px; padding: 6px 12px; cursor: pointer;
+}
+.unavailable {
+  border: 1px solid var(--line-strong); background: var(--surface); padding: 26px 28px;
+  position: relative; margin-top: 8px;
+}
+.unavailable::before, .unavailable::after { content: ""; position: absolute; width: 18px; height: 18px; border: 2px solid var(--gold); }
+.unavailable::before { top: -5px; left: -5px; border-right: 0; border-bottom: 0; }
+.unavailable::after { bottom: -5px; right: -5px; border-left: 0; border-top: 0; }
+.unavailable h2 { font-family: var(--font-display); font-weight: 500; font-size: 1.3rem; margin: 0 0 10px; }
+.unavailable p { color: var(--muted); margin: 0; }
+.unavailable a { color: var(--accent); }
 .result {
   margin-top: 26px; border: 1px solid var(--line-strong); background: var(--surface);
   padding: 20px 24px; position: relative;
@@ -249,14 +265,26 @@ table.calc-example .no { color: var(--faint); }
 <body>
 <div class="wrap">
   <div class="topline">
-    <a class="back" href="index.html#teaching">&larr; diegohernandezpolpsych.github.io</a>
+    <a class="back" href="index.html#teaching" id="backLink">&larr; diegohernandezpolpsych.github.io</a>
     <button class="theme-btn" id="themeBtn" type="button">Theme</button>
   </div>
 
-  <p class="eyebrow"><span class="triad"><span></span><span></span><span></span></span> POL309 · Summer II 2026</p>
+  <p class="eyebrow"><span class="triad"><span></span><span></span><span></span></span> <span id="eyebrowTerm">POL309</span></p>
   <h1>Grade calculator</h1>
   <p class="sub">Uses the exact weights, letter scale, and late policy from the syllabus. Leave anything you have not received blank.</p>
 
+  <div class="term-switch">
+    <label for="termPicker">Term</label>
+    <select id="termPicker"></select>
+  </div>
+
+  <div class="unavailable" id="calcUnavailable" hidden>
+    <h2 id="unavailableTitle">Grade calculator unavailable</h2>
+    <p>The grading policy is term specific, and there is no syllabus listed for this term yet, so a course total can't be calculated. Email
+      <a href="mailto:diego.hernandez@stonybrook.edu">diego.hernandez@stonybrook.edu</a> with any questions.</p>
+  </div>
+
+  <div id="calcBody" hidden>
   <div class="t-input-wrap" id="inputsWrap">
     <table class="inputs">
       <thead><tr><th>Assignment</th><th>Weight</th><th>Score /100</th><th>Days late</th></tr></thead>
@@ -264,7 +292,7 @@ table.calc-example .no { color: var(--faint); }
     </table>
     <p class="t-error-msg" id="rangeMsg" aria-live="polite">Scores run 0–100 and days late 0–14 — the calculation clamps anything outside that range.</p>
   </div>
-  <p class="late-note">Late work: 5 points per day off that assignment, weekends included. More than a week late may not be accepted.</p>
+  <p class="late-note" id="lateNote"></p>
 
   <div class="result" id="result"></div>
 
@@ -515,43 +543,36 @@ table.calc-example .no { color: var(--faint); }
       <p>The point of building the buffer this way is to take the guesswork and any bias I may have out of it. Nobody has to email me and make a case for a decimal point at the end of the term. If a student's actual performance can't be reliably distinguished from the next letter grade, the same rule applies to them as to everyone else, without exception and without anyone having to ask.</p>
     </div></div>
   </div>
+  </div><!-- /calcBody -->
 
   <p class="note">
     This calculator is an aid, not the official record. Grades on Brightspace are authoritative,
     and the syllabus governs if anything here disagrees.
-    Questions: <a href="mailto:diego.hernandez@stonybrook.edu">diego.hernandez@stonybrook.edu</a>.
+    Questions: <a href="mailto:diego.hernandez@stonybrook.edu" id="noteEmail">diego.hernandez@stonybrook.edu</a>.
   </p>
 </div>
 
+<script src="pol309-common.js"></script>
 <script>
 (function () {
-  /* the syllabus, encoded exactly */
-  var ITEMS = [
-    { id: "q1", name: "Week 1 quiz", sub: "reading check", w: 5 },
-    { id: "q2", name: "Week 2 quiz", sub: "reading check", w: 5 },
-    { id: "q4", name: "Week 4 quiz", sub: "reading check", w: 5 },
-    { id: "writing", name: "Writing assignment", sub: "week 3, Euractiv piece", w: 25 },
-    { id: "meeting", name: "One-to-one meeting", sub: "weeks 4 to 5", w: 10 },
-    { id: "final", name: "Final paper", sub: "due August 15", w: 50 }
-  ];
-  var SCALE = [
-    ["A", 93], ["A-", 90], ["B+", 87], ["B", 83], ["B-", 80],
-    ["C+", 77], ["C", 73], ["C-", 70], ["D+", 67], ["D", 63], ["D-", 60], ["F", 0]
-  ];
   /* Note: this calculator reports raw, unrounded standing. It does not
      attempt to model the SEM-based rounding described in the note below,
      since that buffer can only be computed once all of a term's grades
      are final, and isn't knowable while the course is still in progress. */
+
+  /* ITEMS/SCALE/KEY/lateAmount are set per term by initTerm() below;
+     everything else in this IIFE reads them as shared, mutable state */
+  var ITEMS = [], SCALE = [], KEY = "pol309-grades", lateAmount = 0;
+
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
   function letter(pct) {
     for (var i = 0; i < SCALE.length; i++) {
-      if (pct >= SCALE[i][1]) return SCALE[i][0];
+      if (pct >= SCALE[i].cutoff) return SCALE[i].letter;
     }
     return "F";
   }
-
-  var KEY = "pol309-grades";
-  var saved = {};
-  try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
 
   var lastStanding = null;
   function digitsHtml(str) {
@@ -563,12 +584,6 @@ table.calc-example .no { color: var(--faint); }
   }
 
   var rows = document.getElementById("rows");
-  rows.innerHTML = ITEMS.map(function (it) {
-    return "<tr><td class='aname'><b>" + it.name + "</b><span>" + it.sub + "</span></td>" +
-      "<td>" + it.w + "%</td>" +
-      "<td><input type='number' min='0' max='100' step='1' id='s_" + it.id + "' value='" + (saved["s_" + it.id] || "") + "' /></td>" +
-      "<td><input type='number' min='0' max='14' step='1' id='l_" + it.id + "' value='" + (saved["l_" + it.id] || "") + "' /></td></tr>";
-  }).join("");
 
   function val(id) {
     var v = document.getElementById(id).value.trim();
@@ -578,7 +593,7 @@ table.calc-example .no { color: var(--faint); }
     var s = val("s_" + it.id);
     if (s === null) return null;
     var late = val("l_" + it.id) || 0;
-    return Math.max(0, s - 5 * late);
+    return Math.max(0, s - lateAmount * late);
   }
 
   function recalc() {
@@ -611,7 +626,7 @@ table.calc-example .no { color: var(--faint); }
         html += "<p>Guaranteed range so far: " + floor.toFixed(1) + " (" + letter(floor) + ") to " +
           ceil.toFixed(1) + " (" + letter(ceil) + "), depending on what is still out.</p>";
       }
-      if (anyLate) html += "<p>Late penalties are included: 5 points per day off the affected assignment.</p>";
+      if (anyLate) html += "<p>Late penalties are included, per the late policy above.</p>";
       html += '<p style="margin-top:6px">This is your raw, unrounded standing. If your final total lands close to a grade boundary, see the note below on how rounding is determined.</p>';
       box.innerHTML = html;
       /* number pop-in (transitions.dev): animate only when the value
@@ -640,14 +655,18 @@ table.calc-example .no { color: var(--faint); }
     note.textContent = unknownW
       ? "Right now, " + unknownW + "% of your grade (everything outside the final paper) is not yet entered, so these are floors, not forecasts. They tighten into real requirements as your actual scores come in."
       : "";
+    /* the final's own weight, not a hardcoded fraction — terms differ
+       (50% in Summer, 40% in Fall) */
+    var finalItem = ITEMS.filter(function (it) { return it.id === "final"; })[0];
+    var finalFrac = (finalItem ? finalItem.w : 100) / 100;
     tbody.innerHTML = SCALE.slice(0, 11).map(function (row) {
-      var target = row[1];   // raw syllabus cutoff, unrounded
-      var needed = (target - otherPts - unknownW) / 0.5;
+      var target = row.cutoff;   // raw syllabus cutoff, unrounded
+      var needed = (target - otherPts - unknownW) / finalFrac;
       var cell;
       if (needed <= 0) cell = '<span class="secured">already secured' + (unknownW ? " if the rest of your work comes back perfect" : "") + "</span>";
       else if (needed > 100) cell = '<span class="t-no">out of reach</span>';
       else cell = '<span class="t-need">' + Math.max(0, needed).toFixed(1) + "+</span>";
-      return "<tr><td class='t-ok'>" + row[0] + "</td><td>" + row[1] + "+</td><td>" + cell + "</td></tr>";
+      return "<tr><td class='t-ok'>" + esc(row.letter) + "</td><td>" + row.cutoff + "+</td><td>" + cell + "</td></tr>";
     }).join("");
   }
 
@@ -684,10 +703,6 @@ table.calc-example .no { color: var(--faint); }
       }
     }
   }
-  rows.querySelectorAll("input").forEach(function (i) {
-    i.addEventListener("input", function () { rangeCheck(i); recalc(); });
-  });
-
   /* accordion toggles (transitions.dev): data-open drives the CSS */
   document.querySelectorAll(".t-acc").forEach(function (acc) {
     var head = acc.querySelector(".t-acc-head");
@@ -704,7 +719,81 @@ table.calc-example .no { color: var(--faint); }
     r.setAttribute("data-theme", next);
     try { localStorage.setItem("theme", next); } catch (e) {}
   };
-  recalc();
+
+  /* TERM SWITCHING — everything above this point is generic; initTerm()
+     loads the selected term's ITEMS/SCALE/late policy and (re)builds the
+     score table. Scores are namespaced per term so switching terms never
+     mixes up saved input. */
+  var calcBody = document.getElementById("calcBody");
+  var calcUnavailable = document.getElementById("calcUnavailable");
+  var eyebrowTerm = document.getElementById("eyebrowTerm");
+  var backLink = document.getElementById("backLink");
+
+  function initTerm(term) {
+    eyebrowTerm.textContent = "POL309 · " + term.label;
+    backLink.setAttribute("href", "index.html?term=" + encodeURIComponent(term.id) + "#teaching");
+    document.title = "POL309 · Grade Calculator · " + term.label;
+
+    if (wrapEl._revertTimer) { clearTimeout(wrapEl._revertTimer); wrapEl._revertTimer = null; }
+    wrapEl.classList.remove("is-error");
+
+    if (!term.grading || !Array.isArray(term.grading.items) || !term.grading.items.length) {
+      calcBody.hidden = true;
+      calcUnavailable.hidden = false;
+      document.getElementById("unavailableTitle").textContent = "Grade calculator unavailable for " + term.label;
+      return;
+    }
+    calcBody.hidden = false;
+    calcUnavailable.hidden = true;
+
+    ITEMS = term.grading.items;
+    SCALE = term.grading.scale;
+    lateAmount = term.grading.lateAmount || 0;
+    KEY = "pol309-grades-" + term.id;
+    document.getElementById("lateNote").textContent = term.grading.lateNote || "";
+
+    var saved = {};
+    try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
+
+    rows.innerHTML = ITEMS.map(function (it) {
+      return "<tr><td class='aname'><b>" + esc(it.name) + "</b><span>" + esc(it.sub) + "</span></td>" +
+        "<td>" + it.w + "%</td>" +
+        "<td><input type='number' min='0' max='100' step='1' id='s_" + esc(it.id) + "' value='" + esc(saved["s_" + it.id] || "") + "' /></td>" +
+        "<td><input type='number' min='0' max='14' step='1' id='l_" + esc(it.id) + "' value='" + esc(saved["l_" + it.id] || "") + "' /></td></tr>";
+    }).join("");
+    rows.querySelectorAll("input").forEach(function (i) {
+      i.addEventListener("input", function () { rangeCheck(i); recalc(); });
+    });
+
+    lastStanding = null;
+    recalc();
+  }
+
+  POL309.fetchContent().then(function (c) {
+    var terms = (c && c.pol309 && Array.isArray(c.pol309.terms)) ? c.pol309.terms : [];
+    var picker = document.getElementById("termPicker");
+    if (!terms.length) {
+      calcBody.hidden = true;
+      calcUnavailable.hidden = false;
+      return;
+    }
+    picker.innerHTML = terms.map(function (t) {
+      return '<option value="' + esc(t.id) + '">' + esc(t.label) + "</option>";
+    }).join("");
+
+    var current = POL309.pickTerm(terms, { queryTerm: POL309.queryTerm() });
+    picker.value = current.id;
+    initTerm(current);
+
+    picker.addEventListener("change", function () {
+      var term = terms.filter(function (t) { return t.id === picker.value; })[0];
+      if (!term) return;
+      var url = new URL(location.href);
+      url.searchParams.set("term", term.id);
+      history.replaceState(null, "", url);
+      initTerm(term);
+    });
+  });
 })();
 </script>
 </body>

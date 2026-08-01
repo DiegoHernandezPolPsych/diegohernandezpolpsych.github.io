@@ -73,8 +73,9 @@ collections:
               - { name: title, label: Course, widget: string }
               - { name: meta, label: Role / term, widget: string, required: false }
               - { name: desc, label: Description, widget: text, required: false }
+              - { name: termSelector, label: "Term dropdown group (e.g. pol309 — leave blank unless this course has a Term dropdown below)", widget: string, required: false, hint: "Must match a key under POL309 further down, e.g. \"pol309\"." }
               - name: links
-                label: Links
+                label: "Links (ignored when Term dropdown group is set — those links are generated per term instead)"
                 widget: list
                 required: false
                 fields:
@@ -119,27 +120,66 @@ collections:
               - { name: scrimLight, label: "Opacity in light mode (0 to 1)", widget: number, value_type: float, min: 0, max: 1, step: 0.01, required: false }
 
           - name: pol309
-            label: "POL309 — This Week tracker"
+            label: "POL309 — term dropdown (Teaching tab), This Week tracker, and Grade Calculator"
             widget: object
             collapsed: true
             fields:
-              - { name: calendly, label: "Calendly booking link", widget: string, required: false }
-              - name: weeks
-                label: "Schedule"
-                label_singular: "Week"
+              - name: terms
+                label: "Terms"
+                label_singular: "Term"
                 widget: list
-                summary: "Week {{fields.n}}: {{fields.title}}"
+                hint: "One entry per term. Which term shows by default on the site is computed automatically from today's date (Summer = until Aug 19, Fall = Aug 20–Dec 18, Spring = Dec 19–May 20) matched against the Label below — so keep labels as \"Season YYYY\" (e.g. \"Fall 2026\"). Leave Syllabus blank (and Schedule / Grading empty) for a term that isn't posted yet — the site will show an \"unavailable, email me\" message for that term automatically."
+                summary: "{{fields.label}}"
                 fields:
-                  - { name: n, label: "Week number", widget: number, value_type: int }
-                  - { name: title, label: "Week title", widget: string }
-                  - { name: start, label: "Starts (e.g. 2026-07-06T00:00:00-04:00)", widget: string }
-                  - { name: end, label: "Ends (e.g. 2026-07-12T23:59:59-04:00)", widget: string }
-                  - name: tasks
-                    label: "Tasks"
-                    label_singular: "Task"
+                  - { name: id, label: "ID (short, no spaces, e.g. fall2026 — used in links, never changes once published)", widget: string }
+                  - { name: label, label: "Label (e.g. Fall 2026)", widget: string }
+                  - { name: meetingInfo, label: "Meeting info line (e.g. \"in person · M/W/F, 2–2:55pm · August 24 to December 17\")", widget: string, required: false }
+                  - { name: syllabus, label: "Syllabus PDF (leave blank if not posted yet)", widget: file, required: false, media_folder: "files", public_folder: "/files" }
+                  - { name: calendly, label: "Calendly booking link", widget: string, required: false }
+                  - name: weeks
+                    label: "Schedule (leave empty if there's no syllabus yet)"
+                    label_singular: "Week"
                     widget: list
-                    field: { name: task, label: Task, widget: string }
-                  - { name: deadlineLabel, label: "Deadline name (blank for none)", widget: string, required: false }
-                  - { name: deadlineWhen, label: "Deadline datetime (blank hides the countdown)", widget: string, required: false }
-                  - { name: deadlineText, label: "Deadline shown to students (e.g. Friday, July 10, 11:59pm)", widget: string, required: false }
-                  - { name: calendly, label: "Show the meeting booking button this week", widget: boolean, required: false, default: false }
+                    required: false
+                    summary: "Week {{fields.n}}: {{fields.title}}"
+                    fields:
+                      - { name: n, label: "Week number", widget: number, value_type: int }
+                      - { name: title, label: "Week title", widget: string }
+                      - { name: start, label: "Starts (e.g. 2026-08-24T00:00:00-04:00)", widget: string }
+                      - { name: end, label: "Ends (e.g. 2026-08-30T23:59:59-04:00)", widget: string }
+                      - name: tasks
+                        label: "Tasks"
+                        label_singular: "Task"
+                        widget: list
+                        field: { name: task, label: Task, widget: string }
+                      - { name: deadlineLabel, label: "Deadline name (blank for none)", widget: string, required: false }
+                      - { name: deadlineWhen, label: "Deadline datetime (blank hides the countdown)", widget: string, required: false }
+                      - { name: deadlineText, label: "Deadline shown to students (e.g. Friday, July 10, 11:59pm)", widget: string, required: false }
+                      - { name: calendly, label: "Show the meeting booking button this week", widget: boolean, required: false, default: false }
+                  - name: grading
+                    label: "Grading (leave every field empty if there's no syllabus yet)"
+                    widget: object
+                    required: false
+                    fields:
+                      - name: items
+                        label: "Graded components"
+                        label_singular: "Component"
+                        widget: list
+                        required: false
+                        summary: "{{fields.name}} — {{fields.w}}%"
+                        fields:
+                          - { name: id, label: "ID (short, no spaces)", widget: string }
+                          - { name: name, label: "Name (e.g. Writing Assignment 1)", widget: string }
+                          - { name: sub, label: "Detail line (e.g. \"The EU in the News, week 5\")", widget: string, required: false }
+                          - { name: w, label: "Weight (%, all components should add to 100)", widget: number, value_type: int }
+                      - name: scale
+                        label: "Letter grade cutoffs"
+                        label_singular: "Cutoff"
+                        widget: list
+                        required: false
+                        summary: "{{fields.letter}} = {{fields.cutoff}}+"
+                        fields:
+                          - { name: letter, label: "Letter (e.g. A-)", widget: string }
+                          - { name: cutoff, label: "Minimum percentage", widget: number, value_type: int }
+                      - { name: lateAmount, label: "Late penalty per day (points off a /100 score)", widget: number, value_type: int, required: false }
+                      - { name: lateNote, label: "Late policy note shown to students", widget: string, required: false }

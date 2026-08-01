@@ -38,8 +38,9 @@
   "teaching": [
     {
       "title": "POL309: Politics of the European Union",
-      "meta": "Instructor of Record · Summer 2025; Summer 2026; [Fall 2026](files/POL309_Fall2026.pdf); Spring 2027",
+      "meta": "Instructor of Record",
       "desc": "",
+      "termSelector": "pol309",
       "links": [
         {
           "label": "Syllabus",
@@ -47,11 +48,11 @@
         },
         {
           "label": "This Week at a Glance",
-          "href": "pol309-tracker.html"
+          "href": "pol309-tracker.html?term=summer2026"
         },
         {
           "label": "Grade Calculator",
-          "href": "pol309-grades.html"
+          "href": "pol309-grades.html?term=summer2026"
         }
       ]
     }
@@ -132,97 +133,537 @@
     }
   ],
   "pol309": {
-    "calendly": "https://calendly.com/diego-hernandez-political-science/pol309-politics-in-the-european-union",
-    "weeks": [
+    "terms": [
       {
-        "n": 1,
-        "title": "The Idea of Europe, the Foundation of the Union",
-        "start": "2026-07-06T00:00:00-04:00",
-        "end": "2026-07-12T23:59:59-04:00",
-        "tasks": [
-          "Read Chapter 2, “The Idea of Europe” (McCormick)",
-          "Watch “The Idea of Europe” introduction video, up to the 9:50 mark"
-        ],
-        "deadlineLabel": "",
-        "deadlineWhen": "",
-        "deadlineText": "",
-        "calendly": false
+        "id": "summer2025",
+        "label": "Summer 2025",
+        "meetingInfo": "",
+        "syllabus": "",
+        "calendly": "",
+        "weeks": [],
+        "grading": null
       },
       {
-        "n": 2,
-        "title": "The Political History of the European Union",
-        "start": "2026-07-13T00:00:00-04:00",
-        "end": "2026-07-19T23:59:59-04:00",
-        "tasks": [
-          "Read Chapter 3, “The Evolution of the EU” first",
-          "Then read Chapter 1, “What is the European Union”",
-          "Reading-check quiz on Brightspace (covers Weeks 1 & 2)"
+        "id": "summer2026",
+        "label": "Summer 2026",
+        "meetingInfo": "online, asynchronous · July 6 to August 15",
+        "syllabus": "files/POL309_Summer2026.pdf",
+        "calendly": "https://calendly.com/diego-hernandez-political-science/pol309-politics-in-the-european-union",
+        "weeks": [
+          {
+            "n": 1,
+            "title": "The Idea of Europe, the Foundation of the Union",
+            "start": "2026-07-06T00:00:00-04:00",
+            "end": "2026-07-12T23:59:59-04:00",
+            "tasks": [
+              "Read Chapter 2, “The Idea of Europe” (McCormick)",
+              "Watch “The Idea of Europe” introduction video, up to the 9:50 mark"
+            ],
+            "deadlineLabel": "",
+            "deadlineWhen": "",
+            "deadlineText": "",
+            "calendly": false
+          },
+          {
+            "n": 2,
+            "title": "The Political History of the European Union",
+            "start": "2026-07-13T00:00:00-04:00",
+            "end": "2026-07-19T23:59:59-04:00",
+            "tasks": [
+              "Read Chapter 3, “The Evolution of the EU” first",
+              "Then read Chapter 1, “What is the European Union”",
+              "Reading-check quiz on Brightspace (covers Weeks 1 & 2)"
+            ],
+            "deadlineLabel": "Weeks 1 & 2 quiz",
+            "deadlineWhen": "2026-07-17T23:59:00-04:00",
+            "deadlineText": "Friday, July 17, 11:59pm",
+            "calendly": false
+          },
+          {
+            "n": 3,
+            "title": "Institutions of the European Union",
+            "start": "2026-07-20T00:00:00-04:00",
+            "end": "2026-07-26T23:59:59-04:00",
+            "tasks": [
+              "Read Chapter 4, “The European Institutions”",
+              "Read Chapter 6, “The EU Policy Process”",
+              "Watch the six institution videos on Brightspace",
+              "Writing assignment (25% of your grade): browse euractiv.com, pick an issue, and write 500+ words on how two EU institutions would engage it"
+            ],
+            "deadlineLabel": "Writing assignment",
+            "deadlineWhen": "",
+            "deadlineText": "due this week; see Brightspace for the exact deadline",
+            "calendly": false
+          },
+          {
+            "n": 4,
+            "title": "The Single Market and a Diversity of Opinions",
+            "start": "2026-07-27T00:00:00-04:00",
+            "end": "2026-08-02T23:59:59-04:00",
+            "tasks": [
+              "Read Chapter 7, “Economic Policy”",
+              "Read Chapter 5, “The EU and its Citizens”",
+              "Reading-check quiz on Brightspace",
+              "Book your one-to-one meeting about the final paper (this week or next; earlier is better)"
+            ],
+            "deadlineLabel": "Week 4 quiz",
+            "deadlineWhen": "2026-07-31T23:59:00-04:00",
+            "deadlineText": "Friday, July 31, 11:59pm",
+            "calendly": true
+          },
+          {
+            "n": 5,
+            "title": "The Politics of Crisis and Europe's Response",
+            "start": "2026-08-03T00:00:00-04:00",
+            "end": "2026-08-09T23:59:59-04:00",
+            "tasks": [
+              "Read Chapter 8, “Internal Policies”",
+              "Read Chapter 9, “The EU in the World”",
+              "If you have not met with me yet, book your one-to-one now"
+            ],
+            "deadlineLabel": "",
+            "deadlineWhen": "",
+            "deadlineText": "",
+            "calendly": true
+          },
+          {
+            "n": 6,
+            "title": "Final Papers",
+            "start": "2026-08-10T00:00:00-04:00",
+            "end": "2026-08-15T23:59:59-04:00",
+            "tasks": [
+              "Write and submit your final paper (50% of your grade): 6 to 7 pages, double spaced, MLA or APA, substantially referencing the textbook",
+              "Submit on Brightspace"
+            ],
+            "deadlineLabel": "Final paper",
+            "deadlineWhen": "2026-08-15T23:59:00-04:00",
+            "deadlineText": "Saturday, August 15, 11:59pm EST",
+            "calendly": false
+          }
         ],
-        "deadlineLabel": "Weeks 1 & 2 quiz",
-        "deadlineWhen": "2026-07-17T23:59:00-04:00",
-        "deadlineText": "Friday, July 17, 11:59pm",
-        "calendly": false
+        "grading": {
+          "items": [
+            {
+              "id": "q1",
+              "name": "Week 1 quiz",
+              "sub": "reading check",
+              "w": 5
+            },
+            {
+              "id": "q2",
+              "name": "Week 2 quiz",
+              "sub": "reading check",
+              "w": 5
+            },
+            {
+              "id": "q4",
+              "name": "Week 4 quiz",
+              "sub": "reading check",
+              "w": 5
+            },
+            {
+              "id": "writing",
+              "name": "Writing assignment",
+              "sub": "week 3, Euractiv piece",
+              "w": 25
+            },
+            {
+              "id": "meeting",
+              "name": "One-to-one meeting",
+              "sub": "weeks 4 to 5",
+              "w": 10
+            },
+            {
+              "id": "final",
+              "name": "Final paper",
+              "sub": "due August 15",
+              "w": 50
+            }
+          ],
+          "scale": [
+            {
+              "letter": "A",
+              "cutoff": 93
+            },
+            {
+              "letter": "A-",
+              "cutoff": 90
+            },
+            {
+              "letter": "B+",
+              "cutoff": 87
+            },
+            {
+              "letter": "B",
+              "cutoff": 83
+            },
+            {
+              "letter": "B-",
+              "cutoff": 80
+            },
+            {
+              "letter": "C+",
+              "cutoff": 77
+            },
+            {
+              "letter": "C",
+              "cutoff": 73
+            },
+            {
+              "letter": "C-",
+              "cutoff": 70
+            },
+            {
+              "letter": "D+",
+              "cutoff": 67
+            },
+            {
+              "letter": "D",
+              "cutoff": 63
+            },
+            {
+              "letter": "D-",
+              "cutoff": 60
+            },
+            {
+              "letter": "F",
+              "cutoff": 0
+            }
+          ],
+          "lateAmount": 5,
+          "lateNote": "Late work: 5 points per day off that assignment, weekends included. More than a week late may not be accepted."
+        }
       },
       {
-        "n": 3,
-        "title": "Institutions of the European Union",
-        "start": "2026-07-20T00:00:00-04:00",
-        "end": "2026-07-26T23:59:59-04:00",
-        "tasks": [
-          "Read Chapter 4, “The European Institutions”",
-          "Read Chapter 6, “The EU Policy Process”",
-          "Watch the six institution videos on Brightspace",
-          "Writing assignment (25% of your grade): browse euractiv.com, pick an issue, and write 500+ words on how two EU institutions would engage it"
+        "id": "fall2026",
+        "label": "Fall 2026",
+        "meetingInfo": "in person · M/W/F, 2–2:55pm · August 24 to December 17",
+        "syllabus": "files/POL309_Fall2026.pdf",
+        "calendly": "https://calendly.com/diego-hernandez-political-science/pol309-politics-in-the-european-union",
+        "weeks": [
+          {
+            "n": 1,
+            "title": "The Idea of Europe, the Foundation of the Union",
+            "start": "2026-08-24T00:00:00-04:00",
+            "end": "2026-08-30T23:59:59-04:00",
+            "tasks": [
+              "Read Chapter 2, “The Idea of Europe” (McCormick)",
+              "Read the Churchill Zurich speech and the Schuman Declaration (primary documents on Brightspace)",
+              "Read Judt, “The Past is Another Country” before Friday"
+            ],
+            "deadlineLabel": "",
+            "deadlineWhen": "",
+            "deadlineText": "",
+            "calendly": false
+          },
+          {
+            "n": 2,
+            "title": "The Political History of the European Union",
+            "start": "2026-08-31T00:00:00-04:00",
+            "end": "2026-09-06T23:59:59-04:00",
+            "tasks": [
+              "Read Chapter 3, “The Evolution of the EU”",
+              "Read the Monnet and Milward excerpts, plus the Treaty of Rome preamble and de Gaulle's 1963 veto speech (Brightspace)",
+              "Wednesday (9/2) and Friday (9/4) sessions meet online"
+            ],
+            "deadlineLabel": "",
+            "deadlineWhen": "",
+            "deadlineText": "",
+            "calendly": false
+          },
+          {
+            "n": 3,
+            "title": "Theories of European Integration",
+            "start": "2026-09-07T00:00:00-04:00",
+            "end": "2026-09-13T23:59:59-04:00",
+            "tasks": [
+              "Monday (9/7): Labor Day, no class",
+              "Read the Haas, Hoffmann, and Moravcsik excerpts and Hooghe & Marks (2009)",
+              "Friday: interactive session — which theory best explains the last decade?"
+            ],
+            "deadlineLabel": "",
+            "deadlineWhen": "",
+            "deadlineText": "",
+            "calendly": false
+          },
+          {
+            "n": 4,
+            "title": "Institutions of the European Union I: The Executive Machinery",
+            "start": "2026-09-14T00:00:00-04:00",
+            "end": "2026-09-20T23:59:59-04:00",
+            "tasks": [
+              "Read Chapter 4, “The European Institutions”",
+              "Watch the European Commission, European Council, and Council of the EU videos on Brightspace",
+              "Friday: interactive case study — the executives in motion"
+            ],
+            "deadlineLabel": "",
+            "deadlineWhen": "",
+            "deadlineText": "",
+            "calendly": false
+          },
+          {
+            "n": 5,
+            "title": "Institutions of the European Union II: Parliament, Law, and the Policy Process",
+            "start": "2026-09-21T00:00:00-04:00",
+            "end": "2026-09-27T23:59:59-04:00",
+            "tasks": [
+              "Read Chapter 6, “The EU Policy Process”",
+              "Watch the European Parliament, EU financial system, and EU laws videos on Brightspace",
+              "Writing Assignment 1 (15% of your grade): browse euractiv.com and write 500+ words on how two EU institutions would engage an issue you find"
+            ],
+            "deadlineLabel": "Writing Assignment 1",
+            "deadlineWhen": "2026-09-25T23:59:00-04:00",
+            "deadlineText": "Friday, September 25, 11:59pm",
+            "calendly": false
+          },
+          {
+            "n": 6,
+            "title": "The Single Market and Economic Policy",
+            "start": "2026-09-28T00:00:00-04:00",
+            "end": "2026-10-04T23:59:59-04:00",
+            "tasks": [
+              "Read Chapter 7, “Economic Policy”",
+              "Friday's lecture on the eurozone crisis bridges into the identity unit"
+            ],
+            "deadlineLabel": "",
+            "deadlineWhen": "",
+            "deadlineText": "",
+            "calendly": false
+          },
+          {
+            "n": 7,
+            "title": "Foundations: Social Identity Theory and Political Identity",
+            "start": "2026-10-05T00:00:00-04:00",
+            "end": "2026-10-11T23:59:59-04:00",
+            "tasks": [
+              "Read Tajfel & Turner, “An Integrative Theory of Intergroup Conflict”",
+              "Read Huddy, “From Social to Political Identity”",
+              "Read Chapter 5, “The EU and its Citizens”"
+            ],
+            "deadlineLabel": "",
+            "deadlineWhen": "",
+            "deadlineText": "",
+            "calendly": false
+          },
+          {
+            "n": 8,
+            "title": "Is There a European Identity? Identities, Cleavages, and Cross-Cutting Issues",
+            "start": "2026-10-12T00:00:00-04:00",
+            "end": "2026-10-18T23:59:59-04:00",
+            "tasks": [
+              "Monday (10/12): Fall Break, no class",
+              "Read Risse ch. 1, the Bruter excerpt, Roccas & Brewer (2002), and Hooghe & Marks (2018)",
+              "Schedule your one-to-one meeting about the final paper (weeks 8, 9, or 10 — earlier is better)"
+            ],
+            "deadlineLabel": "",
+            "deadlineWhen": "",
+            "deadlineText": "",
+            "calendly": true
+          },
+          {
+            "n": 9,
+            "title": "Brexit: Identity, Cleavages, and Exit",
+            "start": "2026-10-19T00:00:00-04:00",
+            "end": "2026-10-25T23:59:59-04:00",
+            "tasks": [
+              "Read Hobolt (2016) and Goodwin & Heath (2016) on the Brexit vote",
+              "Friday: interactive session — did the cleavage argument pass its test?",
+              "If you haven't scheduled your one-to-one meeting yet, do so this week"
+            ],
+            "deadlineLabel": "",
+            "deadlineWhen": "",
+            "deadlineText": "",
+            "calendly": true
+          },
+          {
+            "n": 10,
+            "title": "The Migration Crisis I: Politics, Policy, and Public Opinion",
+            "start": "2026-10-26T00:00:00-04:00",
+            "end": "2026-11-01T23:59:59-05:00",
+            "tasks": [
+              "Read Chapter 8, “Internal Policies”",
+              "Read Niemann & Zaun (2018) and the Geddes & Scholten excerpt",
+              "Last chance to schedule your one-to-one meeting if you haven't yet"
+            ],
+            "deadlineLabel": "",
+            "deadlineWhen": "",
+            "deadlineText": "",
+            "calendly": true
+          },
+          {
+            "n": 11,
+            "title": "The Migration Crisis II: Alan Kurdi, the Psychology of Compassion, and the Empathy Debate",
+            "start": "2026-11-02T00:00:00-05:00",
+            "end": "2026-11-08T23:59:59-05:00",
+            "tasks": [
+              "Content note: this week concerns the death of a child; lecture will discuss the photographs but will not require you to view them",
+              "Read Slovic et al. (2017), Small, Loewenstein & Slovic (2007), the Vis & Goriunova selections, and the Bloom excerpt (required for Friday's debate)",
+              "Friday: full-class structured debate — is empathy a good guide to policy?"
+            ],
+            "deadlineLabel": "Writing Assignment 2",
+            "deadlineWhen": "2026-11-07T23:59:00-05:00",
+            "deadlineText": "Saturday, November 7, 11:59pm",
+            "calendly": false
+          },
+          {
+            "n": 12,
+            "title": "Enlargement I: How the EU Grows",
+            "start": "2026-11-09T00:00:00-05:00",
+            "end": "2026-11-15T23:59:59-05:00",
+            "tasks": [
+              "Review the enlargement sections of Chapter 3",
+              "Read Schimmelfennig & Sedelmeier (2004) and the Vachudova (2005) excerpt"
+            ],
+            "deadlineLabel": "",
+            "deadlineWhen": "",
+            "deadlineText": "",
+            "calendly": false
+          },
+          {
+            "n": 13,
+            "title": "Enlargement II: Eastern Expansion Today: Candidates and Constraints",
+            "start": "2026-11-16T00:00:00-05:00",
+            "end": "2026-11-22T23:59:59-05:00",
+            "tasks": [
+              "Read Anghel & Dzankic (2023) and Kelemen (2020)",
+              "Policy briefs on the candidacies of Ukraine, Moldova, Georgia, and the Western Balkan states will be posted to Brightspace"
+            ],
+            "deadlineLabel": "",
+            "deadlineWhen": "",
+            "deadlineText": "",
+            "calendly": false
+          },
+          {
+            "n": 14,
+            "title": "The EU in the World",
+            "start": "2026-11-23T00:00:00-05:00",
+            "end": "2026-11-29T23:59:59-05:00",
+            "tasks": [
+              "Read Chapter 9, “The EU in the World” and Manners (2002)",
+              "Wednesday (11/25) and Friday (11/27): Thanksgiving Break, no class"
+            ],
+            "deadlineLabel": "",
+            "deadlineWhen": "",
+            "deadlineText": "",
+            "calendly": false
+          },
+          {
+            "n": 15,
+            "title": "Futures of Europe",
+            "start": "2026-11-30T00:00:00-05:00",
+            "end": "2026-12-14T23:59:59-05:00",
+            "tasks": [
+              "Monday: differentiated integration; Wednesday: course synthesis; Friday: final paper workshop and open question session",
+              "Final Paper (40% of your grade): 7 to 8 pages, MLA or APA, must substantially reference the textbook",
+              "Submit on Brightspace"
+            ],
+            "deadlineLabel": "Final paper",
+            "deadlineWhen": "2026-12-14T23:59:00-05:00",
+            "deadlineText": "Monday, December 14, 11:59pm EST",
+            "calendly": false
+          }
         ],
-        "deadlineLabel": "Writing assignment",
-        "deadlineWhen": "",
-        "deadlineText": "due this week; see Brightspace for the exact deadline",
-        "calendly": false
+        "grading": {
+          "items": [
+            {
+              "id": "writing1",
+              "name": "Writing Assignment 1",
+              "sub": "The EU in the News, week 5",
+              "w": 15
+            },
+            {
+              "id": "writing2",
+              "name": "Writing Assignment 2",
+              "sub": "The Image and the Crisis, week 11",
+              "w": 20
+            },
+            {
+              "id": "participation",
+              "name": "Participation",
+              "sub": "across the semester",
+              "w": 10
+            },
+            {
+              "id": "debate",
+              "name": "Empathy Debate",
+              "sub": "in-class, week 11",
+              "w": 10
+            },
+            {
+              "id": "meeting",
+              "name": "One-to-one meeting",
+              "sub": "weeks 8 to 10",
+              "w": 5
+            },
+            {
+              "id": "final",
+              "name": "Final paper",
+              "sub": "due December 14",
+              "w": 40
+            }
+          ],
+          "scale": [
+            {
+              "letter": "A",
+              "cutoff": 93
+            },
+            {
+              "letter": "A-",
+              "cutoff": 90
+            },
+            {
+              "letter": "B+",
+              "cutoff": 87
+            },
+            {
+              "letter": "B",
+              "cutoff": 83
+            },
+            {
+              "letter": "B-",
+              "cutoff": 80
+            },
+            {
+              "letter": "C+",
+              "cutoff": 77
+            },
+            {
+              "letter": "C",
+              "cutoff": 73
+            },
+            {
+              "letter": "C-",
+              "cutoff": 70
+            },
+            {
+              "letter": "D+",
+              "cutoff": 67
+            },
+            {
+              "letter": "D",
+              "cutoff": 63
+            },
+            {
+              "letter": "D-",
+              "cutoff": 60
+            },
+            {
+              "letter": "F",
+              "cutoff": 0
+            }
+          ],
+          "lateAmount": 5,
+          "lateNote": "Late work: 5% per day off that assignment, weekends included. More than a week late may not be accepted."
+        }
       },
       {
-        "n": 4,
-        "title": "The Single Market and a Diversity of Opinions",
-        "start": "2026-07-27T00:00:00-04:00",
-        "end": "2026-08-02T23:59:59-04:00",
-        "tasks": [
-          "Read Chapter 7, “Economic Policy”",
-          "Read Chapter 5, “The EU and its Citizens”",
-          "Reading-check quiz on Brightspace",
-          "Book your one-to-one meeting about the final paper (this week or next; earlier is better)"
-        ],
-        "deadlineLabel": "Week 4 quiz",
-        "deadlineWhen": "2026-07-31T23:59:00-04:00",
-        "deadlineText": "Friday, July 31, 11:59pm",
-        "calendly": true
-      },
-      {
-        "n": 5,
-        "title": "The Politics of Crisis and Europe's Response",
-        "start": "2026-08-03T00:00:00-04:00",
-        "end": "2026-08-09T23:59:59-04:00",
-        "tasks": [
-          "Read Chapter 8, “Internal Policies”",
-          "Read Chapter 9, “The EU in the World”",
-          "If you have not met with me yet, book your one-to-one now"
-        ],
-        "deadlineLabel": "",
-        "deadlineWhen": "",
-        "deadlineText": "",
-        "calendly": true
-      },
-      {
-        "n": 6,
-        "title": "Final Papers",
-        "start": "2026-08-10T00:00:00-04:00",
-        "end": "2026-08-15T23:59:59-04:00",
-        "tasks": [
-          "Write and submit your final paper (50% of your grade): 6 to 7 pages, double spaced, MLA or APA, substantially referencing the textbook",
-          "Submit on Brightspace"
-        ],
-        "deadlineLabel": "Final paper",
-        "deadlineWhen": "2026-08-15T23:59:00-04:00",
-        "deadlineText": "Saturday, August 15, 11:59pm EST",
-        "calendly": false
+        "id": "spring2027",
+        "label": "Spring 2027",
+        "meetingInfo": "",
+        "syllabus": "",
+        "calendly": "",
+        "weeks": [],
+        "grading": null
       }
     ]
   }
