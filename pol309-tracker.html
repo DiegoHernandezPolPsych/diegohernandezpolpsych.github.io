@@ -172,6 +172,11 @@ h1 { font-family: var(--font-display); font-weight: 500; font-size: 2rem; margin
   var backLink = document.getElementById("backLink");
   var termPicker = document.getElementById("termPicker");
   var EMAIL = "diego.hernandez@stonybrook.edu";
+  /* renderSchedule() starts a 60s refresh loop; without tracking and
+     clearing it here, switching terms would leave the old term's loop
+     running and it would overwrite the live #weeks / #now nodes (found
+     fresh by getElementById each tick) with stale data a minute later */
+  var scheduleTimer = null;
 
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) {
     return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -308,10 +313,11 @@ h1 { font-family: var(--font-display); font-weight: 500; font-size: 2rem; margin
     }
 
     render();
-    setInterval(render, 60000);
+    scheduleTimer = setInterval(render, 60000);
   }
 
   function showTerm(term) {
+    if (scheduleTimer) { clearInterval(scheduleTimer); scheduleTimer = null; }
     eyebrowTerm.textContent = "POL309 · " + term.label;
     subLine.textContent = "Politics of the European Union" + (term.meetingInfo ? " · " + term.meetingInfo : "");
     backLink.setAttribute("href", "index.html?term=" + encodeURIComponent(term.id) + "#teaching");
