@@ -472,13 +472,18 @@ html.vt-on .cards .card, html.vt-on .cv-list li, html.vt-on .contact-list li { a
 }
 .card .meta a:hover { color: var(--accent); border-bottom-color: var(--accent); }
 .card p { margin: 0 0 12px; color: var(--muted); font-size: var(--text-base); line-height: 1.55; text-wrap: pretty; }
-.card .card-links { display: flex; flex-wrap: wrap; gap: 8px 18px; }
-.card .card-links a {
-  font-size: var(--text-sm); font-weight: 500;
+.card .card-links { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 14px; }
+.card .card-links a, .card .card-links button {
+  appearance: none; background: transparent; border: 0; cursor: pointer;
+  font: inherit; font-size: var(--text-sm); font-weight: 500; color: var(--ink);
   border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
-  padding-bottom: 1px;
+  padding: 0 0 1px;
 }
-.card .card-links a:hover { border-bottom-color: var(--accent); }
+.card .card-links a:hover, .card .card-links button:hover { border-bottom-color: var(--accent); }
+.card .card-links button[data-term-link="syllabus"] {
+  color: var(--faint); border-bottom-style: dashed;
+}
+.card .card-links button[data-term-link="syllabus"]:hover { color: var(--muted); }
 .cite-btn {
   appearance: none; margin-top: 12px; position: relative;
   font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: .03em;
@@ -519,6 +524,102 @@ html.vt-on .cards .card, html.vt-on .cv-list li, html.vt-on .contact-list li { a
   filter: blur(var(--text-swap-blur));
   opacity: 0;
   transition: none;
+}
+
+/* =========================================================
+   TERM SELECT — dropdown on the POL309 teaching card (transitions.dev
+   modal open/close idiom: scale + blur in from the trigger; a sliding
+   pill, same technique as .tab-indicator, tracks the selected option)
+========================================================= */
+.term-select { position: relative; display: inline-block; flex: none; margin: 4px 0; }
+
+/* card-head: title/meta on the left, term dropdown on the right — wraps
+   (dropdown folds under) only once there isn't room to sit side by side */
+.card-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 6px 20px; }
+.card-head-title { min-width: 0; }
+.card-head-title h3, .card-head-title .meta { margin: 0; }
+.card-head-title h3 { margin-bottom: 6px; }
+.term-select-trigger {
+  appearance: none; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line-strong); border-radius: 100px;
+  padding: 8px 14px 8px 16px; min-height: 40px;
+  transition: border-color .2s var(--ease), background .2s var(--ease);
+}
+.term-select-trigger:hover { border-color: var(--section); }
+.term-select-eyebrow {
+  font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: .1em;
+  text-transform: uppercase; color: var(--faint);
+}
+.term-select-label { font-family: var(--font-body); font-size: var(--text-sm); font-weight: 600; }
+.term-select-chevron { display: inline-flex; width: 12px; height: 12px; transition: transform var(--acc-chevron) var(--acc-ease); }
+.term-select-chevron svg { width: 100%; height: 100%; display: block; }
+.term-select-chevron path { fill: none; stroke: var(--faint); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.term-select[data-open="true"] .term-select-chevron { transform: rotate(180deg); }
+
+.term-select-panel {
+  /* fixed, not absolute: .cards clips overflow for its rounded corners,
+     which would otherwise chop this panel off at the card edge; JS sets
+     top/left from the trigger's viewport rect each time it opens */
+  position: fixed; z-index: 50;
+  min-width: 216px; max-width: 88vw;
+  background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 6px; display: flex; flex-direction: column; gap: 1px;
+  transform-origin: top left;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transform: scale(var(--modal-scale-close)) translateY(-4px);
+  filter: blur(var(--blur-small));
+  transition:
+    opacity var(--modal-close-dur) var(--modal-ease),
+    transform var(--modal-close-dur) var(--modal-ease),
+    filter var(--modal-close-dur) var(--modal-ease),
+    visibility 0s linear var(--modal-close-dur);
+}
+.term-select[data-open="true"] .term-select-panel {
+  opacity: 1; visibility: visible; pointer-events: auto;
+  transform: scale(1) translateY(0);
+  filter: blur(0);
+  transition:
+    opacity var(--modal-open-dur) var(--modal-ease),
+    transform var(--modal-open-dur) var(--modal-ease),
+    filter var(--modal-open-dur) var(--modal-ease),
+    visibility 0s linear 0s;
+}
+.term-select-pill {
+  position: absolute; left: 6px; right: 6px; top: 0; height: 0;
+  background: var(--bg-tint); border-radius: calc(var(--radius) - 3px);
+  transition: transform var(--tabs-dur) var(--tabs-ease), height var(--tabs-dur) var(--tabs-ease);
+  z-index: 0;
+}
+.term-select-option {
+  position: relative; z-index: 1;
+  appearance: none; border: 0; background: transparent; cursor: pointer;
+  width: 100%; text-align: left;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  font-family: var(--font-body); font-size: var(--text-sm); font-weight: 500;
+  color: var(--muted); padding: 9px 12px; border-radius: calc(var(--radius) - 3px);
+  transition: color .15s var(--ease);
+}
+.term-select-option:hover { color: var(--ink); }
+.term-select-option[aria-selected="true"] { color: var(--ink); font-weight: 600; }
+.term-select-tag {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--section); border: 1px solid color-mix(in srgb, var(--section) 45%, transparent);
+  border-radius: 100px; padding: 2px 7px; flex: none;
+}
+
+.term-notice {
+  margin: 14px 0 0; padding: 12px 14px;
+  border: 1px solid var(--line-strong); background: var(--bg-tint); border-radius: var(--radius);
+  font-size: var(--text-sm); color: var(--muted); max-width: 56ch;
+}
+.term-notice a { color: var(--accent); border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); }
+.term-notice a:hover { border-bottom-color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .term-select-panel, .term-select-pill, .term-select-chevron { transition: none !important; }
 }
 
 .colophon { border-top: 1px solid var(--line); }
@@ -919,7 +1020,31 @@ html.vt-on .panel.is-active { animation: none; }
       <article class="card">
         <div class="card-index">→</div>
         <div>
-          <h3>POL309: Politics of the European Union</h3><p class="meta">Instructor of Record · Summer 2025; Summer 2026; <a href="files/POL309_Fall2026.pdf">Fall 2026</a>; Spring 2027</p><div class="card-links"><a href="files/POL309_Summer2026.pdf">Syllabus</a><a href="pol309-tracker.html">This Week at a Glance</a><a href="pol309-grades.html">Grade Calculator</a></div>
+          <div class="card-head">
+            <div class="card-head-title">
+              <h3>POL309: Politics of the European Union</h3>
+              <p class="meta">Instructor of Record</p>
+            </div>
+
+            <div class="term-select" data-term-select data-term-group="pol309">
+              <button type="button" class="term-select-trigger" id="pol309TermTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <span class="term-select-eyebrow">Term</span>
+                <span class="term-select-label" data-term-label>Summer 2026</span>
+                <span class="term-select-chevron" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 6.5L8 10.5L12 6.5"/></svg></span>
+              </button>
+              <div class="term-select-panel" role="listbox" aria-labelledby="pol309TermTrigger" data-term-panel>
+                <span class="term-select-pill" aria-hidden="true" data-term-pill></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-links" data-term-links>
+            <a data-term-link="syllabus" href="files/POL309_Summer2026.pdf">Syllabus</a>
+            <a data-term-link="tracker" href="pol309-tracker.html?term=summer2026">This Week at a Glance</a>
+            <a data-term-link="grades" href="pol309-grades.html?term=summer2026">Grade Calculator</a>
+          </div>
+
+          <p class="term-notice" data-term-notice hidden></p>
         </div>
       </article>
     </div>
@@ -1190,7 +1315,10 @@ document.addEventListener("section:active", function (e) {
     }
   }
 });
+</script>
 
+<script src="pol309-common.js"></script>
+<script>
 /* =========================================================
    CONTENT — render editable fields from data/content.json
    Edited through the CMS at /admin. If the file is missing or
@@ -1236,6 +1364,7 @@ document.addEventListener("section:active", function (e) {
 
     if (Array.isArray(c.publications)) renderCards("publications", c.publications, false, c.name);
     if (Array.isArray(c.teaching)) renderCards("teaching", c.teaching, true, c.name);
+    wireTermSelects(c);
     if (Array.isArray(c.cvEducation)) renderCv("cvEducation", c.cvEducation);
     if (Array.isArray(c.cvFields)) renderCv("cvFields", c.cvFields);
     if (Array.isArray(c.paintings) && c.paintings.length) advancePaintingCycle(c.paintings);
@@ -1255,10 +1384,40 @@ document.addEventListener("section:active", function (e) {
     return who + " (" + year + "). " + title + ". Working paper.";
   }
 
+  /* a teaching item with termSelector gets a term dropdown + dynamic
+     Syllabus/Tracker/Grades links instead of the generic static links \u2014
+     see wireTermSelects(), which fills the dropdown and wires it up
+     once this markup is in the DOM */
+  function teachingTermCardHtml(it) {
+    return '<article class="card"><div class="card-index">\u2192</div><div>' +
+      '<div class="card-head">' +
+        '<div class="card-head-title">' +
+          "<h3>" + esc(it.title) + "</h3>" +
+          (it.meta ? '<p class="meta">' + esc(it.meta) + "</p>" : "") +
+        "</div>" +
+        '<div class="term-select" data-term-select data-term-group="' + esc(it.termSelector) + '">' +
+          '<button type="button" class="term-select-trigger" aria-haspopup="listbox" aria-expanded="false">' +
+            '<span class="term-select-eyebrow">Term</span>' +
+            '<span class="term-select-label" data-term-label></span>' +
+            '<span class="term-select-chevron" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 6.5L8 10.5L12 6.5"/></svg></span>' +
+          "</button>" +
+          '<div class="term-select-panel" role="listbox" data-term-panel></div>' +
+        "</div>" +
+      "</div>" +
+      '<div class="card-links" data-term-links>' +
+        '<a data-term-link="syllabus" href="#">Syllabus</a>' +
+        '<a data-term-link="tracker" href="#">This Week at a Glance</a>' +
+        '<a data-term-link="grades" href="#">Grade Calculator</a>' +
+      "</div>" +
+      '<p class="term-notice" data-term-notice hidden></p>' +
+    "</div></article>";
+  }
+
   function renderCards(name, items, isTeaching, authorName) {
     var box = document.querySelector('[data-list="' + name + '"]');
     if (!box) return;
     box.innerHTML = items.map(function (it, i) {
+      if (isTeaching && it.termSelector) return teachingTermCardHtml(it);
       var index = isTeaching ? "\u2192" : ("0" + (i + 1)).slice(-2);
       var status = (!isTeaching && it.status) ? '<span class="status">' + esc(it.status) + "</span>" : "";
       /* meta is escaped first, then [label](href) becomes an inline link */
@@ -1293,6 +1452,110 @@ document.addEventListener("section:active", function (e) {
         });
       });
     }
+  }
+
+  /* TERM SELECT — dropdown that swaps a teaching card's Syllabus /
+     Tracker / Grade Calculator links to the chosen term. Uses
+     pol309-common.js for the "which term is current right now" rule,
+     shared with the tracker and grade calculator pages. */
+  function wireTermSelects(c) {
+    if (!window.POL309) return;
+    document.querySelectorAll("[data-term-select]").forEach(function (root) {
+      var group = root.getAttribute("data-term-group");
+      var terms = c[group] && Array.isArray(c[group].terms) ? c[group].terms : null;
+      if (!terms || !terms.length) return;
+
+      var card = root.closest(".card");
+      var linksBox = card.querySelector("[data-term-links]");
+      var notice = card.querySelector("[data-term-notice]");
+      var trigger = root.querySelector(".term-select-trigger");
+      var label = root.querySelector("[data-term-label]");
+      var panel = root.querySelector("[data-term-panel]");
+      var todayLabel = POL309.seasonLabelForDate(new Date());
+
+      panel.innerHTML = '<span class="term-select-pill" aria-hidden="true" data-term-pill></span>' +
+        terms.map(function (t) {
+          return '<button type="button" class="term-select-option" role="option" data-term-id="' + esc(t.id) + '">' +
+            "<span>" + esc(t.label) + "</span>" +
+            (t.label === todayLabel ? '<span class="term-select-tag">Current</span>' : "") +
+          "</button>";
+        }).join("");
+      var pill = panel.querySelector("[data-term-pill]");
+
+      function movePill(btn, animate) {
+        if (!btn || !pill) return;
+        if (!animate) pill.style.transition = "none";
+        pill.style.transform = "translateY(" + btn.offsetTop + "px)";
+        pill.style.height = btn.offsetHeight + "px";
+        if (!animate) { void pill.offsetHeight; pill.style.transition = ""; }
+      }
+
+      function openPanel(open) {
+        if (open) {
+          var r = trigger.getBoundingClientRect();
+          panel.style.left = r.left + "px";
+          panel.style.top = (r.bottom + 8) + "px";
+          panel.style.minWidth = Math.max(216, r.width) + "px";
+        }
+        root.setAttribute("data-open", open ? "true" : "false");
+        trigger.setAttribute("aria-expanded", open ? "true" : "false");
+      }
+
+      function selectTerm(term, opts) {
+        opts = opts || {};
+        label.textContent = term.label;
+        root.querySelectorAll(".term-select-option").forEach(function (btn) {
+          var selected = btn.getAttribute("data-term-id") === term.id;
+          btn.setAttribute("aria-selected", selected ? "true" : "false");
+          if (selected) movePill(btn, opts.animate !== false);
+        });
+
+        var trackA = linksBox.querySelector('[data-term-link="tracker"]');
+        var gradeA = linksBox.querySelector('[data-term-link="grades"]');
+        trackA.setAttribute("href", "pol309-tracker.html?term=" + encodeURIComponent(term.id));
+        gradeA.setAttribute("href", "pol309-grades.html?term=" + encodeURIComponent(term.id));
+
+        var oldSyll = linksBox.querySelector('[data-term-link="syllabus"]');
+        if (term.syllabus) {
+          var a = document.createElement("a");
+          a.setAttribute("data-term-link", "syllabus");
+          a.href = term.syllabus; a.target = "_blank"; a.rel = "noopener";
+          a.textContent = "Syllabus";
+          oldSyll.replaceWith(a);
+          notice.hidden = true;
+        } else {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.setAttribute("data-term-link", "syllabus");
+          btn.textContent = "Syllabus unavailable";
+          btn.addEventListener("click", function () { notice.hidden = !notice.hidden; });
+          oldSyll.replaceWith(btn);
+          notice.innerHTML = "The syllabus for <b>" + esc(term.label) + "</b> is not posted yet. Email " +
+            '<a href="mailto:' + esc(c.email) + '">' + esc(c.email) + "</a> with any questions.";
+          notice.hidden = true;
+        }
+      }
+
+      trigger.addEventListener("click", function () { openPanel(root.getAttribute("data-open") !== "true"); });
+      root.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") { openPanel(false); trigger.focus(); }
+      });
+      document.addEventListener("click", function (e) {
+        if (root.getAttribute("data-open") === "true" && !root.contains(e.target)) openPanel(false);
+      });
+      root.querySelectorAll(".term-select-option").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var term = terms.filter(function (t) { return t.id === btn.getAttribute("data-term-id"); })[0];
+          if (term) selectTerm(term);
+          openPanel(false);
+        });
+      });
+      window.addEventListener("resize", function () {
+        movePill(root.querySelector('.term-select-option[aria-selected="true"]'), false);
+      });
+
+      selectTerm(POL309.pickTerm(terms, { queryTerm: POL309.queryTerm() }), { animate: false });
+    });
   }
 
   function renderCv(name, items) {
