@@ -777,7 +777,7 @@ table.calc-example .no { color: var(--faint); }
     var saved = {};
     try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
 
-    var ecRow = "<tr><td class='aname'><b>Extra Credit</b><span>optional, applied at the final's " + highestWeight + "% weight</span></td>" +
+    var ecRow = "<tr><td class='aname'><b>Extra Credit</b><span>optional, total E.C. units earned this term (not a /100 score), applied at the final's " + highestWeight + "% weight</span></td>" +
       "<td></td>" +
       "<td><input type='number' min='0' max='100' step='1' id='ec_extra' value='" + esc(saved["ec_extra"] || "") + "' /></td>" +
       "<td style='color:var(--faint)'>&mdash;</td></tr>";
