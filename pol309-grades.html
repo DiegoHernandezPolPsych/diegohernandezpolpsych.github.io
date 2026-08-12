@@ -562,7 +562,7 @@ table.calc-example .no { color: var(--faint); }
 
   /* ITEMS/SCALE/KEY/lateAmount are set per term by initTerm() below;
      everything else in this IIFE reads them as shared, mutable state */
-  var ITEMS = [], SCALE = [], KEY = "pol309-grades", lateAmount = 0;
+  var ITEMS = [], SCALE = [], KEY = "pol309-grades", lateAmount = 0, highestWeight = 0;
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
     return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -609,6 +609,25 @@ table.calc-example .no { color: var(--faint); }
         if (it.id === "final") finalEntered = true;
       }
     });
+
+    /* Extra Credit: a bonus row, not one of the term's ITEMS. The number
+       typed in is a percent, applied at the highest weight in the term
+       (the final's weight) and added straight to the numerator only —
+       it never counts toward earnedW, so it can't reduce how much of
+       the grade is still "unknown," it can only add on top. */
+    var ecEl = document.getElementById("ec_extra");
+    var ecRaw = ecEl ? ecEl.value.trim() : "";
+    store["ec_extra"] = ecRaw;
+    var ecPts = 0;
+    if (ecRaw !== "") {
+      var ecN = parseFloat(ecRaw);
+      if (!isNaN(ecN)) {
+        ecN = Math.min(100, Math.max(0, ecN));
+        ecPts = highestWeight * ecN / 100;
+        earnedPts += ecPts;
+      }
+    }
+
     try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {}
 
     var box = document.getElementById("result");
@@ -627,6 +646,7 @@ table.calc-example .no { color: var(--faint); }
           ceil.toFixed(1) + " (" + letter(ceil) + "), depending on what is still out.</p>";
       }
       if (anyLate) html += "<p>Late penalties are included, per the late policy above.</p>";
+      if (ecPts > 0) html += "<p>Extra credit included: +" + ecPts.toFixed(1) + " points, at the final's " + highestWeight + "% weight.</p>";
       html += '<p style="margin-top:6px">This is your raw, unrounded standing. If your final total lands close to a grade boundary, see the note below on how rounding is determined.</p>';
       box.innerHTML = html;
       /* number pop-in (transitions.dev): animate only when the value
@@ -645,6 +665,7 @@ table.calc-example .no { color: var(--faint); }
       if (a === null) unknownW += it.w;
       else otherPts += it.w * a / 100;
     });
+    otherPts += ecPts;
     var tbody = document.getElementById("targets");
     var note = document.getElementById("targetsNote");
     if (finalEntered) {
@@ -749,18 +770,24 @@ table.calc-example .no { color: var(--faint); }
     ITEMS = term.grading.items;
     SCALE = term.grading.scale;
     lateAmount = term.grading.lateAmount || 0;
+    highestWeight = Math.max.apply(null, ITEMS.map(function (it) { return it.w; }));
     KEY = "pol309-grades-" + term.id;
     document.getElementById("lateNote").textContent = term.grading.lateNote || "";
 
     var saved = {};
     try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
 
+    var ecRow = "<tr><td class='aname'><b>Extra Credit</b><span>optional, applied at the final's " + highestWeight + "% weight</span></td>" +
+      "<td></td>" +
+      "<td><input type='number' min='0' max='100' step='1' id='ec_extra' value='" + esc(saved["ec_extra"] || "") + "' /></td>" +
+      "<td style='color:var(--faint)'>&mdash;</td></tr>";
+
     rows.innerHTML = ITEMS.map(function (it) {
       return "<tr><td class='aname'><b>" + esc(it.name) + "</b><span>" + esc(it.sub) + "</span></td>" +
         "<td>" + it.w + "%</td>" +
         "<td><input type='number' min='0' max='100' step='1' id='s_" + esc(it.id) + "' value='" + esc(saved["s_" + it.id] || "") + "' /></td>" +
         "<td><input type='number' min='0' max='14' step='1' id='l_" + esc(it.id) + "' value='" + esc(saved["l_" + it.id] || "") + "' /></td></tr>";
-    }).join("");
+    }).join("") + ecRow;
     rows.querySelectorAll("input").forEach(function (i) {
       i.addEventListener("input", function () { rangeCheck(i); recalc(); });
     });
