@@ -611,10 +611,12 @@ table.calc-example .no { color: var(--faint); }
     });
 
     /* Extra Credit: a bonus row, not one of the term's ITEMS. The number
-       typed in is a percent, applied at the highest weight in the term
-       (the final's weight) and added straight to the numerator only —
-       it never counts toward earnedW, so it can't reduce how much of
-       the grade is still "unknown," it can only add on top. */
+       typed in is a raw count of E.C. units, and each unit is worth one
+       percentage point, added straight to the numerator only (it never
+       counts toward earnedW, so it can't reduce how much of the grade
+       is still "unknown," it can only add on top). Capped at the term's
+       highest weight (the final's), since that's the most one component
+       is allowed to be worth. */
     var ecEl = document.getElementById("ec_extra");
     var ecRaw = ecEl ? ecEl.value.trim() : "";
     store["ec_extra"] = ecRaw;
@@ -622,8 +624,7 @@ table.calc-example .no { color: var(--faint); }
     if (ecRaw !== "") {
       var ecN = parseFloat(ecRaw);
       if (!isNaN(ecN)) {
-        ecN = Math.min(100, Math.max(0, ecN));
-        ecPts = highestWeight * ecN / 100;
+        ecPts = Math.min(highestWeight, Math.max(0, ecN));
         earnedPts += ecPts;
       }
     }
@@ -779,7 +780,7 @@ table.calc-example .no { color: var(--faint); }
 
     var ecRow = "<tr><td class='aname'><b>Extra Credit</b><span>optional, total E.C. units earned this term (not a /100 score), applied at the final's " + highestWeight + "% weight</span></td>" +
       "<td></td>" +
-      "<td><input type='number' min='0' max='100' step='1' id='ec_extra' value='" + esc(saved["ec_extra"] || "") + "' /></td>" +
+      "<td><input type='number' min='0' max='" + highestWeight + "' step='1' id='ec_extra' value='" + esc(saved["ec_extra"] || "") + "' /></td>" +
       "<td style='color:var(--faint)'>&mdash;</td></tr>";
 
     rows.innerHTML = ITEMS.map(function (it) {
