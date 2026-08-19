@@ -262,15 +262,16 @@ table.calc-example .no { color: var(--faint); }
 .pb-stat .pb-lbl { font-size: .76rem; color: var(--faint); margin-top: 3px; }
 .pb-chart { width: 100%; height: auto; display: block; margin: 6px 0 4px; }
 .pb-axis { stroke: var(--line-strong); stroke-width: 1; }
-.pb-bar { transition: opacity .2s ease; }
-.pb-before { fill: var(--faint); opacity: .55; }
+.pb-before { fill: none; stroke: var(--faint); stroke-width: 1.5; }
 .pb-after { fill: var(--gold); }
-.pb-count { fill: var(--muted); font-family: var(--font-mono); font-size: 10px; text-anchor: middle; }
+.pb-count { font-family: var(--font-mono); font-size: 10px; }
+.pb-count-before { fill: var(--faint); text-anchor: end; }
+.pb-count-after { fill: var(--muted); text-anchor: start; }
 .pb-cat { fill: var(--faint); font-family: var(--font-mono); font-size: 11px; text-anchor: middle; }
 .pb-legend { display: flex; gap: 18px; font-size: .8rem; color: var(--muted); margin: 2px 0 16px; flex-wrap: wrap; }
 .pb-legend span { display: inline-flex; align-items: center; gap: 6px; }
 .pb-legend i { width: 10px; height: 10px; display: inline-block; border-radius: 2px; }
-.pb-legend .pb-sw-before { background: var(--faint); opacity: .55; }
+.pb-legend .pb-sw-before { background: transparent; border: 1.5px solid var(--faint); }
 .pb-legend .pb-sw-after { background: var(--gold); }
 .pb-legend .pb-sw-arc { width: 16px; height: 2px; background: var(--teal); opacity: .8; border-radius: 0; }
 .pb-arc { fill: none; stroke: var(--teal); stroke-width: 1.75; opacity: .7; }
@@ -586,50 +587,48 @@ table.pb-transitions .pb-arrow { color: var(--teal); font-family: var(--font-mon
         <span><i class="pb-sw-after"></i> After SEM rounding</span>
         <span><i class="pb-sw-arc"></i> where those students landed</span>
       </div>
-      <svg class="pb-chart" viewBox="0 0 640 304" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bar chart comparing letter grade distribution before and after SEM rounding, Summer 2026, with curved arrows tracing which grade band each rounded student moved from and to">
+      <svg class="pb-chart" viewBox="0 0 640 294" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bar chart comparing letter grade distribution before and after SEM rounding, Summer 2026, with curved arrows tracing which grade band each rounded student moved from and to">
         <defs>
           <marker id="pbArrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
             <path d="M0,0 L10,5 L0,10 z" class="pb-arc-arrow"/>
           </marker>
         </defs>
-        <line class="pb-axis" x1="30" y1="270" x2="620" y2="270"/>
-        <rect class="pb-bar pb-before" x="47.7" y="240.0" width="29.5" height="30.0" rx="2"/>
-        <rect class="pb-bar pb-after" x="81.1" y="270.0" width="29.5" height="0.0" rx="2"/>
-        <rect class="pb-bar pb-before" x="146.0" y="260.0" width="29.5" height="10.0" rx="2"/>
-        <rect class="pb-bar pb-after" x="179.5" y="240.0" width="29.5" height="30.0" rx="2"/>
-        <rect class="pb-bar pb-before" x="244.4" y="240.0" width="29.5" height="30.0" rx="2"/>
-        <rect class="pb-bar pb-after" x="277.8" y="260.0" width="29.5" height="10.0" rx="2"/>
-        <rect class="pb-bar pb-before" x="342.7" y="240.0" width="29.5" height="30.0" rx="2"/>
-        <rect class="pb-bar pb-after" x="376.1" y="240.0" width="29.5" height="30.0" rx="2"/>
-        <rect class="pb-bar pb-before" x="441.0" y="220.0" width="29.5" height="50.0" rx="2"/>
-        <rect class="pb-bar pb-after" x="474.5" y="240.0" width="29.5" height="30.0" rx="2"/>
-        <rect class="pb-bar pb-before" x="539.4" y="160.0" width="29.5" height="110.0" rx="2"/>
-        <rect class="pb-bar pb-after" x="572.8" y="110.0" width="29.5" height="160.0" rx="2"/>
-        <path class="pb-arc" marker-end="url(#pbArrow)" d="M 62.4,226.0 C 105.9,186.0 150.7,186.0 194.2,226.0"/>
-        <path class="pb-arc" marker-end="url(#pbArrow)" d="M 160.8,246.0 C 204.3,206.0 249.1,206.0 292.5,246.0"/>
-        <path class="pb-arc" marker-end="url(#pbArrow)" d="M 259.1,226.0 C 302.6,186.0 347.4,186.0 390.9,226.0"/>
-        <path class="pb-arc" marker-end="url(#pbArrow)" d="M 357.5,226.0 C 400.9,186.0 445.7,186.0 489.2,226.0"/>
-        <path class="pb-arc" marker-end="url(#pbArrow)" d="M 455.8,206.0 C 499.3,166.0 544.1,166.0 587.5,206.0"/>
-        <text class="pb-count" x="62.4" y="234.0">3</text>
-        <text class="pb-count" x="160.8" y="254.0">1</text>
-        <text class="pb-count" x="194.2" y="234.0">3</text>
-        <text class="pb-count" x="259.1" y="234.0">3</text>
-        <text class="pb-count" x="292.5" y="254.0">1</text>
-        <text class="pb-count" x="357.5" y="234.0">3</text>
-        <text class="pb-count" x="390.9" y="234.0">3</text>
-        <text class="pb-count" x="455.8" y="214.0">5</text>
-        <text class="pb-count" x="489.2" y="234.0">3</text>
-        <text class="pb-count" x="554.1" y="154.0">11</text>
-        <text class="pb-count" x="587.5" y="104.0">16</text>
-        <text class="pb-cat" x="79.2" y="288.0">B&minus;</text>
-        <text class="pb-cat" x="177.5" y="288.0">B</text>
-        <text class="pb-cat" x="275.8" y="288.0">B+</text>
-        <text class="pb-cat" x="374.2" y="288.0">A&minus;</text>
-        <text class="pb-cat" x="472.5" y="288.0">A</text>
-        <text class="pb-cat" x="570.8" y="288.0">A+</text>
+        <line class="pb-axis" x1="30" y1="260" x2="620" y2="260"/>
+        <rect class="pb-before" x="53.6" y="230.0" width="51.1" height="30.0" rx="2"/>
+        <rect class="pb-before" x="151.9" y="250.0" width="51.1" height="10.0" rx="2"/>
+        <rect class="pb-after" x="163.7" y="230.0" width="27.5" height="30.0" rx="1.5"/>
+        <rect class="pb-before" x="250.3" y="230.0" width="51.1" height="30.0" rx="2"/>
+        <rect class="pb-after" x="262.1" y="250.0" width="27.5" height="10.0" rx="1.5"/>
+        <rect class="pb-before" x="348.6" y="230.0" width="51.1" height="30.0" rx="2"/>
+        <rect class="pb-after" x="360.4" y="230.0" width="27.5" height="30.0" rx="1.5"/>
+        <rect class="pb-before" x="446.9" y="210.0" width="51.1" height="50.0" rx="2"/>
+        <rect class="pb-after" x="458.7" y="230.0" width="27.5" height="30.0" rx="1.5"/>
+        <rect class="pb-before" x="545.3" y="150.0" width="51.1" height="110.0" rx="2"/>
+        <rect class="pb-after" x="557.1" y="100.0" width="27.5" height="160.0" rx="1.5"/>
+        <path class="pb-arc" marker-end="url(#pbArrow)" d="M 79.2,218.0 C 111.6,184.0 145.0,184.0 177.5,218.0"/>
+        <path class="pb-arc" marker-end="url(#pbArrow)" d="M 177.5,238.0 C 209.9,204.0 243.4,204.0 275.8,238.0"/>
+        <path class="pb-arc" marker-end="url(#pbArrow)" d="M 275.8,218.0 C 308.3,184.0 341.7,184.0 374.2,218.0"/>
+        <path class="pb-arc" marker-end="url(#pbArrow)" d="M 374.2,218.0 C 406.6,184.0 440.1,184.0 472.5,218.0"/>
+        <path class="pb-arc" marker-end="url(#pbArrow)" d="M 472.5,198.0 C 504.9,164.0 538.4,164.0 570.8,198.0"/>
+        <text class="pb-count pb-count-before" x="65.2" y="224.0">3</text>
+        <text class="pb-count pb-count-before" x="163.5" y="244.0">1</text>
+        <text class="pb-count pb-count-after" x="191.5" y="224.0">3</text>
+        <text class="pb-count pb-count-before" x="261.8" y="224.0">3</text>
+        <text class="pb-count pb-count-after" x="289.8" y="244.0">1</text>
+        <text class="pb-count pb-count-before" x="360.2" y="224.0">3</text>
+        <text class="pb-count pb-count-after" x="388.2" y="224.0">3</text>
+        <text class="pb-count pb-count-before" x="458.5" y="204.0">5</text>
+        <text class="pb-count pb-count-after" x="486.5" y="224.0">3</text>
+        <text class="pb-count pb-count-before" x="556.8" y="144.0">11</text>
+        <text class="pb-count pb-count-after" x="584.8" y="94.0">16</text>
+        <text class="pb-cat" x="79.2" y="278.0">B&minus;</text>
+        <text class="pb-cat" x="177.5" y="278.0">B</text>
+        <text class="pb-cat" x="275.8" y="278.0">B+</text>
+        <text class="pb-cat" x="374.2" y="278.0">A&minus;</text>
+        <text class="pb-cat" x="472.5" y="278.0">A</text>
+        <text class="pb-cat" x="570.8" y="278.0">A+</text>
       </svg>
 
-      <p>Aggregated by the specific step each rounded student took, so the shape of who benefited is visible without singling anyone out:</p>
       <table class="pb-transitions">
         <thead><tr><th>Step</th><th>Students</th></tr></thead>
         <tbody>
