@@ -256,6 +256,27 @@ table.calc-example .no { color: var(--faint); }
 .sandbox-test .yes { color: var(--teal); font-weight: 600; }
 .sandbox-test .no { color: var(--faint); }
 
+.pb-stats { display: flex; gap: 10px; flex-wrap: wrap; margin: 4px 0 18px; }
+.pb-stat { flex: 1 1 130px; border: 1px solid var(--line-strong); background: var(--bg); padding: 12px 14px; }
+.pb-stat .pb-num { font-family: var(--font-display); font-size: 1.6rem; font-weight: 500; color: var(--accent-strong); line-height: 1.1; }
+.pb-stat .pb-lbl { font-size: .76rem; color: var(--faint); margin-top: 3px; }
+.pb-chart { width: 100%; height: auto; display: block; margin: 6px 0 4px; }
+.pb-axis { stroke: var(--line-strong); stroke-width: 1; }
+.pb-bar { transition: opacity .2s ease; }
+.pb-before { fill: var(--faint); opacity: .55; }
+.pb-after { fill: var(--gold); }
+.pb-count { fill: var(--muted); font-family: var(--font-mono); font-size: 10px; text-anchor: middle; }
+.pb-cat { fill: var(--faint); font-family: var(--font-mono); font-size: 11px; text-anchor: middle; }
+.pb-legend { display: flex; gap: 18px; font-size: .8rem; color: var(--muted); margin: 2px 0 16px; flex-wrap: wrap; }
+.pb-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.pb-legend i { width: 10px; height: 10px; display: inline-block; border-radius: 2px; }
+.pb-legend .pb-sw-before { background: var(--faint); opacity: .55; }
+.pb-legend .pb-sw-after { background: var(--gold); }
+table.pb-transitions { width: 100%; border-collapse: collapse; font-size: .85rem; margin: 4px 0 14px; }
+table.pb-transitions th, table.pb-transitions td { padding: 6px 10px 6px 0; border-bottom: 1px solid var(--line); text-align: left; }
+table.pb-transitions th { font-family: var(--font-mono); font-weight: 500; font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); border-bottom: 1px solid var(--line-strong); }
+table.pb-transitions .pb-arrow { color: var(--teal); font-family: var(--font-mono); }
+
 @media (max-width: 560px) {
   input[type="number"] { width: 64px; }
   table.inputs td, table.inputs th { padding-right: 5px; }
@@ -541,6 +562,70 @@ table.calc-example .no { color: var(--faint); }
       <p>Most grading treats a final percentage as an exact, unquestionable outcome. A 92.9 and a 93.0 get sorted into different tiers as if the difference between them means something real, as if every rubric, every essay prompt, and every quiz question measures performance with perfect precision. I don't assume that they do. Any form of academic assessment carries some amount of noise: an ambiguous prompt, a rubric that reads two different ways, a rough night's sleep before a quiz. None of that is a flaw unique to this course. It's just what measurement looks like.</p>
       <p>Using omega to calculate a real, term-specific SEM means the grading scale can check itself and I can know where to improve my teaching and assessment for future semesters without disadvantaging yours now. If a particular assignment turns out to have been inconsistent or poorly calibrated across this class, the buffer widens to reflect that, automatically, without me having to notice and adjust it by hand.</p>
       <p>The point of building the buffer this way is to take the guesswork and any bias I may have out of it. Nobody has to email me and make a case for a decimal point at the end of the term. If a student's actual performance can't be reliably distinguished from the next letter grade, the same rule applies to them as to everyone else, without exception and without anyone having to ask.</p>
+    </div></div>
+  </div>
+
+  <div class="calc-explainer t-acc" data-open="false">
+    <button class="t-acc-head" type="button" aria-expanded="false">How this method benefited past students <span class="t-acc-chevron"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6.5L8 10.5L12 6.5"/></svg></span></button>
+    <div class="t-acc-panel"><div class="calc-explainer-body t-acc-panel-inner">
+      <p>This is real data from the last time this course ran, Summer 2026 with 28 students. That term's actual measurement precision worked out to SD = 6.23, omega = 0.76, giving a SEM buffer of 3.07 points.</p>
+
+      <div class="pb-stats">
+        <div class="pb-stat"><div class="pb-num">15 of 28</div><div class="pb-lbl">students rounded up (54%)</div></div>
+        <div class="pb-stat"><div class="pb-num">+1.55</div><div class="pb-lbl">avg. point bump, of those rounded</div></div>
+        <div class="pb-stat"><div class="pb-num">15</div><div class="pb-lbl">whole letter grades gained</div></div>
+      </div>
+
+      <p>Every student close enough to a boundary that their distance to the next letter grade could have been attributable to measurement gained a full letter step, what the rule is built to do. The chart below compares the class's raw letter-grade distribution against the distribution after rounding, B&minus; and above.</p>
+
+      <div class="pb-legend">
+        <span><i class="pb-sw-before"></i> Before SEM rounding</span>
+        <span><i class="pb-sw-after"></i> After SEM rounding</span>
+      </div>
+      <svg class="pb-chart" viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bar chart comparing letter grade distribution before and after SEM rounding, Summer 2026">
+        <line class="pb-axis" x1="30" y1="186" x2="620" y2="186"/>
+        <rect class="pb-bar pb-before" x="47.7" y="156.0" width="29.5" height="30.0" rx="2"/>
+        <rect class="pb-bar pb-after" x="81.1" y="186.0" width="29.5" height="0.0" rx="2"/>
+        <rect class="pb-bar pb-before" x="146.0" y="176.0" width="29.5" height="10.0" rx="2"/>
+        <rect class="pb-bar pb-after" x="179.5" y="156.0" width="29.5" height="30.0" rx="2"/>
+        <rect class="pb-bar pb-before" x="244.4" y="156.0" width="29.5" height="30.0" rx="2"/>
+        <rect class="pb-bar pb-after" x="277.8" y="176.0" width="29.5" height="10.0" rx="2"/>
+        <rect class="pb-bar pb-before" x="342.7" y="156.0" width="29.5" height="30.0" rx="2"/>
+        <rect class="pb-bar pb-after" x="376.1" y="156.0" width="29.5" height="30.0" rx="2"/>
+        <rect class="pb-bar pb-before" x="441.0" y="136.0" width="29.5" height="50.0" rx="2"/>
+        <rect class="pb-bar pb-after" x="474.5" y="156.0" width="29.5" height="30.0" rx="2"/>
+        <rect class="pb-bar pb-before" x="539.4" y="76.0" width="29.5" height="110.0" rx="2"/>
+        <rect class="pb-bar pb-after" x="572.8" y="26.0" width="29.5" height="160.0" rx="2"/>
+        <text class="pb-count" x="62.4" y="150.0">3</text>
+        <text class="pb-count" x="160.8" y="170.0">1</text>
+        <text class="pb-count" x="194.2" y="150.0">3</text>
+        <text class="pb-count" x="259.1" y="150.0">3</text>
+        <text class="pb-count" x="292.5" y="170.0">1</text>
+        <text class="pb-count" x="357.5" y="150.0">3</text>
+        <text class="pb-count" x="390.9" y="150.0">3</text>
+        <text class="pb-count" x="455.8" y="130.0">5</text>
+        <text class="pb-count" x="489.2" y="150.0">3</text>
+        <text class="pb-count" x="554.1" y="70.0">11</text>
+        <text class="pb-count" x="587.5" y="20.0">16</text>
+        <text class="pb-cat" x="79.2" y="204.0">B&minus;</text>
+        <text class="pb-cat" x="177.5" y="204.0">B</text>
+        <text class="pb-cat" x="275.8" y="204.0">B+</text>
+        <text class="pb-cat" x="374.2" y="204.0">A&minus;</text>
+        <text class="pb-cat" x="472.5" y="204.0">A</text>
+        <text class="pb-cat" x="570.8" y="204.0">A+</text>
+      </svg>
+
+      <p>Aggregated by the specific step each rounded student took, so the shape of who benefited is visible without singling anyone out:</p>
+      <table class="pb-transitions">
+        <thead><tr><th>Step</th><th>Students</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pb-arrow">B&minus; &rarr; B</span></td><td>3</td></tr>
+          <tr><td><span class="pb-arrow">B &rarr; B+</span></td><td>1</td></tr>
+          <tr><td><span class="pb-arrow">B+ &rarr; A&minus;</span></td><td>3</td></tr>
+          <tr><td><span class="pb-arrow">A&minus; &rarr; A</span></td><td>3</td></tr>
+          <tr><td><span class="pb-arrow">A &rarr; A+</span></td><td>5</td></tr>
+        </tbody>
+      </table>
     </div></div>
   </div>
   </div><!-- /calcBody -->
