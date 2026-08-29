@@ -337,7 +337,7 @@
       {
         "id": "fall2026",
         "label": "Fall 2026",
-        "meetingInfo": "in person · M/W/F, 2–2:55pm · August 24 to December 17",
+        "meetingInfo": "in person · M/W/F, 2–2:55pm · Frey Hall 305 · August 24 to December 17",
         "syllabus": "files/POL309_Fall2026.pdf",
         "calendly": "https://calendly.com/diego-hernandez-political-science/pol309-politics-in-the-european-union",
         "weeks": [
@@ -394,8 +394,8 @@
             "end": "2026-09-20T23:59:59-04:00",
             "tasks": [
               "Read Chapter 4, “The European Institutions”",
-              "Watch the European Commission, European Council, and Council of the EU videos on Brightspace",
-              "Friday: interactive case study — the executives in motion"
+              "Watch the European Commission, European Council, and Council of the EU videos before class",
+              "Friday (9/18): Reading Day, no class — use the time to catch up on readings"
             ],
             "deadlineLabel": "",
             "deadlineWhen": "",
@@ -409,7 +409,8 @@
             "end": "2026-09-27T23:59:59-04:00",
             "tasks": [
               "Read Chapter 6, “The EU Policy Process”",
-              "Watch the European Parliament, EU financial system, and EU laws videos on Brightspace",
+              "Watch the European Parliament, EU financial system, and EU laws videos before class",
+              "Friday: interactive session — following a bill through the ordinary legislative procedure",
               "Writing Assignment 1 (15% of your grade): browse euractiv.com and write 500+ words on how two EU institutions would engage an issue you find"
             ],
             "deadlineLabel": "Writing Assignment 1",
@@ -454,7 +455,7 @@
             "tasks": [
               "Monday (10/12): Fall Break, no class",
               "Read Risse ch. 1, the Bruter excerpt, Roccas & Brewer (2002), El-Tayeb (2011), and Hooghe & Marks (2018)",
-              "Schedule your one-to-one meeting about the final paper (weeks 8, 9, or 10 — earlier is better)"
+              "Schedule your one-to-one meeting about the final paper (weeks 8 to 12 — earlier is better)"
             ],
             "deadlineLabel": "",
             "deadlineWhen": "",
@@ -485,7 +486,7 @@
               "Read Chapter 8, “Internal Policies”",
               "Read Niemann & Zaun (2018) and Kirişci (2014) on Turkey and Syrian refugees",
               "Friday: guest lecture by Chloe Landis (Long Beach Museum of Art) on the migrant and refugee beyond news media",
-              "Last chance to schedule your one-to-one meeting if you haven't yet"
+              "One-to-one meetings about the final paper run through week 12 — book yours if you haven't"
             ],
             "deadlineLabel": "",
             "deadlineWhen": "",
@@ -514,12 +515,13 @@
             "end": "2026-11-15T23:59:59-05:00",
             "tasks": [
               "Review the enlargement sections of Chapter 3",
-              "Read Schimmelfennig & Sedelmeier (2004) and the Vachudova (2005) excerpt"
+              "Read Schimmelfennig & Sedelmeier (2004) and the Vachudova (2005) excerpt",
+              "Final week to hold your one-to-one meeting about the final paper (the window is weeks 8 to 12)"
             ],
             "deadlineLabel": "",
             "deadlineWhen": "",
             "deadlineText": "",
-            "calendly": false
+            "calendly": true
           },
           {
             "n": 13,
@@ -594,7 +596,7 @@
             {
               "id": "meeting",
               "name": "One-to-one meeting",
-              "sub": "weeks 8 to 10",
+              "sub": "weeks 8 to 12",
               "w": 5
             },
             {
