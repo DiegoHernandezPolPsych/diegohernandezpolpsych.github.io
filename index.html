@@ -716,6 +716,68 @@ html.vt-on .cards .card, html.vt-on .cv-list li, html.vt-on .contact-list li { a
 .contact-list a:hover { color: var(--accent); }
 
 /* =========================================================
+   CONTACT · QR quick-connect
+   Pick a destination, scan the code or click the link under it.
+   The inner code panel stays white in both themes so it always
+   scans; only the surrounding card follows the palette.
+========================================================= */
+.qr-card {
+  width: min(100%, 22rem);
+  margin: 44px 0 0;
+  padding: clamp(16px, 3.5vw, 22px);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.qr-card-head {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 10px 14px; margin-bottom: 16px;
+}
+.qr-card-head .label {
+  font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: .1em;
+  text-transform: uppercase; color: var(--faint); margin: 0;
+}
+.qr-select-wrap { position: relative; display: inline-flex; }
+.qr-select {
+  appearance: none; -webkit-appearance: none;
+  font-family: var(--font-body); font-size: var(--text-sm); font-weight: 600;
+  color: var(--ink); background: var(--bg-tint);
+  border: 1px solid var(--line-strong); border-radius: var(--radius);
+  padding: 8px 34px 8px 12px; min-height: 40px; cursor: pointer;
+  transition: border-color .2s var(--ease);
+}
+.qr-select:hover { border-color: var(--plum); }
+.qr-select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.qr-select-chevron {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  width: 12px; height: 12px; pointer-events: none;
+}
+.qr-select-chevron svg { width: 100%; height: 100%; display: block; }
+.qr-select-chevron path {
+  fill: none; stroke: var(--faint); stroke-width: 1.6;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.qr-code {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: clamp(12px, 4vw, 18px);
+  line-height: 0;
+}
+.qr-code svg { width: 100%; height: auto; display: block; }
+.qr-dest {
+  display: block; margin-top: 12px;
+  font-family: var(--font-mono); font-size: var(--text-2xs);
+  letter-spacing: .02em; color: var(--muted); word-break: break-all;
+  transition: color .2s var(--ease);
+}
+.qr-dest:hover { color: var(--accent); }
+@media (max-width: 560px) {
+  .qr-card { width: 100%; }
+}
+
+/* =========================================================
    FOOTER
 ========================================================= */
 /* CV Builder iframe */
@@ -1149,6 +1211,26 @@ html.vt-on .panel.is-active { animation: none; }
           <a href="https://github.com/DiegoHernandezPolPsych" target="_blank" rel="noopener">DiegoHernandezPolPsych</a>
         </li>
       </ul>
+    </div>
+
+    <!-- QR quick-connect: choose a destination, scan the code or tap the link.
+         Rendered by qrcodegen.js; degrades to the links above without JS. -->
+    <div class="qr-card" id="qrCard">
+      <div class="qr-card-head">
+        <p class="label">Scan to connect</p>
+        <span class="qr-select-wrap">
+          <select id="qrTarget" class="qr-select" aria-label="What the QR code links to">
+            <option value="email">Email me</option>
+            <option value="website">Go to Website</option>
+            <option value="academia">See my Academia.edu</option>
+            <option value="linkedin">Connect on LinkedIn</option>
+          </select>
+          <span class="qr-select-chevron" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 6.5L8 10.5L12 6.5"/></svg></span>
+        </span>
+      </div>
+      <div class="qr-code" id="qrCode" aria-live="polite"></div>
+      <a class="qr-dest" id="qrDest" href="#" rel="noopener"></a>
+      <noscript><p class="qr-dest">Turn on JavaScript to see the QR code — or use the links above.</p></noscript>
     </div>
   </section>
 
@@ -1782,6 +1864,81 @@ document.addEventListener("section:active", function (e) {
 })();
 
 document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+<!-- ============================================================
+     CONTACT · QR quick-connect
+     Builds a scannable QR for the chosen destination with the
+     vendored Nayuki qrcodegen library. Destinations are read from
+     the live contact links where possible so they track
+     data/content.json; each falls back to a hard-coded URL.
+============================================================ -->
+<script src="qrcodegen.js"></script>
+<script>
+(function () {
+  var card = document.getElementById("qrCard");
+  if (!card || typeof qrcodegen === "undefined") return;
+
+  var box  = document.getElementById("qrCode");
+  var sel  = document.getElementById("qrTarget");
+  var dest = document.getElementById("qrDest");
+
+  function hrefFrom(selector, fallback) {
+    var el = document.querySelector(selector);
+    var h = el && el.getAttribute("href");
+    return h && h !== "#" ? h : fallback;
+  }
+  function stripScheme(v) { return v.replace(/^https?:\/\//, "").replace(/\/$/, ""); }
+
+  function targetFor(key) {
+    switch (key) {
+      case "website":
+        return { url: "https://diegohernandezpolpsych.github.io", show: stripScheme, external: true };
+      case "academia":
+        return { url: hrefFrom('#contact a[href*="academia.edu"]', "https://sbsuny.academia.edu/DiegoHernandez"), show: stripScheme, external: true };
+      case "linkedin":
+        return { url: hrefFrom('#contact a[href*="linkedin.com"]', "https://www.linkedin.com/in/diego-hernandez-220b821ba/"), show: stripScheme, external: true };
+      default:
+        var m = hrefFrom('#contact a[href^="mailto:"]', "mailto:diego.hernandez@stonybrook.edu");
+        return { url: m, show: function (v) { return v.replace(/^mailto:/, ""); }, external: false };
+    }
+  }
+
+  /* One <path> of 1x1 module squares plus a 4-module quiet zone,
+     scaled by the container. crispEdges keeps modules sharp. */
+  function toSvg(qr, label) {
+    var border = 4, n = qr.size + border * 2, d = [];
+    for (var y = 0; y < qr.size; y++) {
+      for (var x = 0; x < qr.size; x++) {
+        if (qr.getModule(x, y)) d.push("M" + (x + border) + "," + (y + border) + "h1v1h-1z");
+      }
+    }
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + n + ' ' + n + '" ' +
+      'role="img" aria-label="' + label + '" shape-rendering="crispEdges">' +
+      '<rect width="' + n + '" height="' + n + '" fill="#fff"/>' +
+      '<path d="' + d.join("") + '" fill="#14130e"/></svg>';
+  }
+
+  function render() {
+    var optLabel = sel.options[sel.selectedIndex].text;
+    var t = targetFor(sel.value);
+    var qr;
+    try {
+      qr = qrcodegen.QrCode.encodeText(t.url, qrcodegen.QrCode.Ecc.MEDIUM);
+    } catch (e) {
+      box.textContent = "";
+      return;
+    }
+    box.innerHTML = toSvg(qr, "QR code — " + optLabel);
+    dest.setAttribute("href", t.url);
+    dest.textContent = t.show(t.url);
+    if (t.external) dest.setAttribute("target", "_blank");
+    else dest.removeAttribute("target");
+  }
+
+  sel.addEventListener("change", render);
+  render();
+})();
 </script>
 </body>
 </html>
