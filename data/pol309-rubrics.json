@@ -1,0 +1,870 @@
+{
+  "fall2026": {
+    "levels": [
+      "Excellent",
+      "Proficient",
+      "Developing",
+      "Beginning"
+    ],
+    "intro": [
+      "Each graded component of the course is scored out of 100 points using the rubric below, and that score is then weighted according to the syllabus. Every criterion is assessed at one of four levels. Excellent work falls in the top tenth of a criterion's points, Proficient in the next tenth, Developing in the next, and Beginning covers anything below.",
+      "Read the rubric for an assignment before you submit it. The criteria follow the assignment prompts in the syllabus closely, so the rubric is also a checklist of what each assignment asks you to do. Late penalties (5% per day, including weekends) are applied to the rubric score after grading. Work submitted in violation of the course's academic integrity and AI policies is not scored with the rubric, and is subject to additional processes."
+    ],
+    "assignments": [
+      {
+        "id": "writing1",
+        "title": "Writing Assignment 1: The EU in the News",
+        "short": "Writing 1",
+        "meta": "500 words minimum · Due Friday of Week 5 (9/25) at 11:59pm",
+        "note": "Half of this rubric rests on your familiarity with the two institutions you choose, since that is the core of the assignment.",
+        "criteria": [
+          {
+            "id": "issue",
+            "name": "Description of the issue",
+            "max": 15,
+            "levels": [
+              {
+                "min": 14,
+                "max": 15,
+                "desc": "Clearly and accurately explains what is happening, why it matters, and who is involved (governments, EU bodies, parties, interest groups, publics), drawing on the article."
+              },
+              {
+                "min": 12,
+                "max": 13,
+                "desc": "Accurately describes the issue and its main actors, with minor gaps in context or significance, or contains minor issue summary mistakes that do not impede understanding."
+              },
+              {
+                "min": 11,
+                "max": 11,
+                "desc": "Describes the issue in general terms; key actors or context are vague or missing, or has significant issue summary errors that impede understanding."
+              },
+              {
+                "min": 0,
+                "max": 10,
+                "desc": "The issue is unclear or inaccurate, or the article is summarized without identifying who is involved."
+              }
+            ]
+          },
+          {
+            "id": "inst1",
+            "name": "Familiarity with institution 1",
+            "max": 25,
+            "levels": [
+              {
+                "min": 23,
+                "max": 25,
+                "desc": "Shows precise command of the institution's composition, powers, and decision rules from the institutions unit (Weeks 4–5), and uses that knowledge to explain what the institution can and cannot do on this issue."
+              },
+              {
+                "min": 20,
+                "max": 22,
+                "desc": "Accurately describes the institution's role and powers with minor imprecision; the link to the issue is sound but less developed."
+              },
+              {
+                "min": 18,
+                "max": 19,
+                "desc": "Describes the institution in general terms, or confuses some powers or procedures (for example, the European Council with the Council of the EU)."
+              },
+              {
+                "min": 0,
+                "max": 17,
+                "desc": "The description is largely inaccurate, missing, or disconnected from course material."
+              }
+            ],
+            "note": "25 points each, scored separately for the two institutions"
+          },
+          {
+            "id": "inst2",
+            "name": "Familiarity with institution 2",
+            "max": 25,
+            "levels": [
+              {
+                "min": 23,
+                "max": 25,
+                "desc": "Shows precise command of the institution's composition, powers, and decision rules from the institutions unit (Weeks 4–5), and uses that knowledge to explain what the institution can and cannot do on this issue."
+              },
+              {
+                "min": 20,
+                "max": 22,
+                "desc": "Accurately describes the institution's role and powers with minor imprecision; the link to the issue is sound but less developed."
+              },
+              {
+                "min": 18,
+                "max": 19,
+                "desc": "Describes the institution in general terms, or confuses some powers or procedures (for example, the European Council with the Council of the EU)."
+              },
+              {
+                "min": 0,
+                "max": 17,
+                "desc": "The description is largely inaccurate, missing, or disconnected from course material."
+              }
+            ],
+            "note": "25 points each, scored separately for the two institutions"
+          },
+          {
+            "id": "engage",
+            "name": "How the institutions engage the issue",
+            "max": 20,
+            "levels": [
+              {
+                "min": 18,
+                "max": 20,
+                "desc": "Gives a realistic, specific account of how the two institutions and their political actors would engage the issue, respecting the limits of their competences and showing how they interact. Creative framing, if used, stays grounded in how the EU actually works."
+              },
+              {
+                "min": 16,
+                "max": 17,
+                "desc": "Gives a plausible account of engagement; however, the interaction between the institutions or the limits on their powers is underdeveloped."
+              },
+              {
+                "min": 14,
+                "max": 15,
+                "desc": "Engagement is generic (\"Parliament would pass a law\") or overstates what an institution can do on its own."
+              },
+              {
+                "min": 0,
+                "max": 13,
+                "desc": "Little or no connection is drawn between the institutions and the issue."
+              }
+            ]
+          },
+          {
+            "id": "writing",
+            "name": "Writing and organization",
+            "max": 10,
+            "levels": [
+              {
+                "min": 9,
+                "max": 10,
+                "desc": "Clear, well organized, and carefully proofread; the piece moves logically from the issue to the institutions."
+              },
+              {
+                "min": 8,
+                "max": 8,
+                "desc": "Generally clear and organized, with a few lapses in flow or mechanics. Minor spelling, formatting, or missed proofread catches may be present."
+              },
+              {
+                "min": 7,
+                "max": 7,
+                "desc": "Organization or frequent errors make parts of the piece hard to follow."
+              },
+              {
+                "min": 0,
+                "max": 6,
+                "desc": "Disorganized or difficult to read throughout; demonstrates a lack of proofreading and hurried completion."
+              }
+            ]
+          },
+          {
+            "id": "reqs",
+            "name": "Requirements and sources",
+            "max": 5,
+            "levels": [
+              {
+                "min": 5,
+                "max": 5,
+                "desc": "Meets the 500-word minimum, includes the Euractiv link (or an approved alternative), and cites all sources consistently."
+              },
+              {
+                "min": 4,
+                "max": 4,
+                "desc": "Meets requirements with a minor citation lapse."
+              },
+              {
+                "min": 3,
+                "max": 3,
+                "desc": "Missing one requirement (link, citations, or length)."
+              },
+              {
+                "min": 0,
+                "max": 2,
+                "desc": "Missing two or more requirements."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "writing2",
+        "title": "Writing Assignment 2: The Image and the Crisis",
+        "short": "Writing 2",
+        "meta": "500 words minimum · Due Saturday of Week 11 (11/7) at 11:59pm",
+        "note": "Students who request the alternative prompt are graded on the same criteria, adapted to that prompt.",
+        "criteria": [
+          {
+            "id": "image",
+            "name": "The image and its context",
+            "max": 15,
+            "levels": [
+              {
+                "min": 14,
+                "max": 15,
+                "desc": "Identifies the image precisely and explains when, where, and how it circulated, describing it accurately and with care, without gratuitous detail."
+              },
+              {
+                "min": 12,
+                "max": 13,
+                "desc": "Identifies the image and its context accurately, with minor gaps in how or where it circulated."
+              },
+              {
+                "min": 11,
+                "max": 11,
+                "desc": "Context is thin or partly inaccurate; circulation is not explained."
+              },
+              {
+                "min": 0,
+                "max": 10,
+                "desc": "The image or its context is unclear or inaccurate."
+              }
+            ]
+          },
+          {
+            "id": "response",
+            "name": "Public and political response",
+            "max": 20,
+            "levels": [
+              {
+                "min": 18,
+                "max": 20,
+                "desc": "Explains the response the image produced and supports it with at least one concrete, sourced outcome (donations, policy statements, media coverage patterns, or public opinion data), with attention to timing."
+              },
+              {
+                "min": 16,
+                "max": 17,
+                "desc": "Cites at least one concrete outcome accurately; explanation of the broader response or its timing is less developed."
+              },
+              {
+                "min": 14,
+                "max": 15,
+                "desc": "Describes the response in general terms; the concrete outcome is vague, unsourced, or loosely connected to the image."
+              },
+              {
+                "min": 0,
+                "max": 13,
+                "desc": "No concrete outcome, or the response is asserted without evidence."
+              }
+            ]
+          },
+          {
+            "id": "readings",
+            "name": "Use of Week 11 readings",
+            "max": 35,
+            "levels": [
+              {
+                "min": 32,
+                "max": 35,
+                "desc": "Engages at least two assigned Week 11 readings substantively and represents their findings accurately. Concepts (identifiable victim effect, compassion fade, psychic numbing, the pull of children's faces) are applied to the image, not just named."
+              },
+              {
+                "min": 28,
+                "max": 31,
+                "desc": "Uses two readings accurately; application of the concepts is sound but uneven or partly descriptive."
+              },
+              {
+                "min": 25,
+                "max": 27,
+                "desc": "Readings are cited but concepts are named rather than applied, or only one reading is used meaningfully."
+              },
+              {
+                "min": 0,
+                "max": 24,
+                "desc": "Fewer than two readings, or the readings are misrepresented."
+              }
+            ]
+          },
+          {
+            "id": "argument",
+            "name": "Explanatory argument",
+            "max": 15,
+            "levels": [
+              {
+                "min": 14,
+                "max": 15,
+                "desc": "Makes an evidence-based argument for why images like this one move public opinion more than statistics or images of adults, or why the effect faded. The stance is analytical throughout."
+              },
+              {
+                "min": 12,
+                "max": 13,
+                "desc": "The argument is present and mostly analytical, with some reliance on assertion or personal reaction."
+              },
+              {
+                "min": 11,
+                "max": 11,
+                "desc": "The argument is implied rather than made; the piece leans on how the image made the writer feel."
+              },
+              {
+                "min": 0,
+                "max": 10,
+                "desc": "No explanatory argument; the piece is primarily a personal response."
+              }
+            ]
+          },
+          {
+            "id": "writing",
+            "name": "Writing and organization",
+            "max": 10,
+            "levels": [
+              {
+                "min": 9,
+                "max": 10,
+                "desc": "Clear, organized, and carefully proofread; treats the subject seriously and respectfully."
+              },
+              {
+                "min": 8,
+                "max": 8,
+                "desc": "Generally clear, with a few lapses in flow or mechanics."
+              },
+              {
+                "min": 7,
+                "max": 7,
+                "desc": "Organization or frequent errors make parts hard to follow, or tone is occasionally inappropriate to the subject."
+              },
+              {
+                "min": 0,
+                "max": 6,
+                "desc": "Disorganized or difficult to read throughout."
+              }
+            ]
+          },
+          {
+            "id": "reqs",
+            "name": "Requirements and citation",
+            "max": 5,
+            "levels": [
+              {
+                "min": 5,
+                "max": 5,
+                "desc": "Meets the 500-word minimum and cites all readings and sources consistently."
+              },
+              {
+                "min": 4,
+                "max": 4,
+                "desc": "Meets requirements with a minor citation lapse."
+              },
+              {
+                "min": 3,
+                "max": 3,
+                "desc": "Missing one requirement or citations are inconsistent."
+              },
+              {
+                "min": 0,
+                "max": 2,
+                "desc": "Missing two or more requirements."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "debate",
+        "title": "The Empathy Debate",
+        "short": "Debate",
+        "meta": "Held Friday of Week 11 (11/6)",
+        "note": "Students with a documented absence on debate day submit a written brief of approximately 500 words for their assigned side. The brief is graded on the first three criteria as written; the fourth becomes the clarity and organization of the brief, and the brief should include a response to the strongest argument on the other side.",
+        "criteria": [
+          {
+            "id": "prepared",
+            "name": "Prepared argument grounded in the readings",
+            "max": 30,
+            "levels": [
+              {
+                "min": 27,
+                "max": 30,
+                "desc": "Arrives with at least one well-developed argument that draws accurately on specific assigned readings from Weeks 10 and 11, including Bloom where relevant."
+              },
+              {
+                "min": 24,
+                "max": 26,
+                "desc": "Prepared argument is sound and draws on the readings, with some imprecision."
+              },
+              {
+                "min": 21,
+                "max": 23,
+                "desc": "Argument is prepared but only loosely connected to the readings."
+              },
+              {
+                "min": 0,
+                "max": 20,
+                "desc": "No evident preparation, or the argument does not use the readings."
+              }
+            ]
+          },
+          {
+            "id": "normative",
+            "name": "From psychology to a normative claim",
+            "max": 30,
+            "levels": [
+              {
+                "min": 27,
+                "max": 30,
+                "desc": "Converts the psychological findings into a clear normative claim about how policy should or should not respond to empathy, rather than restating the findings."
+              },
+              {
+                "min": 24,
+                "max": 26,
+                "desc": "Makes a normative claim, though the step from evidence to claim is not fully spelled out."
+              },
+              {
+                "min": 21,
+                "max": 23,
+                "desc": "Mostly restates the psychology; the normative claim is thin or implied."
+              },
+              {
+                "min": 0,
+                "max": 20,
+                "desc": "No normative claim."
+              }
+            ]
+          },
+          {
+            "id": "otherside",
+            "name": "Engagement with the other side",
+            "max": 20,
+            "levels": [
+              {
+                "min": 18,
+                "max": 20,
+                "desc": "Responds directly to the strongest opposing arguments and anticipates rebuttals."
+              },
+              {
+                "min": 16,
+                "max": 17,
+                "desc": "Responds to opposing arguments, though sometimes to weaker versions of them."
+              },
+              {
+                "min": 14,
+                "max": 15,
+                "desc": "Engagement is limited or talks past the other side."
+              },
+              {
+                "min": 0,
+                "max": 13,
+                "desc": "No engagement with opposing arguments."
+              }
+            ]
+          },
+          {
+            "id": "delivery",
+            "name": "Delivery and conduct",
+            "max": 20,
+            "levels": [
+              {
+                "min": 18,
+                "max": 20,
+                "desc": "Clear, concise, and within time; respectful toward opponents and collaborative with teammates."
+              },
+              {
+                "min": 16,
+                "max": 17,
+                "desc": "Generally clear and respectful, with minor issues of timing or focus."
+              },
+              {
+                "min": 14,
+                "max": 15,
+                "desc": "Hard to follow at points, or contributes unevenly to the team."
+              },
+              {
+                "min": 0,
+                "max": 13,
+                "desc": "Unclear, disruptive, or disrespectful."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "participation",
+        "title": "Participation",
+        "short": "Participation",
+        "meta": "Assessed across the semester",
+        "flag": "This component may be scrapped (TBD).",
+        "note": "There are no reading quizzes in this course, so discussion is where I see that the reading is getting done. Contributions that engage the assigned readings count for more than those that do not, which is why that criterion carries the most weight.",
+        "criteria": [
+          {
+            "id": "grounded",
+            "name": "Contributions grounded in the readings",
+            "max": 40,
+            "levels": [
+              {
+                "min": 36,
+                "max": 40,
+                "desc": "Contributions regularly engage the week's assigned readings by name and argument, and move the discussion forward."
+              },
+              {
+                "min": 32,
+                "max": 35,
+                "desc": "Contributions often draw on the readings, though some stay at the level of general opinion."
+              },
+              {
+                "min": 28,
+                "max": 31,
+                "desc": "Contributions rarely engage the readings; mostly general opinion."
+              },
+              {
+                "min": 0,
+                "max": 27,
+                "desc": "Contributions show little evidence that the reading is getting done."
+              }
+            ]
+          },
+          {
+            "id": "consistency",
+            "name": "Consistency across the semester",
+            "max": 25,
+            "levels": [
+              {
+                "min": 23,
+                "max": 25,
+                "desc": "Contributes regularly across all units, including any interactive Fridays."
+              },
+              {
+                "min": 20,
+                "max": 22,
+                "desc": "Contributes in most weeks, with occasional quiet stretches."
+              },
+              {
+                "min": 18,
+                "max": 19,
+                "desc": "Contributes sporadically."
+              },
+              {
+                "min": 0,
+                "max": 17,
+                "desc": "Rarely or never contributes."
+              }
+            ]
+          },
+          {
+            "id": "attendance",
+            "name": "Attendance and punctuality",
+            "max": 20,
+            "levels": [
+              {
+                "min": 18,
+                "max": 20,
+                "desc": "Attends consistently and arrives on time; any absences are communicated."
+              },
+              {
+                "min": 16,
+                "max": 17,
+                "desc": "Occasional absences or late arrivals."
+              },
+              {
+                "min": 14,
+                "max": 15,
+                "desc": "Repeated absences or tardiness."
+              },
+              {
+                "min": 0,
+                "max": 13,
+                "desc": "Frequent unexplained absence."
+              }
+            ]
+          },
+          {
+            "id": "conduct",
+            "name": "Discussion conduct",
+            "max": 15,
+            "levels": [
+              {
+                "min": 14,
+                "max": 15,
+                "desc": "Listens, builds on classmates' points, and disagrees respectfully."
+              },
+              {
+                "min": 12,
+                "max": 13,
+                "desc": "Generally respectful and attentive, occasionally talks past others."
+              },
+              {
+                "min": 11,
+                "max": 11,
+                "desc": "Engages others inconsistently or dominates discussion."
+              },
+              {
+                "min": 0,
+                "max": 10,
+                "desc": "Disrespectful or disruptive."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "meeting",
+        "title": "Individual Student Meeting",
+        "short": "Meeting",
+        "meta": "Held during Weeks 8–12, in N709 SBS or over Zoom by request",
+        "criteria": [
+          {
+            "id": "completed",
+            "name": "Meeting completed in Weeks 8–12",
+            "max": 60,
+            "levels": [
+              {
+                "min": 54,
+                "max": 60,
+                "desc": "Scheduled and attended within the window, on time."
+              },
+              {
+                "min": 48,
+                "max": 53,
+                "desc": "Attended within the window after one missed or late-cancelled appointment that was promptly rescheduled."
+              },
+              {
+                "min": 42,
+                "max": 47,
+                "desc": "Attended only after repeated rescheduling, or arrived substantially late."
+              },
+              {
+                "min": 0,
+                "max": 41,
+                "desc": "No meeting held within the window."
+              }
+            ]
+          },
+          {
+            "id": "preparation",
+            "name": "Preparation",
+            "max": 40,
+            "levels": [
+              {
+                "min": 36,
+                "max": 40,
+                "desc": "Arrives with a chosen option, a specific country or case, a tentative argument, and some sources."
+              },
+              {
+                "min": 32,
+                "max": 35,
+                "desc": "Option and case are chosen; the argument is still forming."
+              },
+              {
+                "min": 28,
+                "max": 31,
+                "desc": "Arrives with a general topic only."
+              },
+              {
+                "min": 0,
+                "max": 27,
+                "desc": "No evident preparation."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "final",
+        "title": "Final Paper",
+        "short": "Final paper",
+        "meta": "7–8 pages, double spaced, 12-point font, MLA or APA · Due Monday, December 14 at 11:59pm EST",
+        "criteria": [
+          {
+            "id": "thesis",
+            "name": "Thesis and argument",
+            "max": 20,
+            "levels": [
+              {
+                "min": 18,
+                "max": 20,
+                "desc": "A clear, arguable thesis that answers the chosen option's central question; the writer's opinion is sustained throughout and backed by facts."
+              },
+              {
+                "min": 16,
+                "max": 17,
+                "desc": "A clear thesis with a mostly sustained argument; some sections drift into description."
+              },
+              {
+                "min": 14,
+                "max": 15,
+                "desc": "The thesis is vague or only partly argued; the paper is largely descriptive."
+              },
+              {
+                "min": 0,
+                "max": 13,
+                "desc": "No identifiable thesis, or opinion is offered without factual support."
+              }
+            ]
+          },
+          {
+            "id": "institutions",
+            "name": "EU institutions, actors, and processes",
+            "max": 20,
+            "levels": [
+              {
+                "min": 18,
+                "max": 20,
+                "desc": "Demonstrates command of the relevant institutions, key actors, and political processes, and uses them as part of the argument rather than as background."
+              },
+              {
+                "min": 16,
+                "max": 17,
+                "desc": "Discusses institutions and processes accurately, but they are only partly integrated into the argument."
+              },
+              {
+                "min": 14,
+                "max": 15,
+                "desc": "Institutional discussion is brief, general, or contains errors."
+              },
+              {
+                "min": 0,
+                "max": 13,
+                "desc": "Institutions and processes are missing or largely inaccurate."
+              }
+            ]
+          },
+          {
+            "id": "option",
+            "name": "Option-specific content",
+            "max": 20,
+            "levels": [
+              {
+                "min": 18,
+                "max": 20,
+                "desc": "Fully addresses every element of the chosen option, as listed in the guide below."
+              },
+              {
+                "min": 16,
+                "max": 17,
+                "desc": "Addresses most elements; one is underdeveloped."
+              },
+              {
+                "min": 14,
+                "max": 15,
+                "desc": "Addresses some elements; others are missing or superficial."
+              },
+              {
+                "min": 0,
+                "max": 13,
+                "desc": "Does not address the chosen option's requirements."
+              }
+            ],
+            "note": "see the option guide below"
+          },
+          {
+            "id": "evidence",
+            "name": "Evidence and research",
+            "max": 15,
+            "levels": [
+              {
+                "min": 14,
+                "max": 15,
+                "desc": "Draws on independent research from reputable sources; facts are accurate and well chosen to support the argument."
+              },
+              {
+                "min": 12,
+                "max": 13,
+                "desc": "Research is adequate and mostly accurate, with some thin or less reliable support."
+              },
+              {
+                "min": 11,
+                "max": 11,
+                "desc": "Relies on few or weak sources; some factual errors."
+              },
+              {
+                "min": 0,
+                "max": 10,
+                "desc": "Little research, or significant factual errors."
+              }
+            ]
+          },
+          {
+            "id": "course",
+            "name": "Use of course materials",
+            "max": 10,
+            "levels": [
+              {
+                "min": 9,
+                "max": 10,
+                "desc": "Substantially references the McCormick textbook and uses other course readings where relevant."
+              },
+              {
+                "min": 8,
+                "max": 8,
+                "desc": "References the textbook meaningfully, though course readings could be used more."
+              },
+              {
+                "min": 7,
+                "max": 7,
+                "desc": "Textbook use is minimal or decorative."
+              },
+              {
+                "min": 0,
+                "max": 6,
+                "desc": "Does not reference the textbook."
+              }
+            ]
+          },
+          {
+            "id": "writing",
+            "name": "Organization and writing",
+            "max": 10,
+            "levels": [
+              {
+                "min": 9,
+                "max": 10,
+                "desc": "Well organized with clear transitions; carefully proofread prose."
+              },
+              {
+                "min": 8,
+                "max": 8,
+                "desc": "Generally organized and clear, with minor lapses."
+              },
+              {
+                "min": 7,
+                "max": 7,
+                "desc": "Organization or frequent errors impede the argument."
+              },
+              {
+                "min": 0,
+                "max": 6,
+                "desc": "Disorganized or difficult to read throughout."
+              }
+            ]
+          },
+          {
+            "id": "format",
+            "name": "Format and citation",
+            "max": 5,
+            "levels": [
+              {
+                "min": 5,
+                "max": 5,
+                "desc": "Correct MLA or APA format, 7–8 pages, double spaced, 12-point font, with consistent citations."
+              },
+              {
+                "min": 4,
+                "max": 4,
+                "desc": "Minor formatting or citation lapses."
+              },
+              {
+                "min": 3,
+                "max": 3,
+                "desc": "Noticeably short, or inconsistent citation style."
+              },
+              {
+                "min": 0,
+                "max": 2,
+                "desc": "Well under length or largely uncited."
+              }
+            ]
+          }
+        ],
+        "guideTitle": "Option guide",
+        "guide": [
+          {
+            "option": "Option 1: A member state",
+            "covers": "The country's history in the EU; the landmark events and reasons that led to membership; an argued view of its future membership; internal crises or shifts in public opinion, in the country, its neighbors, or the EU, that may threaten stability."
+          },
+          {
+            "option": "Option 2: A non-member state",
+            "covers": "Why the country wants, or may want, to join or not; the benefits and the compromises entry would require, tied to the accession process (Weeks 12–13); relevant historical events in the country's history; geopolitical context. A paper on the United Kingdom must engage the Week 9 material."
+          },
+          {
+            "option": "Option 3: Identity or the migration crisis",
+            "covers": "Applies the social psychological frameworks from Weeks 7–11 to a specific country, event, or campaign. The readings must do analytical work in the argument, not serve as decoration, and the paper must still show command of EU institutions and processes."
+          }
+        ]
+      }
+    ]
+  }
+}

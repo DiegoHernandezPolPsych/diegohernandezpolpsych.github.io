@@ -57,6 +57,17 @@ input[type="number"] {
 }
 input[type="number"]:focus { outline: 2px solid var(--gold); border-color: transparent; }
 .late-note { color: var(--faint); font-size: .78rem; }
+.rubric-link {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  border: 1px solid var(--line-strong); background: var(--surface); padding: 12px 16px; margin: 0 0 22px;
+  color: var(--ink); text-decoration: none; font-size: .9rem;
+}
+.rubric-link span { color: var(--muted); font-size: .82rem; }
+.rubric-link b { font-weight: 600; }
+.rubric-link i { font-style: normal; color: var(--accent); font-family: var(--font-mono); font-size: .8rem; white-space: nowrap; }
+.rubric-link[hidden] { display: none; }
+.rubric-link:hover { border-color: var(--gold); }
+.rubric-link:hover i { color: var(--accent-strong); }
 .term-switch { display: flex; align-items: center; gap: 8px; margin: 0 0 28px; }
 .term-switch label { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
 .term-switch select {
@@ -310,6 +321,10 @@ table.pb-transitions .pb-arrow { color: var(--teal); font-family: var(--font-mon
   </div>
 
   <div id="calcBody" hidden>
+  <a class="rubric-link" id="rubricLink" href="pol309-rubrics.html" hidden>
+    <div><b>Grading rubrics</b><span> &middot; every criterion, what each cell is worth, and a scorer that fills in this calculator</span></div>
+    <i>Open &rarr;</i>
+  </a>
   <div class="t-input-wrap" id="inputsWrap">
     <table class="inputs">
       <thead><tr><th>Assignment</th><th>Weight</th><th>Score /100</th><th>Days late</th></tr></thead>
@@ -848,6 +863,8 @@ table.pb-transitions .pb-arrow { color: var(--teal); font-family: var(--font-mon
   var calcUnavailable = document.getElementById("calcUnavailable");
   var eyebrowTerm = document.getElementById("eyebrowTerm");
   var backLink = document.getElementById("backLink");
+  var rubricLink = document.getElementById("rubricLink");
+  var RUBRIC_TERMS = {};   // term id -> has rubrics, from data/pol309-rubrics.json
 
   function initTerm(term) {
     eyebrowTerm.textContent = "POL309 · " + term.label;
@@ -891,11 +908,19 @@ table.pb-transitions .pb-arrow { color: var(--teal); font-family: var(--font-mon
       i.addEventListener("input", function () { rangeCheck(i); recalc(); });
     });
 
+    rubricLink.setAttribute("href", "pol309-rubrics.html?term=" + encodeURIComponent(term.id));
+    rubricLink.hidden = !RUBRIC_TERMS[term.id];
+
     lastStanding = null;
     recalc();
   }
 
-  POL309.fetchContent().then(function (c) {
+  Promise.all([
+    POL309.fetchContent(),
+    fetch("data/pol309-rubrics.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; })
+  ]).then(function (res) {
+    var c = res[0];
+    RUBRIC_TERMS = res[1] || {};
     var terms = (c && c.pol309 && Array.isArray(c.pol309.terms)) ? c.pol309.terms : [];
     var picker = document.getElementById("termPicker");
     if (!terms.length) {
