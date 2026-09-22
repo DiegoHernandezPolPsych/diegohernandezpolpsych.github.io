@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>POL309 · Grading Rubrics</title>
+<meta name="description" content="Interactive grading rubrics for POL309: Politics of the European Union, with the points and course-grade value of every rubric cell." />
+<link rel="icon" href="favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
+
+<!-- Apply the theme saved on the main site before paint, so the
+     choice follows the visitor across pages with no flash. -->
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved === "light" || saved === "dark") {
+        document.documentElement.setAttribute("data-theme", saved);
+      }
+    } catch (e) {}
+  })();
+</script>
+
+<style>
+/* palette + fonts come from the shared tokens.css */
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.5;
+  transition: background .4s var(--ease), color .4s var(--ease);
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 40px 22px 60px; }
+.topline { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.back { color: var(--faint); text-decoration: none; font-size: .85rem; }
+.back:hover { color: var(--accent); }
+.theme-btn { background: transparent; border: 1px solid var(--line-strong); color: var(--ink); border-radius: 100px; padding: 5px 13px; cursor: pointer; font: inherit; font-size: .8rem; }
+.eyebrow { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--rose); display: flex; align-items: center; gap: 10px; margin: 34px 0 8px; }
+.triad { display: inline-flex; gap: 4px; }
+.triad span { width: 7px; height: 7px; background: var(--rose); }
+.triad span:nth-child(2) { background: transparent; border: 1.5px solid var(--rose); }
+h1 { font-family: var(--font-display); font-weight: 500; font-size: 2rem; margin: 0 0 4px; }
+.sub { color: var(--muted); margin: 0 0 12px; max-width: 760px; }
+.intro p { color: var(--muted); font-size: .92rem; max-width: 760px; margin: 0 0 10px; }
+.term-switch { display: flex; align-items: center; gap: 8px; margin: 18px 0 26px; }
+.term-switch label { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.term-switch select {
+  font: inherit; font-size: .85rem; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line-strong); border-radius: 100px; padding: 6px 12px; cursor: pointer;
+}
+.unavailable {
+  border: 1px solid var(--line-strong); background: var(--surface); padding: 26px 28px;
+  position: relative; margin-top: 8px; max-width: 760px;
+}
+.unavailable::before, .unavailable::after, .summary::before, .summary::after { content: ""; position: absolute; width: 18px; height: 18px; border: 2px solid var(--gold); }
+.unavailable::before, .summary::before { top: -5px; left: -5px; border-right: 0; border-bottom: 0; }
+.unavailable::after, .summary::after { bottom: -5px; right: -5px; border-left: 0; border-top: 0; }
+.unavailable h2 { font-family: var(--font-display); font-weight: 500; font-size: 1.3rem; margin: 0 0 10px; }
+.unavailable p { color: var(--muted); margin: 0; }
+.unavailable a { color: var(--accent); }
+
+/* assignment tabs */
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 22px; border-bottom: 1px solid var(--line-strong); padding-bottom: 12px; }
+.tab {
+  font: inherit; font-size: .85rem; cursor: pointer;
+  background: transparent; color: var(--muted); border: 1px solid var(--line-strong);
+  border-radius: 100px; padding: 6px 14px; display: inline-flex; gap: 8px; align-items: baseline;
+  transition: color var(--duration-quick) var(--ease-out), border-color var(--duration-quick) var(--ease-out), background var(--duration-quick) var(--ease-out);
+}
+.tab:hover { color: var(--accent); border-color: var(--accent); }
+.tab .tw { font-family: var(--font-mono); font-size: .7rem; color: var(--faint); }
+.tab[aria-selected="true"] { background: var(--surface); color: var(--ink); border-color: var(--gold); }
+.tab[aria-selected="true"] .tw { color: var(--accent); }
+
+h2.a-title { font-family: var(--font-display); font-weight: 500; font-size: 1.5rem; margin: 0 0 4px; }
+.a-meta { color: var(--muted); font-size: .9rem; margin: 0 0 8px; }
+.a-meta b { color: var(--ink); font-weight: 600; }
+.a-flag { font-size: .85rem; color: var(--rose); border-left: 2px solid var(--rose); padding: 4px 10px; margin: 0 0 10px; }
+.a-note { color: var(--muted); font-size: .9rem; max-width: 820px; margin: 0 0 12px; }
+.a-conv {
+  font-family: var(--font-mono); font-size: .78rem; color: var(--muted);
+  background: var(--surface); border: 1px solid var(--line-strong); padding: 8px 12px; margin: 0 0 16px;
+  display: inline-block;
+}
+.a-conv b { color: var(--accent); font-weight: 500; }
+
+/* rubric grid: criterion column + four level cells */
+.rubric { border: 1px solid var(--line-strong); }
+.r-head, .crit { display: grid; grid-template-columns: 1.15fr repeat(4, 1fr); }
+.r-head { background: var(--bg-tint); border-bottom: 1px solid var(--line-strong); }
+.r-head div { font-family: var(--font-mono); font-weight: 500; font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); padding: 9px 12px; }
+.crit { border-bottom: 1px solid var(--line); }
+.crit:last-child { border-bottom: 0; }
+.crit-head { padding: 12px; background: var(--bg-tint); border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+.crit-name { font-weight: 600; font-size: .92rem; line-height: 1.3; }
+.crit-max { font-size: .8rem; color: var(--faint); font-style: italic; }
+.crit-conv { font-family: var(--font-mono); font-size: .7rem; color: var(--faint); }
+
+.stepper { display: inline-flex; align-items: center; gap: 0; margin-top: 2px; }
+.stepper button {
+  width: 28px; height: 30px; font: inherit; font-size: .95rem; line-height: 1; cursor: pointer;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong);
+}
+.stepper button:first-child { border-radius: 4px 0 0 4px; }
+.stepper button:last-of-type { border-radius: 0 4px 4px 0; }
+.stepper button:hover { color: var(--accent); }
+.stepper input {
+  width: 48px; height: 30px; text-align: center; font: inherit; font-size: .92rem;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); border-left: 0; border-right: 0;
+  -moz-appearance: textfield; appearance: textfield;
+}
+.stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.stepper input:focus, .stepper button:focus-visible { outline: 2px solid var(--gold); outline-offset: -1px; position: relative; }
+.stepper .of { font-size: .8rem; color: var(--faint); margin-left: 8px; }
+.crit-earned { font-family: var(--font-mono); font-size: .72rem; color: var(--teal); min-height: 1em; }
+
+.cell {
+  font: inherit; text-align: left; cursor: pointer; color: var(--ink);
+  background: transparent; border: 0; border-right: 1px solid var(--line);
+  padding: 12px; display: flex; flex-direction: column; gap: 4px; position: relative;
+  transition: background var(--duration-quick) var(--ease-out);
+}
+.cell:last-child { border-right: 0; }
+.cell:hover { background: var(--surface); }
+.cell:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.cell .lvl { display: none; font-family: var(--font-mono); font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.cell .pts { font-weight: 700; font-size: .95rem; }
+.cell .conv { font-family: var(--font-mono); font-size: .7rem; color: var(--accent); }
+.cell .desc { font-size: .84rem; color: var(--muted); line-height: 1.45; margin: 2px 0 0; }
+.cell::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--gold);
+  transform: scaleX(0); transform-origin: left; transition: transform var(--duration-fast) var(--ease-smooth-out);
+}
+.cell[aria-checked="true"] { background: var(--surface); box-shadow: inset 0 0 0 1px var(--gold); }
+.cell[aria-checked="true"]::before { transform: scaleX(1); }
+.cell[aria-checked="true"] .desc { color: var(--ink); }
+
+/* score summary */
+.summary {
+  margin-top: 26px; border: 1px solid var(--line-strong); background: var(--surface);
+  padding: 20px 24px; position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 32px;
+}
+.summary .rl { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+.summary .big { font-family: var(--font-display); font-size: 2.2rem; font-weight: 500; margin: 4px 0 0; line-height: 1.15; }
+.summary .big b { color: var(--accent-strong); }
+.summary .big small { font-size: 1rem; color: var(--faint); }
+.summary p { margin: 6px 0 0; color: var(--muted); font-size: .88rem; }
+.summary .late label { font-size: .88rem; color: var(--muted); display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.summary .late input { width: 64px; padding: 6px 8px; font: inherit; font-size: .92rem; background: var(--bg); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 4px; }
+.summary .late input:focus { outline: 2px solid var(--gold); border-color: transparent; }
+.actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; border-top: 1px solid var(--line); padding-top: 14px; }
+.btn {
+  font-family: var(--font-mono); font-size: .75rem; letter-spacing: .04em; cursor: pointer;
+  background: var(--bg); color: var(--muted); border: 1px solid var(--line-strong); padding: 8px 14px;
+}
+.btn:hover:not(:disabled) { color: var(--accent); border-color: var(--accent); }
+.btn.primary { color: var(--ink); border-color: var(--gold); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.sent { font-size: .85rem; color: var(--teal); }
+.sent a { color: var(--accent); }
+
+h3.g-title { font-family: var(--font-display); font-weight: 500; font-size: 1.2rem; margin: 34px 0 10px; }
+table.guide { width: 100%; border-collapse: collapse; font-size: .88rem; }
+table.guide th, table.guide td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+table.guide th { font-family: var(--font-mono); font-weight: 500; font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); border-bottom: 1px solid var(--line-strong); }
+table.guide td:first-child { font-weight: 600; width: 28%; }
+table.guide td:last-child { color: var(--muted); }
+
+.note { margin-top: 36px; color: var(--faint); font-size: .82rem; border-top: 1px solid var(--line); padding-top: 14px; }
+.note a { color: var(--accent); text-decoration: none; }
+
+/* narrow screens: each criterion becomes a card with stacked levels */
+@media (max-width: 820px) {
+  .r-head { display: none; }
+  .crit { grid-template-columns: 1fr 1fr; }
+  .crit-head { grid-column: 1 / -1; border-right: 0; border-bottom: 1px solid var(--line); }
+  .cell { border-bottom: 1px solid var(--line); }
+  .cell:nth-child(odd) { border-right: 0; }
+  .cell .lvl { display: block; }
+  .summary { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .crit { grid-template-columns: 1fr; }
+  .cell { border-right: 0; }
+  .cell:last-child { border-bottom: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body, .tab, .cell, .cell::before { transition: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topline">
+    <a class="back" href="pol309-grades.html" id="backLink">&larr; Grade calculator</a>
+    <button class="theme-btn" id="themeBtn" type="button">Theme</button>
+  </div>
+
+  <p class="eyebrow"><span class="triad"><span></span><span></span><span></span></span> <span id="eyebrowTerm">POL309</span></p>
+  <h1>Grading rubrics</h1>
+  <p class="sub">Click a cell, or use the score box, to try out a score on any criterion. Each cell shows its rubric points and what those points are worth toward your course grade.</p>
+  <div class="intro" id="intro"></div>
+
+  <div class="term-switch">
+    <label for="termPicker">Term</label>
+    <select id="termPicker"></select>
+  </div>
+
+  <div class="unavailable" id="rubricUnavailable" hidden>
+    <h2 id="unavailableTitle">Rubrics unavailable</h2>
+    <p>There are no rubrics posted for this term yet. Email
+      <a href="mailto:diego.hernandez@stonybrook.edu">diego.hernandez@stonybrook.edu</a> with any questions.</p>
+  </div>
+
+  <div id="rubricBody" hidden>
+    <div class="tabs" role="tablist" id="tabs" aria-label="Assignments"></div>
+    <div id="panel" role="tabpanel"></div>
+  </div>
+
+  <p class="note">
+    These rubrics are for planning and self-assessment. Grades on Brightspace are authoritative,
+    and the syllabus governs if anything here disagrees.
+    Questions: <a href="mailto:diego.hernandez@stonybrook.edu">diego.hernandez@stonybrook.edu</a>.
+  </p>
+</div>
+
+<script src="pol309-common.js"></script>
+<script>
+(function () {
+  /* Rubric text lives in data/pol309-rubrics.json, keyed by term id,
+     kept out of content.json because the CMS rewrites that file and
+     drops any field its config doesn't declare. Weights, the letter
+     scale, and the late rate still come from the term's grading block
+     in content.json, so the conversions always match the calculator. */
+  var TERM = null, RUB = null, SCALE = [], WEIGHTS = {}, lateAmount = 0;
+  var STORE_KEY = "", state = {}, activeId = null;
+
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  /* course-grade points, trimmed: 2.25, 2.1, 14 */
+  function fmt(n) { return String(Math.round(n * 100) / 100); }
+  function range(a, b) { return a === b ? String(a) : a + "–" + b; }
+  function letter(pct) {
+    for (var i = 0; i < SCALE.length; i++) if (pct >= SCALE[i].cutoff) return SCALE[i].letter;
+    return "F";
+  }
+  function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
+  function aState(id) { return state[id] || (state[id] = {}); }
+  function levelOf(crit, v) {
+    for (var i = 0; i < crit.levels.length; i++) if (v >= crit.levels[i].min && v <= crit.levels[i].max) return i;
+    return -1;
+  }
+
+  var tabsEl = document.getElementById("tabs");
+  var panel = document.getElementById("panel");
+
+  function renderTabs() {
+    tabsEl.innerHTML = RUB.assignments.map(function (a) {
+      var w = WEIGHTS[a.id];
+      return '<button class="tab" role="tab" type="button" id="tab_' + esc(a.id) + '" data-id="' + esc(a.id) + '" aria-selected="' + (a.id === activeId) + '">' +
+        esc(a.short) + (w != null ? '<span class="tw">' + w + "%</span>" : "") + "</button>";
+    }).join("");
+    tabsEl.querySelectorAll(".tab").forEach(function (b) {
+      b.addEventListener("click", function () { select(b.getAttribute("data-id"), true); });
+    });
+  }
+
+  function renderPanel() {
+    var a = RUB.assignments.filter(function (x) { return x.id === activeId; })[0];
+    var w = WEIGHTS[a.id];
+    var k = w != null ? w / 100 : null;
+    var levels = RUB.levels;
+    var html = '<h2 class="a-title">' + esc(a.title) + "</h2>" +
+      '<p class="a-meta">' + (w != null ? "<b>" + w + "% of the course grade</b> · " : "") + esc(a.meta) + "</p>" +
+      (a.flag ? '<p class="a-flag">' + esc(a.flag) + "</p>" : "") +
+      (a.note ? '<p class="a-note">' + esc(a.note) + "</p>" : "") +
+      (k != null ? '<p class="a-conv">Conversion: 1 rubric point = <b>' + fmt(k) + "</b> course-grade points &middot; 100 rubric points = <b>" + w + "</b></p>" : "");
+
+    html += '<div class="rubric"><div class="r-head" aria-hidden="true"><div>Criterion</div>' +
+      levels.map(function (l) { return "<div>" + esc(l) + "</div>"; }).join("") + "</div>";
+
+    a.criteria.forEach(function (c) {
+      var cid = a.id + "_" + c.id;
+      html += '<div class="crit" role="radiogroup" aria-labelledby="n_' + cid + '">' +
+        '<div class="crit-head">' +
+          '<span class="crit-name" id="n_' + cid + '">' + esc(c.name) + "</span>" +
+          '<span class="crit-max">' + c.max + " points" + (c.note ? ", " + esc(c.note) : "") + "</span>" +
+          (k != null ? '<span class="crit-conv">worth up to ' + fmt(c.max * k) + " course pts</span>" : "") +
+          '<span class="stepper">' +
+            '<button type="button" data-step="-1" data-c="' + esc(c.id) + '" aria-label="One point less">&minus;</button>' +
+            '<input type="number" inputmode="numeric" min="0" max="' + c.max + '" step="1" data-c="' + esc(c.id) + '" aria-label="Points for ' + esc(c.name) + '" placeholder="–" />' +
+            '<button type="button" data-step="1" data-c="' + esc(c.id) + '" aria-label="One point more">+</button>' +
+            '<span class="of">/ ' + c.max + "</span>" +
+          "</span>" +
+          '<span class="crit-earned" data-earned="' + esc(c.id) + '"></span>' +
+        "</div>";
+      c.levels.forEach(function (lv, i) {
+        html += '<button type="button" class="cell" role="radio" aria-checked="false" data-c="' + esc(c.id) + '" data-l="' + i + '">' +
+          '<span class="lvl">' + esc(levels[i]) + "</span>" +
+          '<span class="pts">' + range(lv.min, lv.max) + " pts</span>" +
+          (k != null ? '<span class="conv">= ' + range(fmt(lv.min * k), fmt(lv.max * k)) + " course pts</span>" : "") +
+          '<span class="desc">' + esc(lv.desc) + "</span></button>";
+      });
+      html += "</div>";
+    });
+    html += "</div>";
+
+    html += '<div class="summary" aria-live="polite">' +
+      '<div><span class="rl">Rubric score</span><div class="big" id="sumScore"></div><p id="sumProgress"></p></div>' +
+      '<div class="late"><span class="rl">After late penalty</span><div class="big" id="sumAdj"></div>' +
+        '<label>Days late <input type="number" min="0" max="14" step="1" id="lateDays" placeholder="0" /></label>' +
+        '<p id="sumCourse"></p></div>' +
+      '<div class="actions">' +
+        '<button type="button" class="btn primary" id="sendBtn">Send score to grade calculator</button>' +
+        '<button type="button" class="btn" id="resetBtn">Clear this rubric</button>' +
+        '<span class="sent" id="sentMsg"></span>' +
+      "</div></div>";
+
+    if (a.guide && a.guide.length) {
+      html += '<h3 class="g-title">' + esc(a.guideTitle || "Guide") + "</h3>" +
+        '<table class="guide"><thead><tr><th>Option</th><th>What a full-credit paper covers</th></tr></thead><tbody>' +
+        a.guide.map(function (g) { return "<tr><td>" + esc(g.option) + "</td><td>" + esc(g.covers) + "</td></tr>"; }).join("") +
+        "</tbody></table>";
+    }
+    panel.innerHTML = html;
+    panel.setAttribute("aria-labelledby", "tab_" + a.id);
+    wire(a);
+    update(a);
+  }
+
+  function setScore(a, c, v) {
+    var s = aState(a.id);
+    if (v === null || isNaN(v)) delete s[c.id];
+    else s[c.id] = Math.max(0, Math.min(c.max, Math.round(v)));
+    save();
+    update(a);
+  }
+
+  function wire(a) {
+    var byId = {};
+    a.criteria.forEach(function (c) { byId[c.id] = c; });
+    panel.querySelectorAll(".cell").forEach(function (cell) {
+      cell.addEventListener("click", function () {
+        var c = byId[cell.getAttribute("data-c")];
+        var lv = c.levels[+cell.getAttribute("data-l")];
+        var cur = aState(a.id)[c.id];
+        /* keep a score the student already fine-tuned inside this level;
+           otherwise land on the top of the level's range */
+        setScore(a, c, (cur != null && cur >= lv.min && cur <= lv.max) ? cur : lv.max);
+      });
+    });
+    panel.querySelectorAll(".stepper input").forEach(function (inp) {
+      inp.addEventListener("input", function () {
+        var raw = inp.value.trim();
+        setScore(a, byId[inp.getAttribute("data-c")], raw === "" ? null : parseFloat(raw));
+      });
+      /* show the clamped value once the student leaves the field */
+      inp.addEventListener("blur", function () { update(a); });
+    });
+    panel.querySelectorAll(".stepper button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var c = byId[b.getAttribute("data-c")];
+        var cur = aState(a.id)[c.id];
+        var step = +b.getAttribute("data-step");
+        setScore(a, c, cur == null ? (step > 0 ? 0 : c.max) : cur + step);
+      });
+    });
+    var late = document.getElementById("lateDays");
+    late.addEventListener("input", function () {
+      var raw = late.value.trim(), n = parseFloat(raw);
+      var s = aState(a.id);
+      if (raw === "" || isNaN(n)) delete s._late; else s._late = Math.max(0, Math.min(14, Math.round(n)));
+      save(); update(a, true);
+    });
+    document.getElementById("resetBtn").addEventListener("click", function () {
+      state[a.id] = {}; save(); update(a);
+    });
+    document.getElementById("sendBtn").addEventListener("click", function () { send(a); });
+  }
+
+  function totals(a) {
+    var s = aState(a.id), total = 0, scored = 0;
+    a.criteria.forEach(function (c) { if (s[c.id] != null) { total += s[c.id]; scored++; } });
+    return { total: total, scored: scored, late: s._late || 0 };
+  }
+
+  function update(a, fromLate) {
+    var s = aState(a.id), w = WEIGHTS[a.id], k = w != null ? w / 100 : null;
+    a.criteria.forEach(function (c) {
+      var v = s[c.id], li = v != null ? levelOf(c, v) : -1;
+      var inp = panel.querySelector('.stepper input[data-c="' + c.id + '"]');
+      if (inp && document.activeElement !== inp) inp.value = v != null ? v : "";
+      panel.querySelectorAll('.cell[data-c="' + c.id + '"]').forEach(function (cell) {
+        var on = +cell.getAttribute("data-l") === li;
+        cell.setAttribute("aria-checked", String(on));
+        cell.tabIndex = (on || (li === -1 && cell.getAttribute("data-l") === "0")) ? 0 : -1;
+      });
+      var earned = panel.querySelector('[data-earned="' + c.id + '"]');
+      earned.textContent = v != null ? RUB.levels[li] + (k != null ? " · " + fmt(v * k) + " course pts" : "") : "";
+    });
+
+    var t = totals(a), n = a.criteria.length, done = t.scored === n;
+    var lateInp = document.getElementById("lateDays");
+    if (!fromLate) lateInp.value = s._late ? s._late : "";
+    var adj = Math.max(0, t.total - lateAmount * t.late);
+
+    document.getElementById("sumScore").innerHTML = t.scored
+      ? t.total + " <small>/ 100</small>" + (done ? " &middot; <b>" + esc(letter(t.total)) + "</b>" : "")
+      : '<small>No criteria scored yet</small>';
+    document.getElementById("sumProgress").textContent = done
+      ? "All " + n + " criteria scored."
+      : t.scored + " of " + n + " criteria scored" + (t.scored ? ", so this is a partial total." : ". Click a cell to start.");
+    document.getElementById("sumAdj").innerHTML = t.scored
+      ? adj + " <small>/ 100</small>" + (done ? " &middot; <b>" + esc(letter(adj)) + "</b>" : "")
+      : "<small>&mdash;</small>";
+    document.getElementById("sumCourse").textContent = (t.late ? "−" + fmt(lateAmount * t.late) + " for " + t.late + " day" + (t.late === 1 ? "" : "s") + " late (" + lateAmount + " per day). " : "") +
+      (k != null && t.scored ? "Worth " + fmt(adj * k) + " of " + w + " course-grade points." : "");
+
+    var send = document.getElementById("sendBtn");
+    send.disabled = !done || w == null;
+    send.title = w == null ? "This assignment isn't in the grade calculator for this term" : (done ? "" : "Score every criterion first");
+    document.getElementById("sentMsg").textContent = "";
+  }
+
+  /* writes into the calculator's own per-term store, raw score and days
+     late separately, since the calculator applies the late penalty itself */
+  function send(a) {
+    var t = totals(a), key = "pol309-grades-" + TERM.id, store = {};
+    try { store = JSON.parse(localStorage.getItem(key) || "{}"); } catch (e) {}
+    store["s_" + a.id] = String(t.total);
+    store["l_" + a.id] = t.late ? String(t.late) : "";
+    var ok = true;
+    try { localStorage.setItem(key, JSON.stringify(store)); } catch (e) { ok = false; }
+    document.getElementById("sentMsg").innerHTML = ok
+      ? 'Saved as your ' + esc(a.short) + ' score. <a href="pol309-grades.html?term=' + encodeURIComponent(TERM.id) + '">Open the calculator &rarr;</a>'
+      : "Your browser blocked saving; type " + t.total + " into the calculator instead.";
+  }
+
+  function select(id, pushHash) {
+    if (!RUB.assignments.some(function (a) { return a.id === id; })) id = RUB.assignments[0].id;
+    activeId = id;
+    tabsEl.querySelectorAll(".tab").forEach(function (b) {
+      b.setAttribute("aria-selected", String(b.getAttribute("data-id") === id));
+    });
+    if (pushHash) history.replaceState(null, "", location.pathname + location.search + "#" + id);
+    renderPanel();
+  }
+
+  /* arrow keys move between tabs, and between level cells within a criterion */
+  tabsEl.addEventListener("keydown", function (e) {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    var tabs = [].slice.call(tabsEl.querySelectorAll(".tab"));
+    var i = tabs.indexOf(document.activeElement);
+    if (i < 0) return;
+    var next = tabs[(i + (e.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length];
+    next.focus(); next.click(); e.preventDefault();
+  });
+  panel.addEventListener("keydown", function (e) {
+    var cell = e.target.closest && e.target.closest(".cell");
+    if (!cell || ["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].indexOf(e.key) < 0) return;
+    var cells = [].slice.call(cell.parentNode.querySelectorAll(".cell"));
+    var i = cells.indexOf(cell) + (e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1);
+    var next = cells[(i + cells.length) % cells.length];
+    next.click();
+    var again = panel.querySelector('.cell[data-c="' + next.getAttribute("data-c") + '"][data-l="' + next.getAttribute("data-l") + '"]');
+    if (again) again.focus();
+    e.preventDefault();
+  });
+
+  document.getElementById("themeBtn").onclick = function () {
+    var r = document.documentElement;
+    var next = r.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    r.setAttribute("data-theme", next);
+    try { localStorage.setItem("theme", next); } catch (e) {}
+  };
+
+  var body = document.getElementById("rubricBody");
+  var unavailable = document.getElementById("rubricUnavailable");
+  var intro = document.getElementById("intro");
+  var ALL = {};
+
+  function initTerm(term) {
+    TERM = term;
+    document.getElementById("eyebrowTerm").textContent = "POL309 · " + term.label;
+    document.getElementById("backLink").setAttribute("href", "pol309-grades.html?term=" + encodeURIComponent(term.id));
+    document.title = "POL309 · Grading Rubrics · " + term.label;
+    RUB = ALL[term.id];
+    if (!RUB || !Array.isArray(RUB.assignments) || !RUB.assignments.length) {
+      body.hidden = true; unavailable.hidden = false; intro.innerHTML = "";
+      document.getElementById("unavailableTitle").textContent = "Rubrics unavailable for " + term.label;
+      return;
+    }
+    body.hidden = false; unavailable.hidden = true;
+    intro.innerHTML = (RUB.intro || []).map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("");
+
+    var g = term.grading || {};
+    SCALE = g.scale || [];
+    lateAmount = g.lateAmount || 0;
+    WEIGHTS = {};
+    (g.items || []).forEach(function (it) { WEIGHTS[it.id] = it.w; });
+
+    STORE_KEY = "pol309-rubric-" + term.id;
+    try { state = JSON.parse(localStorage.getItem(STORE_KEY) || "{}") || {}; } catch (e) { state = {}; }
+
+    activeId = location.hash.slice(1) || null;
+    renderTabs();
+    select(activeId, false);
+  }
+
+  Promise.all([
+    POL309.fetchContent(),
+    fetch("data/pol309-rubrics.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; })
+  ]).then(function (res) {
+    var c = res[0];
+    ALL = res[1] || {};
+    var terms = (c && c.pol309 && Array.isArray(c.pol309.terms)) ? c.pol309.terms : [];
+    var picker = document.getElementById("termPicker");
+    if (!terms.length) { body.hidden = true; unavailable.hidden = false; return; }
+    picker.innerHTML = terms.map(function (t) {
+      return '<option value="' + esc(t.id) + '">' + esc(t.label) + "</option>";
+    }).join("");
+    var current = POL309.pickTerm(terms, { queryTerm: POL309.queryTerm() });
+    picker.value = current.id;
+    initTerm(current);
+    picker.addEventListener("change", function () {
+      var term = terms.filter(function (t) { return t.id === picker.value; })[0];
+      if (!term) return;
+      var url = new URL(location.href);
+      url.searchParams.set("term", term.id);
+      url.hash = "";
+      history.replaceState(null, "", url);
+      initTerm(term);
+    });
+  });
+})();
+</script>
+</body>
+</html>
