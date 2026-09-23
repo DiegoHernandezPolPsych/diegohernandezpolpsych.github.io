@@ -171,6 +171,25 @@ table.guide td:last-child { color: var(--muted); }
 .note { margin-top: 36px; color: var(--faint); font-size: .82rem; border-top: 1px solid var(--line); padding-top: 14px; }
 .note a { color: var(--accent); text-decoration: none; }
 
+/* grading mode */
+.term-switch { flex-wrap: wrap; }
+.mode-btn { margin-left: 14px; }
+.mode-btn[aria-pressed="true"] { color: var(--ink); border-color: var(--gold); background: var(--surface); }
+.gbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; border: 1px solid var(--gold); background: var(--surface); padding: 12px 16px; margin: 0 0 18px; }
+.gbar label { font-size: .85rem; color: var(--muted); display: flex; align-items: center; gap: 10px; }
+.gbar input { font: inherit; font-size: .95rem; width: 220px; max-width: 100%; padding: 7px 10px; background: var(--bg); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 4px; }
+.gbar input:focus { outline: 2px solid var(--gold); border-color: transparent; }
+.gfile { font-family: var(--font-mono); font-size: .74rem; color: var(--faint); }
+.gfile b { color: var(--accent); font-weight: 500; word-break: break-all; }
+.comments .c-intro, .comments .c-empty { color: var(--muted); font-size: .88rem; max-width: 760px; margin: 0 0 12px; }
+.comments #cCount { color: var(--teal); }
+.c-card { border: 1px solid var(--line-strong); margin: 0 0 12px; background: var(--surface); }
+.c-head { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 12px; flex-wrap: wrap; padding: 9px 14px; background: var(--bg-tint); border-bottom: 1px solid var(--line); }
+.c-name { font-weight: 600; font-size: .92rem; }
+.c-score { font-family: var(--font-mono); font-size: .74rem; color: var(--teal); }
+.c-card textarea { display: block; width: 100%; min-height: 84px; resize: vertical; overflow: hidden; padding: 10px 14px; font: inherit; font-size: .92rem; line-height: 1.5; color: var(--ink); background: transparent; border: 0; }
+.c-card textarea:focus { outline: 2px solid var(--gold); outline-offset: -2px; }
+
 /* narrow screens: each criterion becomes a card with stacked levels */
 @media (max-width: 820px) {
   .r-head { display: none; }
@@ -206,6 +225,7 @@ table.guide td:last-child { color: var(--muted); }
   <div class="term-switch">
     <label for="termPicker">Term</label>
     <select id="termPicker"></select>
+    <button type="button" class="btn mode-btn" id="modeBtn" aria-pressed="false" title="For instructors: name the PDF for a student and add comments on criteria below full credit">Grading mode: off</button>
   </div>
 
   <div class="unavailable" id="rubricUnavailable" hidden>
@@ -236,6 +256,10 @@ table.guide td:last-child { color: var(--muted); }
      in content.json, so the conversions always match the calculator. */
   var TERM = null, RUB = null, SCALE = [], WEIGHTS = {}, lateAmount = 0;
   var STORE_KEY = "", state = {}, activeId = null;
+  /* grading mode is an instructor tool: a last-name field that names the
+     exported PDF, and comment boxes for criteria scored below the max */
+  var grading = false, GRADE_KEY = "pol309-rubric-grading";
+  try { grading = localStorage.getItem(GRADE_KEY) === "1"; } catch (e) {}
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
     return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -278,6 +302,7 @@ table.guide td:last-child { color: var(--muted); }
       (a.note ? '<p class="a-note">' + esc(a.note) + "</p>" : "") +
       (k != null ? '<p class="a-conv">Conversion: 1 rubric point = <b>' + fmt(k) + "</b> course-grade points &middot; 100 rubric points = <b>" + w + "</b></p>" : "");
 
+    if (grading) html += gbarHtml(a);
     html += '<div class="rubric"><div class="r-head" aria-hidden="true"><div>Criterion</div>' +
       levels.map(function (l) { return "<div>" + esc(l) + "</div>"; }).join("") + "</div>";
 
@@ -313,12 +338,16 @@ table.guide td:last-child { color: var(--muted); }
         '<label>Days late <input type="number" min="0" max="14" step="1" id="lateDays" placeholder="0" /></label>' +
         '<p id="sumCourse"></p></div>' +
       '<div class="actions">' +
-        '<button type="button" class="btn primary" id="sendBtn">Send score to grade calculator</button>' +
-        '<button type="button" class="btn" id="pdfBtn" title="Downloads this rubric with your selected levels highlighted">Download this rubric (PDF)</button>' +
-        '<button type="button" class="btn" id="pdfAllBtn" title="One PDF with every assignment\'s rubric and your selections">Download all rubrics (PDF)</button>' +
+        (grading
+          ? '<button type="button" class="btn primary" id="pdfBtn">Export graded PDF</button>'
+          : '<button type="button" class="btn primary" id="sendBtn">Send score to grade calculator</button>' +
+            '<button type="button" class="btn" id="pdfBtn" title="Downloads this rubric with your selected levels highlighted">Download this rubric (PDF)</button>' +
+            '<button type="button" class="btn" id="pdfAllBtn" title="One PDF with every assignment\'s rubric and your selections">Download all rubrics (PDF)</button>') +
         '<button type="button" class="btn" id="resetBtn">Clear this rubric</button>' +
         '<span class="sent" id="sentMsg"></span>' +
       "</div></div>";
+
+    if (grading) html += '<div class="comments" id="comments"></div>';
 
     if (a.guide && a.guide.length) {
       html += '<h3 class="g-title">' + esc(a.guideTitle || "Guide") + "</h3>" +
@@ -379,9 +408,15 @@ table.guide td:last-child { color: var(--muted); }
     document.getElementById("resetBtn").addEventListener("click", function () {
       state[a.id] = {}; save(); update(a);
     });
-    document.getElementById("sendBtn").addEventListener("click", function () { send(a); });
-    document.getElementById("pdfBtn").addEventListener("click", function () { exportPdf([a]); });
-    document.getElementById("pdfAllBtn").addEventListener("click", function () { exportPdf(RUB.assignments); });
+    var sendB = document.getElementById("sendBtn"), allB = document.getElementById("pdfAllBtn"), nameIn = document.getElementById("gName");
+    if (sendB) sendB.addEventListener("click", function () { send(a); });
+    if (allB) allB.addEventListener("click", function () { exportPdf(RUB.assignments, false); });
+    document.getElementById("pdfBtn").addEventListener("click", function () { exportPdf([a], grading); });
+    if (nameIn) nameIn.addEventListener("input", function () {
+      var st = aState(a.id), v = nameIn.value.trim();
+      if (v) st._name = v; else delete st._name;
+      save(); gradingUpdate(a);
+    });
   }
 
   function totals(a) {
@@ -422,10 +457,13 @@ table.guide td:last-child { color: var(--muted); }
     document.getElementById("sumCourse").textContent = (t.late ? "−" + fmt(lateAmount * t.late) + " for " + t.late + " day" + (t.late === 1 ? "" : "s") + " late (" + lateAmount + " per day). " : "") +
       (k != null && t.scored ? "Worth " + fmt(adj * k) + " of " + w + " course-grade points." : "");
 
-    var send = document.getElementById("sendBtn");
-    send.disabled = !done || w == null;
-    send.title = w == null ? "This assignment isn't in the grade calculator for this term" : (done ? "" : "Score every criterion first");
+    var sendB = document.getElementById("sendBtn");
+    if (sendB) {
+      sendB.disabled = !done || w == null;
+      sendB.title = w == null ? "This assignment isn't in the grade calculator for this term" : (done ? "" : "Score every criterion first");
+    }
     document.getElementById("sentMsg").textContent = "";
+    if (grading) gradingUpdate(a);
   }
 
   /* writes into the calculator's own per-term store, raw score and days
@@ -440,6 +478,71 @@ table.guide td:last-child { color: var(--muted); }
     document.getElementById("sentMsg").innerHTML = ok
       ? 'Saved as your ' + esc(a.short) + ' score. <a href="pol309-grades.html?term=' + encodeURIComponent(TERM.id) + '">Open the calculator &rarr;</a>'
       : "Your browser blocked saving; type " + t.total + " into the calculator instead.";
+  }
+
+  /* ---- grading mode ------------------------------------------------ */
+  function slug(parts) {
+    return parts.join("-").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, "").replace(/[^A-Za-z0-9._-]/g, "");
+  }
+  function cleanName(raw) { return slug([String(raw || "")]); }
+  function pdfName(a, last) { return slug(["POL309", TERM.label, a.short, last]) + ".pdf"; }
+  /* criteria that have a score, but not the maximum */
+  function belowMax(a) {
+    var s = aState(a.id);
+    return a.criteria.filter(function (c) { return s[c.id] != null && s[c.id] < c.max; });
+  }
+  function gbarHtml(a) {
+    return '<div class="gbar"><label>Student last name <input type="text" id="gName" autocomplete="off" spellcheck="false" maxlength="40" placeholder="e.g. Hernandez" value="' + esc(aState(a.id)._name || "") + '" /></label>' +
+      '<span class="gfile">Exports as <b id="gFile"></b></span></div>';
+  }
+  function gradingUpdate(a) {
+    var last = cleanName(aState(a.id)._name), btn = document.getElementById("pdfBtn");
+    btn.disabled = !last;
+    btn.title = last ? "" : "Enter the student's last name first";
+    document.getElementById("gFile").textContent = pdfName(a, last || "LastName");
+    renderComments(a);
+  }
+  function commentCount(a) {
+    var cm = aState(a.id)._comments || {}, list = belowMax(a), el = document.getElementById("cCount");
+    if (!el) return;
+    var n = list.filter(function (c) { return String(cm[c.id] || "").trim(); }).length;
+    el.textContent = n + " of " + list.length + " written.";
+  }
+  function grow(ta) { ta.style.height = "auto"; ta.style.height = ta.scrollHeight + 2 + "px"; }
+  /* one comment box per criterion below full credit; rebuilt only when that
+     set changes, so typing is never interrupted by a re-render */
+  function renderComments(a) {
+    var box = document.getElementById("comments");
+    if (!box) return;
+    var s = aState(a.id), list = belowMax(a), cm = s._comments || {};
+    var sig = list.map(function (c) { return c.id; }).join("|");
+    if (box.getAttribute("data-sig") !== sig || !box.firstChild) {
+      box.setAttribute("data-sig", sig);
+      var h = '<h3 class="g-title">Comments</h3>';
+      if (!list.length) h += '<p class="c-empty">A comment box appears here for every criterion you score below its maximum. Nothing is below full credit yet.</p>';
+      else {
+        h += '<p class="c-intro">These go in the exported PDF, one section per criterion; boxes left empty are left out. Start a line with "- " for a bullet, and leave a blank line between paragraphs. <span id="cCount"></span></p>';
+        list.forEach(function (c) {
+          h += '<div class="c-card"><div class="c-head"><span class="c-name">' + esc(c.name) + '</span><span class="c-score" data-cs="' + esc(c.id) + '"></span></div>' +
+            '<textarea data-c="' + esc(c.id) + '" aria-label="Comment on ' + esc(c.name) + '" placeholder="Why this criterion earned less than full credit, and what would raise it.">' + esc(cm[c.id] || "") + "</textarea></div>";
+        });
+      }
+      box.innerHTML = h;
+      box.querySelectorAll("textarea").forEach(function (ta) {
+        grow(ta);
+        ta.addEventListener("input", function () {
+          grow(ta);
+          var st = aState(a.id);
+          (st._comments || (st._comments = {}))[ta.getAttribute("data-c")] = ta.value;
+          save(); commentCount(a);
+        });
+      });
+    }
+    list.forEach(function (c) {
+      var el = box.querySelector('[data-cs="' + c.id + '"]'), v = s[c.id];
+      if (el) el.textContent = v + " / " + c.max + " · " + (RUB.levels[levelOf(c, v)] || "") + " (−" + (c.max - v) + ")";
+    });
+    commentCount(a);
   }
 
   /* ---- PDF export ------------------------------------------------
@@ -509,10 +612,10 @@ table.guide td:last-child { color: var(--muted); }
              accent: [.5, .36, .04], rose: [.62, .3, .2], white: [1, 1, 1] };
   function rgb(c) { return c[0].toFixed(3) + " " + c[1].toFixed(3) + " " + c[2].toFixed(3); }
 
-  function PdfDoc(title) { this.title = title; this.pages = []; this.ops = null; this.y = TOP; }
+  function PdfDoc(title, student) { this.title = title; this.student = student || ""; this.pages = []; this.ops = null; this.y = TOP; }
   PdfDoc.prototype.newPage = function () {
     this.ops = []; this.pages.push(this.ops); this.y = TOP;
-    this.text(PM, 24, pdfEnc("POL309 · Politics of the European Union · " + TERM.label), 7.5, false, PC.faint);
+    this.text(PM, 24, pdfEnc("POL309 · Politics of the European Union · " + TERM.label + (this.student ? " · Student: " + this.student : "")), 7.5, false, PC.faint);
     var d = pdfEnc("Grading rubrics · " + new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }));
     this.text(PW - PM - textW(d, 7.5, false), 24, d, 7.5, false, PC.faint);
     this.line(PM, 30, PW - PM, 30, PC.line, .5);
@@ -543,7 +646,7 @@ table.guide td:last-child { color: var(--muted); }
     var n = this.pages.length, self = this;
     this.pages.forEach(function (ops, i) {
       self.ops = ops;
-      self.text(PM, PH - 22, pdfEnc("For planning and self-assessment. Grades on Brightspace are authoritative, and the syllabus governs."), 7.5, false, PC.faint);
+      self.text(PM, PH - 22, pdfEnc((self.student ? "Graded rubric. " : "For planning and self-assessment. ") + "Grades on Brightspace are authoritative, and the syllabus governs."), 7.5, false, PC.faint);
       var p = pdfEnc("Page " + (i + 1) + " of " + n);
       self.text(PW - PM - textW(p, 7.5, false), PH - 22, p, 7.5, false, PC.faint);
     });
@@ -572,7 +675,7 @@ table.guide td:last-child { color: var(--muted); }
 
   /* one assignment: heading, the rubric grid with the selected level of
      each criterion highlighted, the score summary, and the guide table */
-  function pdfAssignment(doc, a) {
+  function pdfAssignment(doc, a, g) {
     var s = aState(a.id), w = WEIGHTS[a.id], k = w != null ? w / 100 : null;
     var t = totals(a), n = a.criteria.length, done = t.scored === n;
     var adj = Math.max(0, t.total - lateAmount * t.late);
@@ -581,6 +684,7 @@ table.guide td:last-child { color: var(--muted); }
 
     doc.newPage();
     doc.para(a.title, 15, true, PC.ink, 19);
+    if (g) doc.para("Student: " + g.name, 11, true, PC.ink, 16);
     doc.para((w != null ? w + "% of the course grade · " : "") + a.meta, 9.5, false, PC.muted, 13);
     if (a.flag) doc.para(a.flag, 9, false, PC.rose, 12);
     if (a.note) doc.para(a.note, 9, false, PC.muted, 12);
@@ -650,7 +754,12 @@ table.guide td:last-child { color: var(--muted); }
     if (k != null && t.scored) doc.text(PM + half, sy + 71, pdfEnc("Worth " + fmt(adj * k) + " of " + w + " course-grade points."), 8.5, false, PC.muted);
     doc.y = sy + 78;
 
-    if (a.guide && a.guide.length) {
+    if (g) {
+      var items = belowMax(a).filter(function (c) { return s._comments && String(s._comments[c.id] || "").trim(); });
+      if (items.length) pdfComments(doc, a, items);
+    }
+
+    if (!g && a.guide && a.guide.length) {
       doc.y += 20;
       if (doc.y + 60 > BOTTOM) doc.newPage();
       doc.para(a.guideTitle || "Guide", 11, true, PC.ink, 15);
@@ -671,13 +780,66 @@ table.guide td:last-child { color: var(--muted); }
     }
   }
 
-  function exportPdf(list) {
+  /* comment text -> blocks: blank line = paragraph gap, "- " = bullet */
+  function parseComment(raw) {
+    var out = [], gap = false;
+    String(raw).split(/\r?\n/).forEach(function (ln) {
+      var t = ln.trim();
+      if (!t) { if (out.length && !gap) { out.push({ gap: true }); gap = true; } return; }
+      gap = false;
+      var m = /^[-*•]\s+(.*)$/.exec(t);
+      out.push(m ? { bullet: true, text: m[1] } : { text: t });
+    });
+    while (out.length && out[out.length - 1].gap) out.pop();
+    return out;
+  }
+
+  /* one section per criterion scored below its max: a header band with the
+     criterion and score, then the grader's comment */
+  function pdfComments(doc, a, items) {
+    var s = aState(a.id);
+    doc.y += 20;
+    if (doc.y + 70 > BOTTOM) doc.newPage();
+    doc.para("Comments", 12, true, PC.ink, 17);
+    doc.y += 4;
+    items.forEach(function (c) {
+      var v = s[c.id], lvl = RUB.levels[levelOf(c, v)] || "";
+      var right = pdfEnc(v + " / " + c.max + (lvl ? " · " + lvl : "") + "  (-" + (c.max - v) + ")");
+      if (doc.y + 46 > BOTTOM) doc.newPage();
+      doc.rect(PM, doc.y, PCW, 20, { fill: PC.head, stroke: PC.line, lw: .5 });
+      doc.text(PM + 8, doc.y + 13.5, pdfEnc(c.name), 9.5, true, PC.ink);
+      doc.text(PW - PM - 8 - textW(right, 8.5, true), doc.y + 13.5, right, 8.5, true, PC.teal);
+      doc.y += 26;
+      parseComment(s._comments[c.id]).forEach(function (b) {
+        if (b.gap) { doc.y += 4; return; }
+        var indent = b.bullet ? 12 : 0;
+        wrapText(b.text, 9, false, PCW - 24 - indent).forEach(function (ln, i) {
+          if (doc.y + 12 > BOTTOM) doc.newPage();
+          if (b.bullet && i === 0) doc.text(PM + 12, doc.y + 9, pdfEnc("•"), 9, false, PC.muted);
+          doc.text(PM + 12 + indent, doc.y + 9, ln, 9, false, PC.ink);
+          doc.y += 12;
+        });
+      });
+      doc.y += 6;
+      doc.line(PM, doc.y, PW - PM, doc.y, PC.line, .5);
+      doc.y += 12;
+    });
+  }
+
+  function exportPdf(list, grade) {
     var msg = document.getElementById("sentMsg");
     try {
-      var one = list.length === 1;
-      var doc = new PdfDoc("POL309 " + TERM.label + " grading rubric" + (one ? ": " + list[0].short : "s"));
-      list.forEach(function (a) { pdfAssignment(doc, a); });
-      var name = ["POL309", TERM.label, one ? list[0].short : "all", "rubric" + (one ? "" : "s")].join("-").replace(/\s+/g, "").replace(/[^A-Za-z0-9._-]/g, "") + ".pdf";
+      var one = list.length === 1, g = null, name;
+      if (grade) {
+        var nm = String(aState(list[0].id)._name || "").trim();
+        if (!cleanName(nm)) { msg.textContent = "Enter the student's last name first."; return; }
+        g = { name: nm };
+        name = pdfName(list[0], cleanName(nm));
+      } else {
+        name = slug(["POL309", TERM.label, one ? list[0].short : "all", "rubric" + (one ? "" : "s")]) + ".pdf";
+      }
+      var doc = new PdfDoc("POL309 " + TERM.label + " grading rubric" + (one ? ": " + list[0].short : "s") + (g ? " (" + g.name + ")" : ""), g && g.name);
+      list.forEach(function (a) { pdfAssignment(doc, a, g); });
       var url = URL.createObjectURL(doc.build());
       var link = document.createElement("a");
       link.href = url; link.download = name;
@@ -719,6 +881,19 @@ table.guide td:last-child { color: var(--muted); }
     if (again) again.focus();
     e.preventDefault();
   });
+
+  var modeBtn = document.getElementById("modeBtn");
+  function setModeUI() {
+    modeBtn.setAttribute("aria-pressed", String(grading));
+    modeBtn.textContent = "Grading mode: " + (grading ? "on" : "off");
+  }
+  modeBtn.addEventListener("click", function () {
+    grading = !grading;
+    try { localStorage.setItem(GRADE_KEY, grading ? "1" : "0"); } catch (e) {}
+    setModeUI();
+    if (RUB && !body.hidden) renderPanel();
+  });
+  setModeUI();
 
   document.getElementById("themeBtn").onclick = function () {
     var r = document.documentElement;
