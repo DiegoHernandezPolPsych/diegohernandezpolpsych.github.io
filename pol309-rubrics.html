@@ -314,6 +314,8 @@ table.guide td:last-child { color: var(--muted); }
         '<p id="sumCourse"></p></div>' +
       '<div class="actions">' +
         '<button type="button" class="btn primary" id="sendBtn">Send score to grade calculator</button>' +
+        '<button type="button" class="btn" id="pdfBtn" title="Downloads this rubric with your selected levels highlighted">Download this rubric (PDF)</button>' +
+        '<button type="button" class="btn" id="pdfAllBtn" title="One PDF with every assignment\'s rubric and your selections">Download all rubrics (PDF)</button>' +
         '<button type="button" class="btn" id="resetBtn">Clear this rubric</button>' +
         '<span class="sent" id="sentMsg"></span>' +
       "</div></div>";
@@ -378,6 +380,8 @@ table.guide td:last-child { color: var(--muted); }
       state[a.id] = {}; save(); update(a);
     });
     document.getElementById("sendBtn").addEventListener("click", function () { send(a); });
+    document.getElementById("pdfBtn").addEventListener("click", function () { exportPdf([a]); });
+    document.getElementById("pdfAllBtn").addEventListener("click", function () { exportPdf(RUB.assignments); });
   }
 
   function totals(a) {
@@ -436,6 +440,253 @@ table.guide td:last-child { color: var(--muted); }
     document.getElementById("sentMsg").innerHTML = ok
       ? 'Saved as your ' + esc(a.short) + ' score. <a href="pol309-grades.html?term=' + encodeURIComponent(TERM.id) + '">Open the calculator &rarr;</a>'
       : "Your browser blocked saving; type " + t.total + " into the calculator instead.";
+  }
+
+  /* ---- PDF export ------------------------------------------------
+     A small hand-written PDF (standard Helvetica, no library) so the
+     file downloads directly instead of going through the print dialog.
+     Always light-on-white, landscape Letter, whatever the site theme. */
+  var HW  = [278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584];
+  var HWB = [278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611,975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667,667,611,333,278,333,584,556,333,556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556,500,389,280,389,584];
+  var WIN1252 = { 8211: 150, 8212: 151, 8216: 145, 8217: 146, 8220: 147, 8221: 148, 8226: 149, 8230: 133 };
+
+  /* unicode -> WinAnsi bytes (as a string); anything outside it falls back
+     to its unaccented letter or "?" */
+  function pdfEnc(s) {
+    s = String(s == null ? "" : s).replace(/−/g, "-").replace(/→/g, "->").replace(/≈/g, "~").replace(/[   ]/g, " ").replace(/\s+/g, " ");
+    var out = "";
+    for (var i = 0; i < s.length; i++) {
+      var ch = s.charCodeAt(i);
+      if (ch >= 32 && ch < 127) out += s.charAt(i);
+      else if (WIN1252[ch]) out += String.fromCharCode(WIN1252[ch]);
+      else if (ch >= 160 && ch <= 255) out += s.charAt(i);
+      else if (ch > 255) {
+        var base = s.charAt(i).normalize("NFD").replace(/[̀-ͯ]/g, "");
+        out += (base && base.charCodeAt(0) < 127) ? base.charAt(0) : "?";
+      }
+    }
+    return out;
+  }
+  function glyphW(code, bold) {
+    if (code >= 32 && code < 127) return (bold ? HWB : HW)[code - 32];
+    if (code === 149) return 350;
+    if (code === 150 || code === 215) return code === 215 ? 584 : 556;
+    if (code === 151 || code === 133) return 1000;
+    if (code === 145 || code === 146) return bold ? 278 : 222;
+    if (code === 147 || code === 148) return bold ? 500 : 333;
+    if (code === 183) return bold ? 333 : 278;
+    return (code >= 192 && code <= 222) ? 667 : 556;
+  }
+  function textW(enc, size, bold) {
+    var w = 0;
+    for (var i = 0; i < enc.length; i++) w += glyphW(enc.charCodeAt(i), bold);
+    return w * size / 1000;
+  }
+  /* raw text in, wrapped WinAnsi lines out */
+  function wrapText(raw, size, bold, maxW) {
+    var words = pdfEnc(raw).split(" "), lines = [], cur = "";
+    function push(word) {
+      while (textW(word, size, bold) > maxW && word.length > 1) {
+        var cut = word.length - 1;
+        while (cut > 1 && textW(word.slice(0, cut), size, bold) > maxW) cut--;
+        lines.push(word.slice(0, cut)); word = word.slice(cut);
+      }
+      cur = word;
+    }
+    words.forEach(function (wd) {
+      if (!wd) return;
+      if (!cur) { push(wd); return; }
+      if (textW(cur + " " + wd, size, bold) <= maxW) cur += " " + wd;
+      else { lines.push(cur); cur = ""; push(wd); }
+    });
+    if (cur) lines.push(cur);
+    return lines.length ? lines : [""];
+  }
+
+  var PW = 792, PH = 612, PM = 36, PCW = PW - 2 * PM, TOP = 46, BOTTOM = PH - 40;
+  var PC = { ink: [.12, .12, .11], muted: [.33, .33, .30], faint: [.5, .5, .46], line: [.8, .8, .76],
+             head: [.95, .94, .91], selFill: [1, .95, .76], selLine: [.7, .52, .08], teal: [.06, .4, .35],
+             accent: [.5, .36, .04], rose: [.62, .3, .2], white: [1, 1, 1] };
+  function rgb(c) { return c[0].toFixed(3) + " " + c[1].toFixed(3) + " " + c[2].toFixed(3); }
+
+  function PdfDoc(title) { this.title = title; this.pages = []; this.ops = null; this.y = TOP; }
+  PdfDoc.prototype.newPage = function () {
+    this.ops = []; this.pages.push(this.ops); this.y = TOP;
+    this.text(PM, 24, pdfEnc("POL309 · Politics of the European Union · " + TERM.label), 7.5, false, PC.faint);
+    var d = pdfEnc("Grading rubrics · " + new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }));
+    this.text(PW - PM - textW(d, 7.5, false), 24, d, 7.5, false, PC.faint);
+    this.line(PM, 30, PW - PM, 30, PC.line, .5);
+  };
+  /* y is measured from the top of the page; enc is already WinAnsi */
+  PdfDoc.prototype.text = function (x, y, enc, size, bold, color) {
+    this.ops.push("BT /F" + (bold ? 2 : 1) + " " + size + " Tf " + rgb(color) + " rg " + x.toFixed(2) + " " + (PH - y).toFixed(2) +
+      " Td (" + enc.replace(/[\\()]/g, "\\$&") + ") Tj ET");
+  };
+  PdfDoc.prototype.rect = function (x, y, w, h, o) {
+    var op = o.fill && o.stroke ? "B" : (o.fill ? "f" : "S");
+    this.ops.push((o.fill ? rgb(o.fill) + " rg " : "") + (o.stroke ? rgb(o.stroke) + " RG " + (o.lw || .5) + " w " : "") +
+      x.toFixed(2) + " " + (PH - y - h).toFixed(2) + " " + w.toFixed(2) + " " + h.toFixed(2) + " re " + op);
+  };
+  PdfDoc.prototype.line = function (x1, y1, x2, y2, color, lw) {
+    this.ops.push(rgb(color) + " RG " + lw + " w " + x1.toFixed(2) + " " + (PH - y1).toFixed(2) + " m " + x2.toFixed(2) + " " + (PH - y2).toFixed(2) + " l S");
+  };
+  /* wrapped paragraph at the current y, breaking pages as needed */
+  PdfDoc.prototype.para = function (raw, size, bold, color, lh, x, width) {
+    var self = this;
+    wrapText(raw, size, bold, width || PCW).forEach(function (ln) {
+      if (self.y + lh > BOTTOM) self.newPage();
+      self.text(x || PM, self.y + size, ln, size, bold, color);
+      self.y += lh;
+    });
+  };
+  PdfDoc.prototype.build = function () {
+    var n = this.pages.length, self = this;
+    this.pages.forEach(function (ops, i) {
+      self.ops = ops;
+      self.text(PM, PH - 22, pdfEnc("For planning and self-assessment. Grades on Brightspace are authoritative, and the syllabus governs."), 7.5, false, PC.faint);
+      var p = pdfEnc("Page " + (i + 1) + " of " + n);
+      self.text(PW - PM - textW(p, 7.5, false), PH - 22, p, 7.5, false, PC.faint);
+    });
+    var objs = [null, "<< /Type /Catalog /Pages 2 0 R >>", null,
+      "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>",
+      "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>",
+      "<< /Title (" + pdfEnc(this.title).replace(/[\\()]/g, "\\$&") + ") /Producer (diegohernandezpolpsych.github.io) >>"];
+    var kids = [];
+    this.pages.forEach(function (ops, i) {
+      var pg = 6 + 2 * i, stream = ops.join("\n");
+      kids.push(pg + " 0 R");
+      objs[pg] = "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " + PW + " " + PH + "] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents " + (pg + 1) + " 0 R >>";
+      objs[pg + 1] = "<< /Length " + stream.length + " >>\nstream\n" + stream + "\nendstream";
+    });
+    objs[2] = "<< /Type /Pages /Kids [" + kids.join(" ") + "] /Count " + n + " >>";
+    var out = "%PDF-1.4\n%\xE2\xE3\xCF\xD3\n", offs = [];
+    for (var k = 1; k < objs.length; k++) { offs[k] = out.length; out += k + " 0 obj\n" + objs[k] + "\nendobj\n"; }
+    var xref = out.length;
+    out += "xref\n0 " + objs.length + "\n0000000000 65535 f \n";
+    for (k = 1; k < objs.length; k++) out += ("0000000000" + offs[k]).slice(-10) + " 00000 n \n";
+    out += "trailer\n<< /Size " + objs.length + " /Root 1 0 R /Info 5 0 R >>\nstartxref\n" + xref + "\n%%EOF";
+    var bytes = new Uint8Array(out.length);
+    for (var i = 0; i < out.length; i++) bytes[i] = out.charCodeAt(i) & 255;
+    return new Blob([bytes], { type: "application/pdf" });
+  };
+
+  /* one assignment: heading, the rubric grid with the selected level of
+     each criterion highlighted, the score summary, and the guide table */
+  function pdfAssignment(doc, a) {
+    var s = aState(a.id), w = WEIGHTS[a.id], k = w != null ? w / 100 : null;
+    var t = totals(a), n = a.criteria.length, done = t.scored === n;
+    var adj = Math.max(0, t.total - lateAmount * t.late);
+    var c0 = 150, lw = (PCW - c0) / 4, xs = [PM, PM + c0, PM + c0 + lw, PM + c0 + 2 * lw, PM + c0 + 3 * lw];
+    var PAD = 6;
+
+    doc.newPage();
+    doc.para(a.title, 15, true, PC.ink, 19);
+    doc.para((w != null ? w + "% of the course grade · " : "") + a.meta, 9.5, false, PC.muted, 13);
+    if (a.flag) doc.para(a.flag, 9, false, PC.rose, 12);
+    if (a.note) doc.para(a.note, 9, false, PC.muted, 12);
+    if (k != null) doc.para("Conversion: 1 rubric point = " + fmt(k) + " course-grade points · 100 rubric points = " + w, 8.5, false, PC.accent, 12);
+    doc.y += 8;
+
+    function gridHead() {
+      doc.rect(PM, doc.y, PCW, 16, { fill: PC.head, stroke: PC.line, lw: .5 });
+      ["Criterion"].concat(RUB.levels).forEach(function (l, i) {
+        doc.text(xs[i] + PAD, doc.y + 11, pdfEnc(l.toUpperCase()), 7, true, PC.faint);
+      });
+      doc.y += 16;
+    }
+    gridHead();
+
+    a.criteria.forEach(function (c) {
+      var v = s[c.id], li = v != null ? levelOf(c, v) : -1;
+      var nameL = wrapText(c.name, 9, true, c0 - 2 * PAD);
+      var maxL = wrapText(c.max + " points" + (c.note ? ", " + c.note : ""), 7.5, false, c0 - 2 * PAD);
+      var lvlL = v != null && li >= 0 ? wrapText(RUB.levels[li] + (k != null ? " · " + fmt(v * k) + " course pts" : ""), 7.5, false, c0 - 2 * PAD) : [];
+      var headH = nameL.length * 11 + maxL.length * 9.5 + (k != null ? 9.5 : 0) + 8 + 12 + lvlL.length * 9.5;
+      var cells = c.levels.map(function (lv, i) {
+        var lines = wrapText(lv.desc, 8, false, lw - 2 * PAD), sel = i === li;
+        return { lv: lv, lines: lines, sel: sel, h: (sel ? 9 : 0) + 11 + (k != null ? 10 : 0) + lines.length * 10 };
+      });
+      var h = Math.max.apply(null, [headH].concat(cells.map(function (x) { return x.h; }))) + 2 * PAD;
+
+      if (doc.y + h > BOTTOM) { doc.newPage(); gridHead(); }
+      var y0 = doc.y;
+      doc.rect(xs[0], y0, c0, h, { fill: PC.head, stroke: PC.line, lw: .5 });
+      var cy = y0 + PAD;
+      nameL.forEach(function (ln) { doc.text(xs[0] + PAD, cy + 9, ln, 9, true, PC.ink); cy += 11; });
+      maxL.forEach(function (ln) { doc.text(xs[0] + PAD, cy + 7.5, ln, 7.5, false, PC.faint); cy += 9.5; });
+      if (k != null) { doc.text(xs[0] + PAD, cy + 7.5, pdfEnc("worth up to " + fmt(c.max * k) + " course pts"), 7.5, false, PC.faint); cy += 9.5; }
+      cy += 8;
+      if (v != null) doc.text(xs[0] + PAD, cy + 9.5, pdfEnc("Score: " + v + " / " + c.max), 9.5, true, PC.teal);
+      else doc.text(xs[0] + PAD, cy + 9, pdfEnc("Not scored"), 9, false, PC.faint);
+      cy += 12;
+      lvlL.forEach(function (ln) { doc.text(xs[0] + PAD, cy + 7.5, ln, 7.5, false, PC.teal); cy += 9.5; });
+
+      cells.forEach(function (cell, i) {
+        var x = xs[i + 1];
+        doc.rect(x, y0, lw, h, { fill: cell.sel ? PC.selFill : null, stroke: PC.line, lw: .5 });
+        var yy = y0 + PAD;
+        if (cell.sel) { doc.text(x + PAD, yy + 6.5, pdfEnc("SELECTED"), 6.5, true, PC.selLine); yy += 9; }
+        doc.text(x + PAD, yy + 9, pdfEnc(range(cell.lv.min, cell.lv.max) + " pts"), 9, true, PC.ink); yy += 11;
+        if (k != null) { doc.text(x + PAD, yy + 7.5, pdfEnc("= " + range(fmt(cell.lv.min * k), fmt(cell.lv.max * k)) + " course pts"), 7.5, false, PC.accent); yy += 10; }
+        cell.lines.forEach(function (ln) { doc.text(x + PAD, yy + 8, ln, 8, false, cell.sel ? PC.ink : PC.muted); yy += 10; });
+      });
+      cells.forEach(function (cell, i) {
+        if (cell.sel) doc.rect(xs[i + 1] + .7, y0 + .7, lw - 1.4, h - 1.4, { stroke: PC.selLine, lw: 1.4 });
+      });
+      doc.y = y0 + h;
+    });
+
+    /* score summary */
+    doc.y += 14;
+    if (doc.y + 84 > BOTTOM) doc.newPage();
+    var sy = doc.y, half = PCW / 2;
+    doc.rect(PM, sy, PCW, 78, { fill: PC.white, stroke: PC.line, lw: .75 });
+    doc.text(PM + 14, sy + 17, pdfEnc("RUBRIC SCORE"), 7, true, PC.faint);
+    doc.text(PM + 14, sy + 42, t.scored ? pdfEnc(t.total + " / 100" + (done ? "  ·  " + letter(t.total) : "")) : pdfEnc("No criteria scored"), t.scored ? 20 : 11, true, PC.ink);
+    doc.text(PM + 14, sy + 60, pdfEnc(done ? "All " + n + " criteria scored." : t.scored + " of " + n + " criteria scored" + (t.scored ? " (partial total)." : ".")), 8.5, false, PC.muted);
+    doc.text(PM + half, sy + 17, pdfEnc("AFTER LATE PENALTY"), 7, true, PC.faint);
+    doc.text(PM + half, sy + 42, t.scored ? pdfEnc(adj + " / 100" + (done ? "  ·  " + letter(adj) : "")) : pdfEnc("-"), t.scored ? 20 : 11, true, PC.ink);
+    doc.text(PM + half, sy + 60, pdfEnc(t.late ? "Days late: " + t.late + " (-" + fmt(lateAmount * t.late) + " at " + lateAmount + " per day)" : "Days late: 0"), 8.5, false, PC.muted);
+    if (k != null && t.scored) doc.text(PM + half, sy + 71, pdfEnc("Worth " + fmt(adj * k) + " of " + w + " course-grade points."), 8.5, false, PC.muted);
+    doc.y = sy + 78;
+
+    if (a.guide && a.guide.length) {
+      doc.y += 20;
+      if (doc.y + 60 > BOTTOM) doc.newPage();
+      doc.para(a.guideTitle || "Guide", 11, true, PC.ink, 15);
+      doc.y += 4;
+      var gw = PCW - 170;
+      var rows = [{ head: true, a: ["OPTION"], b: ["WHAT A FULL-CREDIT PAPER COVERS"] }].concat(a.guide.map(function (g) {
+        return { a: wrapText(g.option, 8.5, true, 150), b: wrapText(g.covers, 8.5, false, gw) };
+      }));
+      rows.forEach(function (row) {
+        var size = row.head ? 7 : 8.5, lh = row.head ? 9 : 11;
+        var rh = Math.max(row.a.length, row.b.length) * lh + 10;
+        if (doc.y + rh > BOTTOM) doc.newPage();
+        row.a.forEach(function (ln, i) { doc.text(PM, doc.y + 6 + size + i * lh, ln, size, true, row.head ? PC.faint : PC.ink); });
+        row.b.forEach(function (ln, i) { doc.text(PM + 170, doc.y + 6 + size + i * lh, ln, size, !!row.head, row.head ? PC.faint : PC.muted); });
+        doc.line(PM, doc.y + rh, PW - PM, doc.y + rh, row.head ? PC.faint : PC.line, .5);
+        doc.y += rh;
+      });
+    }
+  }
+
+  function exportPdf(list) {
+    var msg = document.getElementById("sentMsg");
+    try {
+      var one = list.length === 1;
+      var doc = new PdfDoc("POL309 " + TERM.label + " grading rubric" + (one ? ": " + list[0].short : "s"));
+      list.forEach(function (a) { pdfAssignment(doc, a); });
+      var name = ["POL309", TERM.label, one ? list[0].short : "all", "rubric" + (one ? "" : "s")].join("-").replace(/\s+/g, "").replace(/[^A-Za-z0-9._-]/g, "") + ".pdf";
+      var url = URL.createObjectURL(doc.build());
+      var link = document.createElement("a");
+      link.href = url; link.download = name;
+      document.body.appendChild(link); link.click();
+      setTimeout(function () { link.remove(); URL.revokeObjectURL(url); }, 1500);
+      msg.textContent = "Downloaded " + name + ".";
+    } catch (e) {
+      msg.textContent = "Couldn't create the PDF in this browser.";
+    }
   }
 
   function select(id, pushHash) {
