@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>POL309 · Check In</title>
+<meta name="description" content="Class attendance check-in for POL309." />
+<meta name="robots" content="noindex" />
+<meta name="referrer" content="no-referrer" />
+<link rel="icon" href="favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&family=Hanken+Grotesk:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
+
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved === "light" || saved === "dark") {
+        document.documentElement.setAttribute("data-theme", saved);
+      }
+    } catch (e) {}
+  })();
+</script>
+
+<style>
+/* palette + fonts come from the shared tokens.css */
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.55;
+  min-height: 100vh; min-height: 100dvh;
+  display: flex; align-items: center; justify-content: center; padding: 24px 16px;
+}
+.card {
+  width: 100%; max-width: 400px; border: 1px solid var(--line-strong); background: var(--surface);
+  padding: 30px 24px 26px; position: relative; text-align: center;
+}
+.card::before, .card::after { content: ""; position: absolute; width: 18px; height: 18px; border: 2px solid var(--gold); }
+.card::before { top: -5px; left: -5px; border-right: 0; border-bottom: 0; }
+.card::after { bottom: -5px; right: -5px; border-left: 0; border-top: 0; }
+
+.eyebrow {
+  font-family: var(--font-mono); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--rose); display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 0 14px;
+}
+.triad { display: inline-flex; gap: 4px; }
+.triad span { width: 7px; height: 7px; background: var(--rose); }
+.triad span:nth-child(2) { background: transparent; border: 1.5px solid var(--rose); }
+h1 { font-family: var(--font-display); font-weight: 500; font-size: 1.7rem; line-height: 1.2; margin: 0 0 6px; text-wrap: balance; }
+p { color: var(--muted); margin: 0 0 20px; text-wrap: pretty; }
+
+input {
+  width: 100%; font-family: var(--font-mono); font-size: 2.1rem; letter-spacing: .4em; text-indent: .4em;
+  text-align: center; padding: 12px 8px; color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line-strong); border-radius: 0; font-variant-numeric: tabular-nums;
+}
+input:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+input::placeholder { color: var(--line-strong); }
+button {
+  width: 100%; margin-top: 14px; font: inherit; font-weight: 600; font-size: 1.05rem; padding: 14px;
+  border: 0; background: var(--accent); color: var(--bg); cursor: pointer;
+  transition: background var(--duration-quick) var(--ease-out), opacity var(--duration-quick) var(--ease-out);
+}
+button:hover { background: var(--accent-strong); }
+button:disabled { opacity: .55; cursor: default; }
+.error { color: var(--rose); min-height: 1.6em; margin: 12px 0 0; font-size: .95rem; }
+
+.check {
+  width: 64px; height: 64px; margin: 0 auto 14px; color: var(--teal);
+  animation: pop var(--duration-very-slow) var(--ease-bounce) both;
+}
+@keyframes pop { from { opacity: 0; transform: scale(.6); filter: blur(var(--blur-medium)); } }
+.stamp { font-family: var(--font-mono); color: var(--ink); }
+
+.spinner {
+  width: 26px; height: 26px; margin: 6px auto 16px; border: 2px solid var(--line-strong);
+  border-top-color: var(--gold); border-radius: 50%; animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .check, .spinner { animation: none; } }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="eyebrow"><span class="triad"><span></span><span></span><span></span></span>POL309 · Attendance</div>
+
+  <section id="loading">
+    <div class="spinner" aria-hidden="true"></div>
+    <h1>Checking your code…</h1>
+  </section>
+
+  <section id="form" hidden>
+    <h1>Check in</h1>
+    <p>Enter the last 5 digits of your student ID.</p>
+    <form id="f" autocomplete="off" novalidate>
+      <input id="digits" inputmode="numeric" maxlength="5" placeholder="•••••" autocomplete="off"
+             aria-label="Last 5 digits of student ID" aria-describedby="error" />
+      <button id="submit" type="submit">Check in</button>
+    </form>
+    <p id="error" class="error" role="alert"></p>
+  </section>
+
+  <section id="done" hidden>
+    <svg class="check" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="32" cy="32" r="29" /><path d="M20 33l8 8 16-17" />
+    </svg>
+    <h1 id="doneText"></h1>
+    <p>Recorded at <span class="stamp" id="doneTime"></span>. You can close this page.</p>
+  </section>
+
+  <section id="info" hidden>
+    <h1 id="infoTitle"></h1>
+    <p id="infoText"></p>
+  </section>
+</main>
+
+<script>
+  /* The PUBLIC web app URL of the attendance Apps Script (access: Anyone, ends in /exec).
+     Names never come through here: the script only answers "checked in" or an error. */
+  var API_URL = "https://script.google.com/macros/s/AKfycbyDWlzkG_k4DQlShVjMoex7GGoAekJzCt-bEzY4qQS_k2M0tiXv3bTDEDt2x48uvZn5uQ/exec";
+
+  var MESSAGES = {
+    closed:  ["Check-in is closed", "Check-in hasn’t started yet, or it has already ended."],
+    scan:    ["Scan the QR code", "Use your phone camera to scan the code on the classroom screen."],
+    expired: ["That code expired", "The code on screen changes every few seconds. Scan the current one."],
+    error:   ["Couldn’t connect", "Check your internet connection, then scan the QR code again."]
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var ticket = "";
+
+  function show(id) {
+    ["loading", "form", "done", "info"].forEach(function (s) { $(s).hidden = s !== id; });
+  }
+  function info(state) {
+    var m = MESSAGES[state] || MESSAGES.scan;
+    $("infoTitle").textContent = m[0];
+    $("infoText").textContent = m[1];
+    show("info");
+  }
+  function deviceId() {
+    try {
+      var id = localStorage.getItem("attendance-device");
+      if (!id) {
+        id = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+        localStorage.setItem("attendance-device", id);
+      }
+      return id;
+    } catch (e) {
+      return "";
+    }
+  }
+
+  // Take the one-time code out of the address bar so it can't be bookmarked or re-shared.
+  var token = new URLSearchParams(location.search).get("t") || "";
+  if (token) history.replaceState(null, "", location.pathname);
+
+  if (!token) {
+    info("scan");
+  } else {
+    fetch(API_URL + "?action=scan&t=" + encodeURIComponent(token))
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (res.state !== "ready") return info(res.state);
+        ticket = res.ticket;
+        show("form");
+        $("digits").focus();
+      })
+      .catch(function () { info("error"); });
+  }
+
+  var input = $("digits");
+  input.addEventListener("input", function () {
+    input.value = input.value.replace(/\D/g, "").slice(0, 5);
+  });
+
+  $("f").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var error = $("error"), button = $("submit");
+    if (!/^\d{5}$/.test(input.value)) { error.textContent = "Enter exactly 5 digits."; return; }
+    button.disabled = true;
+    error.textContent = "";
+    // A plain-text body keeps this a "simple" request, so the browser skips the CORS preflight Apps Script can't answer.
+    fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ ticket: ticket, digits: input.value, device: deviceId() })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (r) {
+        button.disabled = false;
+        if (r.ok) {
+          $("doneText").textContent = r.message;
+          $("doneTime").textContent = new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+          show("done");
+        } else if (r.rescan) {
+          info("expired");
+        } else {
+          error.textContent = r.message;
+        }
+      })
+      .catch(function () {
+        button.disabled = false;
+        error.textContent = "Couldn’t reach the server. Try again.";
+      });
+  });
+</script>
+</body>
+</html>
