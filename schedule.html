@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Schedule a Meeting · Diego Hernandez</title>
+<meta name="description" content="Book office hours or a meeting with Diego Hernandez." />
+<link rel="icon" href="favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
+
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved === "light" || saved === "dark") {
+        document.documentElement.setAttribute("data-theme", saved);
+      }
+    } catch (e) {}
+  })();
+</script>
+
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.5;
+  transition: background .4s var(--ease), color .4s var(--ease);
+}
+.wrap { max-width: 980px; margin: 0 auto; padding: 40px 22px 60px; }
+.topline { display: flex; justify-content: space-between; align-items: center; }
+.back { color: var(--faint); text-decoration: none; font-size: .85rem; }
+.back:hover { color: var(--accent); }
+.theme-btn { background: transparent; border: 1px solid var(--line-strong); color: var(--ink); border-radius: 100px; padding: 5px 13px; cursor: pointer; font: inherit; font-size: .8rem; }
+.eyebrow { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--plum); display: flex; align-items: center; gap: 10px; margin: 34px 0 8px; }
+.triad { display: inline-flex; gap: 4px; }
+.triad span { width: 7px; height: 7px; background: var(--plum); }
+.triad span:nth-child(2) { background: transparent; border: 1.5px solid var(--plum); }
+h1 { font-family: var(--font-display); font-weight: 500; font-size: 2rem; margin: 0 0 4px; }
+.sub { color: var(--muted); margin: 0 0 26px; max-width: 60ch; }
+.frame {
+  border: 1px solid var(--line-strong); border-radius: 12px;
+  background: var(--surface); box-shadow: var(--shadow); overflow: hidden;
+}
+.frame iframe { display: block; width: 100%; height: 720px; border: 0; }
+.fallback { padding: 40px 28px; color: var(--muted); }
+.fallback a { color: var(--accent); }
+.alt { margin-top: 18px; color: var(--faint); font-size: .88rem; }
+.alt a { color: var(--accent); }
+@media (max-width: 640px) { .frame iframe { height: 780px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topline">
+    <a class="back" href="index.html#contact">&larr; diegohernandezpolpsych.github.io</a>
+    <button class="theme-btn" id="themeBtn" type="button">Theme</button>
+  </div>
+
+  <p class="eyebrow"><span class="triad"><span></span><span></span><span></span></span> Contact</p>
+  <h1>Schedule a meeting</h1>
+  <p class="sub">Pick a time that works for you. You will get a calendar invite and a confirmation email.</p>
+
+  <div class="frame" id="frame">
+    <div class="fallback" id="fallback" hidden>
+      Online booking is not live yet. Please <a href="mailto:diego.hernandez@stonybrook.edu">email me</a> to set up a time.
+    </div>
+  </div>
+
+  <p class="alt">Prefer email? <a href="mailto:diego.hernandez@stonybrook.edu">diego.hernandez@stonybrook.edu</a></p>
+</div>
+
+<script>
+  /* EDIT: the one place the booking link lives. Set to your Cal.diy
+     page once it is deployed, e.g. "https://cal.example.com/diego". */
+  var BOOKING_URL = "";
+
+  var root = document.documentElement;
+  var frame = document.getElementById("frame");
+
+  function currentTheme() { return root.getAttribute("data-theme") === "light" ? "light" : "dark"; }
+
+  function mountFrame() {
+    var old = frame.querySelector("iframe");
+    if (!BOOKING_URL) { document.getElementById("fallback").hidden = false; return; }
+    var f = document.createElement("iframe");
+    f.title = "Booking calendar";
+    f.loading = "lazy";
+    f.src = BOOKING_URL + (BOOKING_URL.indexOf("?") > -1 ? "&" : "?") + "theme=" + currentTheme();
+    if (old) old.replaceWith(f); else frame.appendChild(f);
+  }
+
+  document.getElementById("themeBtn").onclick = function () {
+    var next = currentTheme() === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("theme", next); } catch (e) {}
+    mountFrame();
+  };
+
+  mountFrame();
+</script>
+</body>
+</html>
